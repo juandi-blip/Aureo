@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUREO · Control & Logística de Ferretería Industrial</title>
+    <meta name="description"
+        content="Sistema inteligente de optimización logística, inventarios ABC y facturación para ferretería y suministros pesados de alta gama.">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Ambient Backdrop Glows -->
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="brand-section">
+            <div class="brand-logo-container">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#1B2230" stroke-width="1.9" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="12" cy="11" r="5.1" />
+                    <ellipse cx="12" cy="11" rx="10.6" ry="3.5" transform="rotate(-24 12 11)" />
+                </svg>
+            </div>
+            <span class="brand-title">AUREO</span>
+        </div>
+        <nav>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('dataentry')" id="nav-dataentry">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <ellipse cx="12" cy="5" rx="9" ry="3" />
+                            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                        </svg>
+                        <span>Ingreso de Datos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" onclick="switchTab('dashboard')" id="nav-dashboard">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="7" height="9" rx="1" />
+                            <rect x="14" y="3" width="7" height="5" rx="1" />
+                            <rect x="14" y="12" width="7" height="9" rx="1" />
+                            <rect x="3" y="16" width="7" height="5" rx="1" />
+                        </svg>
+                        <span>Dashboard Operativo</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('inventory')" id="nav-inventory">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                        </svg>
+                        <span>Inventario / Catálogo</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('invoicing')" id="nav-invoicing">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="4" width="20" height="16" rx="2" />
+                            <line x1="12" y1="4" x2="12" y2="20" />
+                            <line x1="2" y1="12" x2="22" y2="12" />
+                        </svg>
+                        <span>Terminal Punto de Venta</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('logistics')" id="nav-logistics">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                            <line x1="12" y1="22.08" x2="12" y2="12" />
+                        </svg>
+                        <span>Optimización WMS</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('picking')" id="nav-picking">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 11l3 3L22 4" />
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                        </svg>
+                        <span>Preparación de Pedidos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('settings')" id="nav-settings">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="4" y1="21" x2="4" y2="14" />
+                            <line x1="4" y1="10" x2="4" y2="3" />
+                            <line x1="12" y1="21" x2="12" y2="12" />
+                            <line x1="12" y1="8" x2="12" y2="3" />
+                            <line x1="20" y1="21" x2="20" y2="16" />
+                            <line x1="20" y1="12" x2="20" y2="3" />
+                            <line x1="1" y1="14" x2="7" y2="14" />
+                            <line x1="9" y1="8" x2="15" y2="8" />
+                            <line x1="17" y1="16" x2="23" y2="16" />
+                        </svg>
+                        <span>Ajustes Técnicos</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="avatar"
+                    style="display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 600; font-size: 1rem; color: var(--accent-gold-soft);"
+                    id="brand-avatar-box">AU</div>
+                <div class="user-info">
+                    <div class="user-name" id="profile-company-name">Aureo S.A.</div>
+                    <div class="user-role" id="profile-company-license">Operador Master · Heavy Enterprise</div>
+                </div>
+            </div>
+
+            <!-- Sesión activa + Cerrar sesión -->
+            <div class="session-bar">
+                <div class="session-user">
+                    <span class="session-user-name" id="session-username">—</span>
+                    <span class="session-user-role" id="session-userrole">—</span>
+                </div>
+                <button class="logout-btn" id="logout-btn" onclick="vulcanLogout()" title="Cerrar sesión">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="page-title-section">
+                <h1 id="header-view-title">Dashboard Operativo</h1>
+                <p id="header-view-desc">Análisis general y rendimiento de inventario en tiempo real.</p>
+            </div>
+            <div class="header-actions">
+                <div class="date-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                    <span id="current-date-display">Cargando fecha...</span>
+                </div>
+                <div class="notifications-btn"
+                    onclick="triggerToast('notif', 'Todas las existencias están sincronizadas correctamente con el depósito.')">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                    </svg>
+                    <div class="notification-dot"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD VIEW -->
+        <section class="page-container active" id="dashboard-view">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="card stat-card stat-gold">
+                    <div class="stat-header">
+                        <span class="stat-title">Ingresos Totales</span>
+                        <div class="stat-icon-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="1" x2="12" y2="23" />
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="stat-revenue">$0.00</div>
+                    <div class="stat-meta">
+                        <span class="stat-trend up" id="stat-revenue-trend">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2"
+                                fill="none">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg>
+                            +12.4%
+                        </span>
+                        <span class="stat-period">vs mes anterior</span>
+                    </div>
+                </div>
+                <div class="card stat-card stat-emerald">
+                    <div class="stat-header">
+                        <span class="stat-title">Órdenes Emitidas</span>
+                        <div class="stat-icon-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="stat-invoice-count">0</div>
+                    <div class="stat-meta">
+                        <span class="stat-trend up" id="stat-invoice-trend">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2"
+                                fill="none">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg>
+                            +8.1%
+                        </span>
+                        <span class="stat-period">este mes</span>
+                    </div>
+                </div>
+                <div class="card stat-card stat-cyan">
+                    <div class="stat-header">
+                        <span class="stat-title">Artículos en Inventario</span>
+                        <div class="stat-icon-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <path
+                                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="stat-total-stock">0</div>
+                    <div class="stat-meta">
+                        <span class="stat-trend neutral">Sincronizado</span>
+                        <span class="stat-period">en 5 categorías</span>
+                    </div>
+                </div>
+                <div class="card stat-card stat-rose">
+                    <div class="stat-header">
+                        <span class="stat-title">Alertas Críticas</span>
+                        <div class="stat-icon-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                <line x1="12" y1="9" x2="12" y2="13" />
+                                <line x1="12" y1="17" x2="12.01" y2="17" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="stat-alerts">0</div>
+                    <div class="stat-meta">
+                        <span class="stat-trend down" id="stat-alerts-severity">Stock Bajo</span>
+                        <span class="stat-period">requieren reposición</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Dashboard Panels -->
+            <div class="dashboard-main-grid">
+                <!-- Trend Analysis Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                                <polyline points="17 6 23 6 23 12" />
+                            </svg>
+                            Curva de Facturación Semanal
+                        </h2>
+                        <span class="badge badge-info" id="chart-legend-date">Semana Actual</span>
+                    </div>
+
+                    <!-- SVG Interactive Chart Mockup -->
+                    <div class="chart-container">
+                        <svg class="chart-svg" id="dashboard-trend-svg" viewBox="0 0 500 220">
+                            <!-- Grids -->
+                            <line class="chart-grid-line" x1="40" y1="20" x2="480" y2="20" />
+                            <line class="chart-grid-line" x1="40" y1="70" x2="480" y2="70" />
+                            <line class="chart-grid-line" x1="40" y1="120" x2="480" y2="120" />
+                            <line class="chart-grid-line" x1="40" y1="170" x2="480" y2="170" />
+
+                            <!-- Gradients -->
+                            <defs>
+                                <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#7BA3D0" />
+                                    <stop offset="100%" stop-color="#2E4A6E" />
+                                </linearGradient>
+                                <linearGradient id="chart-fill-gradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#2E4A6E" stop-opacity="0.22" />
+                                    <stop offset="100%" stop-color="#2E4A6E" stop-opacity="0" />
+                                </linearGradient>
+                            </defs>
+
+                            <!-- Fill Area -->
+                            <path class="chart-fill" d="M 40 170 Q 110 130, 180 80 T 320 90 T 460 30 L 460 170 Z"
+                                id="chart-area-path" />
+
+                            <!-- Glow Line -->
+                            <path class="chart-path-glow" d="M 40 170 Q 110 130, 180 80 T 320 90 T 460 30"
+                                id="chart-glow-path" />
+
+                            <!-- Main Line -->
+                            <path class="chart-path-main" d="M 40 170 Q 110 130, 180 80 T 320 90 T 460 30"
+                                id="chart-main-path" />
+
+                            <!-- Dots for points -->
+                            <circle class="chart-dot" cx="40" cy="170" r="5" data-val="1200"
+                                onclick="showChartValue(this, 'Lunes', '$1,200')" />
+                            <circle class="chart-dot" cx="110" cy="140" r="5" data-val="2500"
+                                onclick="showChartValue(this, 'Martes', '$2,500')" />
+                            <circle class="chart-dot" cx="180" cy="80" r="5" data-val="5200"
+                                onclick="showChartValue(this, 'Miércoles', '$5,200')" />
+                            <circle class="chart-dot" cx="250" cy="110" r="5" data-val="4100"
+                                onclick="showChartValue(this, 'Jueves', '$4,100')" />
+                            <circle class="chart-dot" cx="320" cy="90" r="5" data-val="4800"
+                                onclick="showChartValue(this, 'Viernes', '$4,800')" />
+                            <circle class="chart-dot" cx="390" cy="50" r="5" data-val="7100"
+                                onclick="showChartValue(this, 'Sábado', '$7,100')" />
+                            <circle class="chart-dot" cx="460" cy="30" r="5" data-val="8400"
+                                onclick="showChartValue(this, 'Domingo', '$8,400')" />
+                            <!-- X Axis Labels -->
+                            <text x="40" y="195" fill="#9C907E" font-size="10" text-anchor="middle">Lun</text>
+                            <text x="110" y="195" fill="#9C907E" font-size="10" text-anchor="middle">Mar</text>
+                            <text x="180" y="195" fill="#9C907E" font-size="10" text-anchor="middle">Mie</text>
+                            <text x="250" y="195" fill="#9C907E" font-size="10" text-anchor="middle">Jue</text>
+                            <text x="320" y="195" fill="#9C907E" font-size="10" text-anchor="middle">Vie</text>
+                            <text x="390" y="195" fill="#9C907E" font-size="10" text-anchor="middle">Sab</text>
+                            <text x="460" y="195" fill="#9C907E" font-size="10" text-anchor="middle">Dom</text>
+                        </svg>
+
+                        <!-- Mini interactive tooltip -->
+                        <div id="chart-tooltip"
+                            style="position: absolute; display: none; background: #FFFFFF; border: 1px solid var(--border-accent); padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; pointer-events: none; box-shadow: var(--shadow-md); z-index: 10;">
+                            <span id="tooltip-day" style="font-weight: 600; color: var(--text-primary);"></span>:
+                            <span id="tooltip-val"
+                                style="color: var(--accent-gold-strong); font-weight:700; font-family: var(--font-mono);"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Invoices Sidebar -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            Últimas Transacciones
+                        </h2>
+                        <a onclick="switchTab('invoicing')" class="btn btn-secondary btn-sm">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            Nueva Venta
+                        </a>
+                    </div>
+                    <div class="activity-list" id="dashboard-recent-invoices">
+                        <!-- Loaded dynamically from app.js -->
+                        <div style="text-align: center; color: var(--text-muted); padding: 2rem;">No hay registros de
+                            transacciones disponibles.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Occupancy indices (rendered dynamically) -->
+            <div id="dashboard-occupancy-section" style="margin-top:2rem;"></div>
+
+            <!-- Freshness indicator (rendered dynamically) -->
+            <div id="dashboard-freshness-section" style="margin-top:2rem;"></div>
+
+        </section>
+
+        <!-- INVENTORY VIEW -->
+        <section class="page-container" id="inventory-view">
+            <div class="card">
+                <!-- Search, Filter & Actions Controls -->
+                <div class="table-controls">
+                    <div class="search-filter-group">
+                        <div class="input-wrapper" style="flex: 1;">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <input type="text" class="form-input" id="inventory-search"
+                                placeholder="Buscar por herramienta, SKU o especificación..."
+                                oninput="filterInventory()">
+                        </div>
+                        <div style="width: 220px;">
+                            <select class="form-select" id="inventory-category-filter" onchange="filterInventory()">
+                                <option value="all">Todas las Categorías</option>
+                                <option value="Herramientas Eléctricas">Herramientas Eléctricas</option>
+                                <option value="Herramientas Manuales">Herramientas Manuales</option>
+                                <option value="Consumibles">Consumibles y EPP</option>
+                                <option value="Fijaciones">Fijaciones y Anclajes</option>
+                                <option value="Maquinaria Pesada">Maquinaria Pesada</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-shrink: 0;">
+                        <button class="btn btn-primary" onclick="openProductModal()">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5"
+                                fill="none" style="margin-right: 0.25rem;">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            Ingresar Mercancía
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Products Table -->
+                <div class="table-responsive">
+                    <table class="custom-table" id="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Artículo</th>
+                                <th>Lote / N°</th>
+                                <th>Categoría</th>
+                                <th style="text-align: right;">Precio Unitario</th>
+                                <th style="width: 140px;">Existencias (Stock)</th>
+                                <th>Fechas (Fab / Rec)</th>
+                                <th>Garantía / Calibración</th>
+                                <th>Estado</th>
+                                <th style="text-align: right;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body">
+                            <!-- Populated dynamically from app.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- INVOICING VIEW -->
+        <section class="page-container" id="invoicing-view">
+            <div class="invoice-split-layout">
+                <!-- Left panel: Invoice construction controls -->
+                <div class="card">
+                    <div class="card-header"
+                        style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem;">
+                        <h2 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                            </svg>
+                            Generador de Comprobantes
+                        </h2>
+                    </div>
+
+                    <!-- Client selection -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="invoice-client-name">Cliente / Razón Social</label>
+                            <div class="input-wrapper">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                    <circle cx="12" cy="7" r="4" />
+                                </svg>
+                                <input type="text" class="form-input" id="invoice-client-name" value="Juan Díaz"
+                                    oninput="updateInvoicePreview()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="invoice-client-id">R.U.T / Identificación Fiscal</label>
+                            <div class="input-wrapper">
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="3" y="4" width="18" height="16" rx="2" ry="2" />
+                                    <line x1="7" y1="8" x2="17" y2="8" />
+                                    <line x1="7" y1="12" x2="17" y2="12" />
+                                    <line x1="7" y1="16" x2="13" y2="16" />
+                                </svg>
+                                <input type="text" class="form-input" id="invoice-client-id" value="RUT-12.845.922-K"
+                                    oninput="updateInvoicePreview()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add product line controls -->
+                    <div class="form-group"
+                        style="background: rgba(46, 74, 110, 0.04); border: 1px solid var(--border-accent); padding: 1.5rem; border-radius: var(--radius-md); margin-top: 1rem; margin-bottom: 2rem;">
+                        <span class="form-label"
+                            style="font-weight: 700; color: var(--accent-gold); margin-bottom: 1.15rem; display: block; letter-spacing: 0.5px;">Agregar
+                            Artículos al Detalle</span>
+                        <div class="form-row"
+                            style="grid-template-columns: 2fr 1fr auto; align-items: end; gap: 1.25rem;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label" for="invoice-product-selector">Seleccionar Artículo</label>
+                                <select class="form-select" id="invoice-product-selector">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label" for="invoice-product-qty">Cantidad</label>
+                                <input type="number" class="form-input" id="invoice-product-qty" value="1" min="1">
+                            </div>
+                            <div>
+                                <button class="btn btn-primary" onclick="addInvoiceItem()" style="height: 48px;">
+                                    Agregar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Selected items grid table -->
+                    <h3 class="form-label" style="font-weight: 700; margin-bottom: 1rem; letter-spacing: 0.5px;">Detalle
+                        de la Transacción</h3>
+                    <table class="item-selection-table">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left;">Artículo</th>
+                                <th style="width: 90px; text-align: center;">Cantidad</th>
+                                <th style="text-align: right; width: 110px;">Unitario</th>
+                                <th style="text-align: right; width: 110px;">Total</th>
+                                <th style="width: 50px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoice-builder-items">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+
+                    <!-- Additional details (Taxes & Discounts) -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="invoice-discount">Descuento (%)</label>
+                            <select class="form-select" id="invoice-discount" onchange="calculateInvoiceTotals()">
+                                <option value="0">Sin Descuento (0%)</option>
+                                <option value="5">Descuento Especial (5%)</option>
+                                <option value="10">Descuento Corporativo (10%)</option>
+                                <option value="15">Descuento V.I.P (15%)</option>
+                                <option value="20">Liquidación Ferretera (20%)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="invoice-tax-rate">Impuesto Aplicable (IVA)</label>
+                            <select class="form-select" id="invoice-tax-rate" onchange="calculateInvoiceTotals()">
+                                <option value="19">IVA General (19%)</option>
+                                <option value="10">IVA Reducido (10%)</option>
+                                <option value="0">Exento de Impuesto (0%)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right panel: Interactive Live Receipt Preview -->
+                <div class="invoice-preview-card">
+                    <!-- Ticket Header -->
+                    <div class="invoice-preview-header">
+                        <div class="invoice-header-top">
+                            <div>
+                                <span class="brand-title"
+                                    style="font-size: 1.65rem; display: block; margin-bottom: 4px;">AUREO</span>
+                                <span
+                                    style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-family: var(--font-ui); font-weight: 700;"
+                                    id="invoice-corp-sub">Suministros de Acero e Ingeniería</span>
+                            </div>
+                            <div class="invoice-meta">
+                                <span class="invoice-number-label">Boleta de Suministro</span>
+                                <div class="invoice-number" id="preview-invoice-number">FACT-2026-0001</div>
+                                <div class="invoice-date" id="preview-invoice-date">31/05/2026</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ticket Body -->
+                    <div class="invoice-preview-body">
+                        <!-- Client summary card inside receipt -->
+                        <div class="invoice-client-summary">
+                            <div class="client-summary-title">Cliente / Despacho</div>
+                            <div class="client-summary-name" id="preview-client-name">Juan Díaz</div>
+                            <div class="client-summary-details" id="preview-client-id">RUT-12.845.922-K</div>
+                        </div>
+
+                        <!-- Items list inside receipt -->
+                        <div class="invoice-items-summary" id="preview-items-list">
+                            <!-- Rendered dynamically -->
+                        </div>
+
+                        <!-- Grand totals inside receipt -->
+                        <div class="invoice-totals-section">
+                            <div class="totals-row">
+                                <span>Subtotal Neto</span>
+                                <span id="preview-subtotal">$0.00</span>
+                            </div>
+                            <div class="totals-row">
+                                <span id="preview-discount-label">Descuento (0%)</span>
+                                <span id="preview-discount-val">-$0.00</span>
+                            </div>
+                            <div class="totals-row">
+                                <span id="preview-tax-label">I.V.A (19%)</span>
+                                <span id="preview-tax-val">$0.00</span>
+                            </div>
+                            <div class="totals-row grand-total">
+                                <span>TOTAL A COBRAR</span>
+                                <span class="totals-value" id="preview-grand-total">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Receipt Actions Footer -->
+                    <div class="invoice-preview-footer">
+                        <button class="btn btn-secondary" onclick="window.print();" style="flex: 1;">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"
+                                fill="none" style="margin-right: 0.25rem;">
+                                <polyline points="6 9 6 2 18 2 18 9" />
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                                <rect x="6" y="14" width="12" height="8" />
+                            </svg>
+                            Imprimir
+                        </button>
+                        <button class="btn btn-success" onclick="commitInvoiceTransaction()" style="flex: 1.5;">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2"
+                                fill="none" style="margin-right: 0.25rem;">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg>
+                            Despachar y Cobrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LOGISTICS ABC OPTIMIZATION VIEW -->
+        <section class="page-container" id="logistics-view">
+            <!-- Controls, Filters and Exports Row -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="table-controls" style="margin-bottom: 0; flex-wrap: wrap; gap: 1rem;">
+                    <div class="search-filter-group"
+                        style="max-width: 100%; flex-wrap: wrap; align-items: flex-end; gap: 1rem;">
+                        <div style="flex: 1; min-width: 145px;">
+                            <label class="form-label" style="margin-bottom: 0.4rem; font-size: 0.8rem;">Rango del
+                                Análisis</label>
+                            <select class="form-select" id="abc-period" onchange="renderABCView()"
+                                style="padding: 0.6rem 0.95rem;">
+                                <option value="mensual">Mensual (30 días)</option>
+                                <option value="semanal">Semanal (7 días)</option>
+                                <option value="trimestral">Trimestral (90 días)</option>
+                                <option value="anual">Anual (365 días)</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1; min-width: 185px;">
+                            <label class="form-label" style="margin-bottom: 0.4rem; font-size: 0.8rem;">Filtrar por
+                                Depósito</label>
+                            <select class="form-select" id="abc-warehouse" onchange="renderABCView()"
+                                style="padding: 0.6rem 0.95rem;">
+                                <option value="all">Todos los Depósitos</option>
+                                <option value="Bodega Principal">Patio de Carga Principal</option>
+                                <option value="Bodega Secundaria">Nave de Acoplamiento B</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1; min-width: 185px;">
+                            <label class="form-label"
+                                style="margin-bottom: 0.4rem; font-size: 0.8rem;">Categoría</label>
+                            <select class="form-select" id="abc-category" onchange="renderABCView()"
+                                style="padding: 0.6rem 0.95rem;">
+                                <option value="all">Todas las Categorías</option>
+                                <option value="Herramientas Eléctricas">Herramientas Eléctricas</option>
+                                <option value="Herramientas Manuales">Herramientas Manuales</option>
+                                <option value="Consumibles">Consumibles y EPP</option>
+                                <option value="Fijaciones">Fijaciones y Anclajes</option>
+                                <option value="Maquinaria Pesada">Maquinaria Pesada</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem; align-self: flex-end; flex-shrink: 0; flex-wrap: wrap;">
+                        <button class="btn btn-secondary btn-sm" onclick="exportToCSV()" style="height: 42px;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5"
+                                fill="none" style="margin-right: 0.25rem;">
+                                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" />
+                                <line x1="9" y1="15" x2="15" y2="15" />
+                                <line x1="12" y1="12" x2="12" y2="18" />
+                            </svg>
+                            Exportar Reporte
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="window.print()" style="height: 42px;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5"
+                                fill="none" style="margin-right: 0.25rem;">
+                                <polyline points="6 9 6 2 18 2 18 9" />
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                                <rect x="6" y="14" width="12" height="8" />
+                            </svg>
+                            Imprimir Planilla
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABC Stats Grid -->
+            <div class="stats-grid">
+                <div class="card stat-card stat-emerald">
+                    <div class="stat-header">
+                        <span class="stat-title">Rotación A (Crítico 80%)</span>
+                        <div class="stat-icon-wrapper"
+                            style="background: rgba(0, 255, 135, 0.08); border: 1px solid rgba(0, 255, 135, 0.15); color: var(--accent-emerald); font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.15rem;">
+                            A
+                        </div>
+                    </div>
+                    <div class="stat-value" id="abc-count-a">0</div>
+                    <div class="stat-meta">
+                        <span class="stat-trend up" id="abc-pct-a">0.0%</span>
+                        <span class="stat-period">participación en ventas</span>
+                    </div>
+                </div>
+
+                <div class="card stat-card stat-cyan">
+                    <div class="stat-header">
+                        <span class="stat-title">Rotación B (Medio 15%)</span>
+                        <div class="stat-icon-wrapper"
+                            style="background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.15); color: var(--accent-cyan); font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.15rem;">
+                            B
+                        </div>
+                    </div>
+                    <div class="stat-value" id="abc-count-b">0</div>
+                    <div class="stat-meta">
+                        <span class="stat-trend neutral" id="abc-pct-b">0.0%</span>
+                        <span class="stat-period">participación en ventas</span>
+                    </div>
+                </div>
+
+                <div class="card stat-card stat-rose">
+                    <div class="stat-header">
+                        <span class="stat-title">Rotación C (Bajo 5%)</span>
+                        <div class="stat-icon-wrapper"
+                            style="background: rgba(255, 42, 95, 0.08); border: 1px solid rgba(255, 42, 95, 0.15); color: var(--accent-rose); font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.15rem;">
+                            C
+                        </div>
+                    </div>
+                    <div class="stat-value" id="abc-count-c">0</div>
+                    <div class="stat-meta">
+                        <span class="stat-trend down" id="abc-pct-c">0.0%</span>
+                        <span class="stat-period">participación en ventas</span>
+                    </div>
+                </div>
+
+                <div class="card stat-card stat-gold">
+                    <div class="stat-header">
+                        <span class="stat-title">Alineación de Bahías</span>
+                        <div class="stat-icon-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="abc-warehouse-efficiency">0%</div>
+                    <div class="stat-meta">
+                        <span class="stat-trend up" id="abc-misplaced-count">0 mal ubicados</span>
+                        <span class="stat-period">optimización WMS</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Heatmap Map and Pareto SVG Chart -->
+            <div class="dashboard-main-grid">
+                <!-- Warehouse heat map container -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <svg viewBox="0 0 24 24">
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <line x1="9" y1="3" x2="9" y2="21" />
+                                <line x1="15" y1="3" x2="15" y2="21" />
+                                <line x1="3" y1="9" x2="21" y2="9" />
+                                <line x1="3" y1="15" x2="21" y2="15" />
+                            </svg>
+                            Layout Térmico del Depósito (WMS)
+                        </h2>
+                        <span class="badge badge-info" id="heatmap-warehouse-label">Patio de Carga Principal</span>
+                    </div>
+                    <p
+                        style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1.5rem; margin-top: -1rem;">
+                        Distribución física de estanterías y bahías de carga. Las zonas más cercanas al muelle de
+                        despacho (Picking Yard) deben almacenar herramientas y consumibles Clase A (Verde) para acortar
+                        recorridos de picking.
+                    </p>
+
+                    <!-- Visual 2D Floor Plan layout -->
+                    <div class="warehouse-floorplan"
+                        style="display: flex; flex-direction: column; gap: 1.25rem; background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                        <!-- Aisles Grid Map -->
+                        <div class="warehouse-racks-grid" id="warehouse-grid-map"
+                            style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; min-height: 260px;">
+                            <!-- Populated dynamically: 4 Aisle Columns (Pasillos A, B, C, D) -->
+                        </div>
+
+                        <!-- Dispatch / Picking Yard representation at the bottom -->
+                        <div class="warehouse-picking-yard"
+                            style="background: linear-gradient(90deg, rgba(192,138,45,0.05) 0%, rgba(154,107,27,0.09) 100%); border: 1px dashed var(--border-accent); border-radius: var(--radius-sm); padding: 1.15rem; text-align: center; font-weight: 700; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; justify-content: center; gap: 0.65rem; margin-top: 1rem; font-family: var(--font-ui); letter-spacing: 1px;">
+                            <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--accent-gold)"
+                                stroke-width="2.5" fill="none">
+                                <rect x="1" y="3" width="15" height="13" />
+                                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                                <circle cx="5.5" cy="18.5" r="2.5" />
+                                <circle cx="18.5" cy="18.5" r="2.5" />
+                            </svg>
+                            MUELLE DE DESPACHO Y PICKING ACELERADO (DISTANCIA CERO)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pareto SVG Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <svg viewBox="0 0 24 24">
+                                <line x1="18" y1="20" x2="18" y2="10" />
+                                <line x1="12" y1="20" x2="12" y2="4" />
+                                <line x1="6" y1="20" x2="6" y2="14" />
+                            </svg>
+                            Curva de Pareto ABC (Desempeño Acumulado)
+                        </h2>
+                        <span class="badge badge-success">Ventas Acumuladas %</span>
+                    </div>
+
+                    <div class="chart-container" style="height: 320px;">
+                        <!-- SVG Pareto graph -->
+                        <svg class="chart-svg" id="abc-pareto-svg" viewBox="0 0 500 280">
+                            <!-- Grids and labels drawn dynamically in app.js -->
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Intelligent Recommendations & Relocations -->
+            <div class="dashboard-main-grid" style="grid-template-columns: 1fr 1.6fr;">
+                <div class="card">
+                    <div class="card-header"
+                        style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                        <h2 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            </svg>
+                            Reubicación Sugerida WMS
+                        </h2>
+                        <div id="abc-rec-btn-area"></div>
+                    </div>
+                    <div class="abc-recommendations-list" id="abc-recommendations-list"
+                        style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- Full ABC Inventory Listing -->
+                <div class="card">
+                    <div class="card-header"
+                        style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                        <h2 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                            </svg>
+                            Análisis Crítico de Rotación ABC
+                        </h2>
+                    </div>
+                    <div class="table-responsive" style="margin-top: 0;">
+                        <table class="custom-table" style="font-size: 0.85rem;">
+                            <thead>
+                                <tr>
+                                    <th>Artículo</th>
+                                    <th style="text-align: right;">Ventas (Uds)</th>
+                                    <th style="text-align: right;">Ingresos</th>
+                                    <th style="text-align: center;">Bahía Actual</th>
+                                    <th style="text-align: right;">Distancia</th>
+                                    <th style="text-align: right;">Score ABC</th>
+                                    <th>Clasificación</th>
+                                    <th style="text-align: right;">Estado WMS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="abc-table-body">
+                                <!-- Populated dynamically inside app.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manual Relocation Section (rendered dynamically) -->
+            <div id="wms-manual-section" style="margin-top:2rem;"></div>
+
+        </section>
+
+        <!-- PICKING / PREPARACIÓN DE PEDIDOS VIEW -->
+        <section class="page-container" id="picking-view">
+            <!-- Sub-pestañas del módulo -->
+            <div class="picking-subtabs">
+                <button class="picking-subtab active" id="picksub-panel" onclick="switchPickingSub('panel')">
+                    Resumen
+                </button>
+                <button class="picking-subtab" id="picksub-nueva" onclick="switchPickingSub('nueva')">
+                    Nueva lista <span class="pick-tab-count" id="pickcount-nueva"></span>
+                </button>
+                <button class="picking-subtab" id="picksub-proceso" onclick="switchPickingSub('proceso')">
+                    En preparación <span class="pick-tab-count" id="pickcount-proceso"></span>
+                </button>
+                <button class="picking-subtab" id="picksub-completado" onclick="switchPickingSub('completado')">
+                    Preparados <span class="pick-tab-count" id="pickcount-completado"></span>
+                </button>
+                <button class="picking-subtab" id="picksub-comprometido" onclick="switchPickingSub('comprometido')">
+                    Stock comprometido
+                </button>
+                <button class="picking-subtab" id="picksub-pendientes" onclick="switchPickingSub('pendientes')">
+                    Productos pendientes
+                </button>
+                <button class="picking-subtab" id="picksub-historial" onclick="switchPickingSub('historial')">
+                    Historial
+                </button>
+            </div>
+
+            <!-- Banda de alertas automáticas -->
+            <div class="picking-alerts" id="picking-alerts" style="display:none;"></div>
+
+            <!-- Contenido dinámico de la sub-pestaña activa -->
+            <div id="picking-content"></div>
+        </section>
+
+        <!-- DATA ENTRY VIEW -->
+        <section class="page-container" id="dataentry-view">
+            <!-- Sub-tab navigation -->
+            <div class="dataentry-tabs" id="dataentry-tabs">
+                <!-- Los apartados se inyectarán aquí -->
+            </div>
+
+            <!-- Banda de estado -->
+            <div class="dataentry-status-bar" id="dataentry-status-bar" style="display:none;"></div>
+
+            <!-- Contenido dinámico del apartado activo -->
+            <div id="dataentry-content">
+                <div class="dataentry-placeholder">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <ellipse cx="12" cy="5" rx="9" ry="3" />
+                        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                    </svg>
+                    <h3>Ingreso de Datos</h3>
+                    <p>Configura los apartados de este módulo para comenzar.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SETTINGS VIEW -->
+        <section class="page-container" id="settings-view">
+            <div class="card" style="max-width: 720px; margin: 0 auto;">
+                <div class="card-header"
+                    style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem; margin-bottom: 2rem;">
+                    <h2 class="card-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                        </svg>
+                        Parámetros Técnicos del Sistema
+                    </h2>
+                </div>
+                <form id="settings-form" onsubmit="saveCompanySettings(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="settings-company-name">Razón Social Ferretería</label>
+                            <input type="text" class="form-input" id="settings-company-name" value="Aureo S.A.">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="settings-company-slogan">Eslogan Comercial / Giro</label>
+                            <input type="text" class="form-input" id="settings-company-slogan"
+                                value="Suministros de Acero e Ingeniería">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="settings-company-currency">Divisa de Operación</label>
+                            <select class="form-select" id="settings-company-currency">
+                                <option value="USD">Dólar Comercial ($)</option>
+                                <option value="EUR">Euro Siderúrgico (€)</option>
+                                <option value="CLP">Peso Chileno ($)</option>
+                                <option value="MXN">Peso Mexicano ($)</option>
+                                <option value="COP">Peso Colombiano ($)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="settings-company-tax-id">R.U.T / Registro Tributario</label>
+                            <input type="text" class="form-input" id="settings-company-tax-id" value="RUT-77.928.344-9">
+                        </div>
+                    </div>
+                    <div
+                        style="margin-top: 2.25rem; border-top: 1px solid var(--border-subtle); padding-top: 1.75rem; display: flex; justify-content: space-between; align-items: center;">
+                        <button type="button" class="btn btn-danger" onclick="resetSystemDatabase()">
+                            Formatear Base de Datos
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Aplicar Parámetros
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- PRODUCT DETAIL ADD / EDIT MODAL -->
+    <div class="modal-overlay" id="product-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="product-modal-title">Registrar Nuevo Producto</h3>
+                <button class="modal-close-btn" onclick="closeProductModal()">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+
+            <form id="product-form" onsubmit="saveProductForm(event)">
+                <!-- Hidden ID for edits -->
+                <input type="hidden" id="product-modal-id" value="">
+
+                <div class="form-group">
+                    <label class="form-label" for="product-modal-name">Nombre / Especificación Técnica</label>
+                    <input type="text" class="form-input" id="product-modal-name" required
+                        placeholder="Ej: Rotomartillo SDS-Max Bosch 1500W">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="product-modal-sku">SKU de Inventario</label>
+                        <input type="text" class="form-input" id="product-modal-sku" required
+                            placeholder="Ej: SKU-BOSC-1500">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="product-modal-category">Categoría Industrial</label>
+                        <select class="form-select" id="product-modal-category" required>
+                            <option value="Herramientas Eléctricas">Herramientas Eléctricas</option>
+                            <option value="Herramientas Manuales">Herramientas Manuales</option>
+                            <option value="Consumibles">Consumibles y EPP</option>
+                            <option value="Fijaciones">Fijaciones y Anclajes</option>
+                            <option value="Maquinaria Pesada">Maquinaria Pesada</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="product-modal-price">Precio Unitario ($)</label>
+                        <input type="number" step="0.01" class="form-input" id="product-modal-price" required
+                            placeholder="Ej: 450.90">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="product-modal-stock">Cantidad Inicial (Uds)</label>
+                        <input type="number" class="form-input" id="product-modal-stock" required placeholder="Ej: 15">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="product-modal-lot">Lote / Serie de Recepción</label>
+                        <input type="text" class="form-input" id="product-modal-lot" required placeholder="Ej: L-3849">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="product-modal-mfg-date">Fecha de Recepción / Fabricación</label>
+                        <input type="date" class="form-input" id="product-modal-mfg-date" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="product-modal-exp-date">Límite Garantía / Próxima
+                            Calibración</label>
+                        <input type="date" class="form-input" id="product-modal-exp-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="product-modal-warehouse">Depósito de Almacenamiento</label>
+                        <select class="form-select" id="product-modal-warehouse" required>
+                            <option value="Bodega Principal">Patio de Carga Principal</option>
+                            <option value="Bodega Secundaria">Nave de Acoplamiento B</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="product-modal-aisle">Pasillo (A cercano, D alejado)</label>
+                        <select class="form-select" id="product-modal-aisle" required>
+                            <option value="A">Pasillo A (Bahía Rápida / EPP)</option>
+                            <option value="B">Pasillo B (Bahía Intermedia / Herramientas)</option>
+                            <option value="C">Pasillo C (Bahía Profunda / Fijaciones)</option>
+                            <option value="D">Pasillo D (Patio de Carga Lejano / Maquinaria)</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label" for="product-modal-shelf">Estantería</label>
+                            <input type="number" class="form-input" id="product-modal-shelf" min="1" max="6" required
+                                value="1">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label" for="product-modal-level">Nivel de Altura</label>
+                            <input type="number" class="form-input" id="product-modal-level" min="1" max="3" required
+                                value="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="product-modal-distance">Distancia al Muelle Despacho (m)</label>
+                        <input type="number" class="form-input" id="product-modal-distance" min="1" max="100" required
+                            value="12">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="product-modal-brand">Marca del Fabricante</label>
+                        <input type="text" class="form-input" id="product-modal-brand" required
+                            placeholder="Ej: Bosch, DeWalt, Stanley">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="product-modal-supplier">Proveedor Oficial</label>
+                        <input type="text" class="form-input" id="product-modal-supplier" required
+                            placeholder="Ej: Sodimac Mayorista Ltda.">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="product-modal-threshold">Umbral Crítico (Stock Alerta)</label>
+                        <input type="number" class="form-input" id="product-modal-threshold" required value="3">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="product-modal-submit-btn">Guardar
+                        Artículo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- PICKING DETAIL / PREPARACIÓN INTERACTIVA MODAL -->
+    <div class="modal-overlay" id="picking-modal">
+        <div class="modal-content modal-content-lg">
+            <div class="modal-header">
+                <h3 class="modal-title">Preparación de Pedido</h3>
+                <button class="modal-close-btn" onclick="closePickingModal()">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div id="picking-modal-body">
+                <!-- Renderizado dinámicamente en app.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Drawer -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- SheetJS — lectura de archivos Excel (.xlsx / .xls) -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <!-- Guardia de sesión y control de acceso por rol (debe ir ANTES de app.js) -->
+    <script src="auth.js"></script>
+    <!-- Script Application Logic -->
+    <script src="app.js"></script>
+</body>
+
+</html>

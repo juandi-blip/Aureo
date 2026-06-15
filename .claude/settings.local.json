@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(Remove-Item -Recurse -Force \"D:\\\\juandiplay\\\\Proyecto_ferreteria - copia \\(3\\)\\\\Proyecto_ferreteria - copia\\\\backend\\\\node_modules\" -ErrorAction SilentlyContinue)",
+      "Bash(node -e \"require\\('./server'\\)\")",
+      "Bash(curl -s -X POST http://localhost:3001/api/auth/login -H \"Content-Type: application/json\" -d \"{\\\\\"username\\\\\":\\\\\"admin\\\\\",\\\\\"password\\\\\":\\\\\"admin123\\\\\"}\")",
+      "Bash(netstat -ano)",
+      "Bash(taskkill *)",
+      "PowerShell(Stop-Process *)"
+    ]
+  }
+}
