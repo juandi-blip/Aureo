@@ -7,7 +7,10 @@
       "Bash(curl -s -X POST http://localhost:3001/api/auth/login -H \"Content-Type: application/json\" -d \"{\\\\\"username\\\\\":\\\\\"admin\\\\\",\\\\\"password\\\\\":\\\\\"admin123\\\\\"}\")",
       "Bash(netstat -ano)",
       "Bash(taskkill *)",
-      "PowerShell(Stop-Process *)"
+      "PowerShell(Stop-Process *)",
+      "WebFetch(domain:www.bitsperfoods.com)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\user\\\\Documents\\\\aureo-main\" -File | Select-Object Name, LastWriteTime, @{N=\"KB\";E={[math]::Round\\($_.Length/1KB,1\\)}} | Sort-Object LastWriteTime -Descending)",
+      "PowerShell(git *)"
     ]
   }
 }
