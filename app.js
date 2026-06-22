@@ -254,6 +254,10 @@ async function loadDatabase() {
 
     loadWMSLog();
     applyVisualSettings();
+
+    // --- Inventario ---
+    const invTareasRaw = localStorage.getItem('aureo_inv_tareas');
+    if (invTareasRaw) state.invTareas = JSON.parse(invTareasRaw);
 }
 
 function saveProductsToStorage() {
@@ -425,6 +429,11 @@ function switchTab(tabId) {
             headerDesc.innerText = "Recorridos de bodega, productos por recoger y despacho de pedidos en tiempo real.";
             renderPicking();
             break;
+        case 'inventario':
+            headerTitle.innerText = "Inventario";
+            headerDesc.innerText = "Gestión de conteos físicos, tareas de inventario y conciliación de existencias.";
+            renderInventario();
+            break;
         case 'dataentry':
             headerTitle.innerText = "Ingreso de Datos";
             headerDesc.innerText = "Panel centralizado para el registro y actualización de información del sistema.";
@@ -435,6 +444,1337 @@ function switchTab(tabId) {
             headerDesc.innerText = "Configuraciones tributarias, moneda de operación y restablecimiento.";
             break;
     }
+}
+
+// ==========================================================================
+//   MÓDULO: INVENTARIO
+// ==========================================================================
+
+const INV_SUBS = [
+    { id: 'panel',        label: 'Panel de inventarios', icon: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>' },
+    { id: 'crear-tarea',  label: 'Crear tarea',          icon: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>' },
+    { id: 'mis-conteos',  label: 'Mis conteos',          icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>' },
+    { id: 'conteos',      label: 'Conteos físicos',      icon: '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>' },
+    { id: 'conciliacion', label: 'Conciliación',         icon: '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>' },
+    { id: 'reconteos',    label: 'Reconteos',            icon: '<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>' },
+    { id: 'informe',      label: 'Informe inventario',   icon: '<path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="15" y2="11"/>' }
+];
+
+let activeInventarioSub = null;
+
+function renderInventario() {
+    const tabsContainer = document.getElementById('inventario-tabs');
+    tabsContainer.innerHTML = INV_SUBS.map(sub => `
+        <button class="dataentry-tab-btn ${activeInventarioSub === sub.id ? 'active' : ''}"
+            onclick="switchInventarioSub('${sub.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                ${sub.icon}
+            </svg>
+            ${sub.label}
+        </button>
+    `).join('');
+
+    if (activeInventarioSub) {
+        switchInventarioSub(activeInventarioSub);
+    }
+}
+
+function switchInventarioSub(subId) {
+    activeInventarioSub = subId;
+    const sub = INV_SUBS.find(s => s.id === subId);
+
+    document.querySelectorAll('#inventario-tabs .dataentry-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.trim() === sub.label);
+    });
+
+    const content = document.getElementById('inventario-content');
+
+    if (subId === 'panel') {
+        const tareasActivas     = (state.invTareas     || []).filter(t => t.estado === 'activa').length;
+        const pendientesConcil  = (state.invConteos    || []).filter(c => c.estado === 'pendiente').length;
+        const reconteosAbiertos = (state.invReconteos  || []).filter(r => r.estado === 'abierto').length;
+        const diferencias       = tareasActivas + pendientesConcil + reconteosAbiertos;
+
+        content.innerHTML = `
+            <div style="margin-top: 1.5rem;">
+                <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                    <button class="btn btn-primary" onclick="switchInventarioSub('informe')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="margin-right: 0.4rem;">
+                            <path d="M14 3v4a1 1 0 0 0 1 1h4"/>
+                            <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/>
+                            <line x1="9" y1="15" x2="15" y2="15"/>
+                            <line x1="9" y1="11" x2="15" y2="11"/>
+                        </svg>
+                        Ver informes
+                    </button>
+                    <button class="btn btn-secondary" onclick="switchInventarioSub('crear-tarea')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="margin-right: 0.4rem;">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        Nueva tarea
+                    </button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="card stat-card stat-emerald">
+                        <div class="stat-header">
+                            <span class="stat-title">Tareas activas</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 11l3 3L22 4"/>
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${tareasActivas}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend up">En ejecución</span>
+                            <span class="stat-period">tareas de conteo</span>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card stat-cyan">
+                        <div class="stat-header">
+                            <span class="stat-title">Pendientes conciliación</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="20" x2="18" y2="10"/>
+                                    <line x1="12" y1="20" x2="12" y2="4"/>
+                                    <line x1="6" y1="20" x2="6" y2="14"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${pendientesConcil}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend neutral">Requieren revisión</span>
+                            <span class="stat-period">por conciliar</span>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card stat-gold">
+                        <div class="stat-header">
+                            <span class="stat-title">Reconteos abiertos</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="17 1 21 5 17 9"/>
+                                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                                    <polyline points="7 23 3 19 7 15"/>
+                                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${reconteosAbiertos}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend neutral">Pendientes</span>
+                            <span class="stat-period">reconteos activos</span>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card stat-rose">
+                        <div class="stat-header">
+                            <span class="stat-title">Diferencias detectadas</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${diferencias}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend ${diferencias > 0 ? 'down' : 'up'}">${diferencias > 0 ? 'Requieren atención' : 'Sin diferencias'}</span>
+                            <span class="stat-period">total acumulado</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                        <h2 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                            </svg>
+                            Últimas tareas de inventario
+                        </h2>
+                    </div>
+                    <div class="table-responsive" style="margin-top: 0;">
+                        <table class="custom-table" style="font-size: 0.85rem;">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Tipo</th>
+                                    <th>Ubicación</th>
+                                    <th>Estado</th>
+                                    <th>Responsable</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inv-panel-tabla">
+                                ${(() => {
+                                    const tareas = (state.invTareas || []).slice(-10).reverse();
+                                    if (tareas.length === 0) return `
+                                        <tr>
+                                            <td colspan="6" style="text-align:center; color:var(--text-secondary); padding: 2rem;">
+                                                No hay tareas registradas.
+                                            </td>
+                                        </tr>`;
+                                    return tareas.map(t => `
+                                        <tr>
+                                            <td><span class="badge badge-info">${t.codigo || '—'}</span></td>
+                                            <td>${t.tipo || '—'}</td>
+                                            <td>${t.ubicacion || '—'}</td>
+                                            <td><span class="badge ${t.estado === 'activa' ? 'badge-success' : t.estado === 'pendiente' ? 'badge-warning' : 'badge-info'}">${t.estado || '—'}</span></td>
+                                            <td>${t.responsable || '—'}</td>
+                                            <td>${t.fecha || '—'}</td>
+                                        </tr>`).join('');
+                                })()}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    if (subId === 'crear-tarea') {
+        content.innerHTML = `
+            <div style="margin-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start;">
+
+                <!-- Creación de orden -->
+                <div class="card">
+                    <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                        <h2 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            Creación de orden
+                        </h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Código</label>
+                        <input type="text" class="form-input" id="inv-tarea-codigo" placeholder="Auto-generado" readonly
+                            style="opacity: 0.6; cursor: default;">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tipo de conteo</label>
+                        <select class="form-select" id="inv-tarea-tipo" onchange="invActualizarResumen()">
+                            <option value="">— Seleccionar —</option>
+                            <option value="Zona">Zona</option>
+                            <option value="Familia">Familia</option>
+                            <option value="Material">Material</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Zona</label>
+                        <input type="text" class="form-input" id="inv-tarea-zona"
+                            placeholder="Ej: Bodega Principal - Pasillo A" oninput="invActualizarResumen()">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Asignado a</label>
+                        <input type="text" class="form-input" id="inv-tarea-asignado"
+                            placeholder="Nombre del responsable" oninput="invActualizarResumen()">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Creado por</label>
+                        <input type="text" class="form-input" id="inv-tarea-creadopor"
+                            placeholder="Nombre de quien crea la tarea" oninput="invActualizarResumen()">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Observación</label>
+                        <textarea class="form-input" id="inv-tarea-obs" rows="3"
+                            placeholder="Notas adicionales sobre la tarea..." oninput="invActualizarResumen()"
+                            style="resize: vertical; font-family: inherit;"></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
+                        <button class="btn btn-primary" onclick="invGuardarTarea()" style="flex: 1;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="margin-right: 0.4rem;">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                <polyline points="17 21 17 13 7 13 7 21"/>
+                                <polyline points="7 3 7 8 15 8"/>
+                            </svg>
+                            Guardar tarea
+                        </button>
+                        <button class="btn btn-secondary" onclick="invLimpiarFormTarea()">
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Resumen operativo -->
+                <div class="card" id="inv-resumen-card">
+                    <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                        <h2 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 3v4a1 1 0 0 0 1 1h4"/>
+                                <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/>
+                                <line x1="9" y1="15" x2="15" y2="15"/>
+                                <line x1="9" y1="11" x2="15" y2="11"/>
+                            </svg>
+                            Resumen operativo
+                        </h2>
+                        <span class="badge badge-info" id="inv-resumen-badge">Borrador</span>
+                    </div>
+                    <div id="inv-resumen-body">
+                        <div style="text-align: center; color: var(--text-secondary); padding: 3rem 1rem; font-size: 0.88rem;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round" width="40" height="40"
+                                style="display: block; margin: 0 auto 1rem; opacity: 0.35;">
+                                <path d="M14 3v4a1 1 0 0 0 1 1h4"/>
+                                <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/>
+                            </svg>
+                            Completa el formulario para ver el resumen de la tarea.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        `;
+
+        const codigo = 'INV-' + String((state.invTareas || []).length + 1).padStart(4, '0');
+        document.getElementById('inv-tarea-codigo').value = codigo;
+        invActualizarResumen();
+        return;
+    }
+
+    if (subId === 'mis-conteos') {
+        const tareas     = state.invTareas || [];
+        const total      = tareas.length;
+        const pendientes = tareas.filter(t => t.estado === 'pendiente').length;
+        const enProceso  = tareas.filter(t => t.estado === 'activa').length;
+        const reconteos  = (state.invReconteos || []).length;
+
+        content.innerHTML = `
+            <div style="margin-top: 1.5rem;">
+                <div class="stats-grid">
+                    <div class="card stat-card stat-cyan">
+                        <div class="stat-header">
+                            <span class="stat-title">Total de tareas</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${total}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend neutral">Registradas</span>
+                            <span class="stat-period">en el sistema</span>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card stat-gold">
+                        <div class="stat-header">
+                            <span class="stat-title">Pendientes</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${pendientes}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend ${pendientes > 0 ? 'down' : 'up'}">${pendientes > 0 ? 'Por iniciar' : 'Al día'}</span>
+                            <span class="stat-period">tareas pendientes</span>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card stat-emerald">
+                        <div class="stat-header">
+                            <span class="stat-title">En proceso</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 11l3 3L22 4"/>
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${enProceso}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend up">Activas</span>
+                            <span class="stat-period">en ejecución</span>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card stat-rose">
+                        <div class="stat-header">
+                            <span class="stat-title">Reconteos</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="17 1 21 5 17 9"/>
+                                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                                    <polyline points="7 23 3 19 7 15"/>
+                                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${reconteos}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend ${reconteos > 0 ? 'down' : 'up'}">${reconteos > 0 ? 'Requieren revisión' : 'Sin reconteos'}</span>
+                            <span class="stat-period">abiertos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:1.25rem; margin-top:1.5rem; align-items:flex-start; flex-wrap:wrap;">
+
+                <!-- CONSULTA -->
+                <div class="card" style="flex:1; min-width:0;">
+                    <div class="card-header" style="border-bottom:1px solid var(--border-subtle); padding-bottom:1rem; margin-bottom:1.25rem;">
+                        <h2 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            Consulta de tareas
+                        </h2>
+                    </div>
+                    <div class="table-controls" style="margin-bottom:1rem; flex-wrap:wrap; gap:0.6rem;">
+                        <div class="input-wrapper" style="flex:1; min-width:160px;">
+                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                            <input type="text" class="form-input" id="mc-buscar-asignado" placeholder="Asignado a...">
+                        </div>
+                        <div style="min-width:170px;">
+                            <select class="form-select" id="mc-filtro-estado">
+                                <option value="todos">Todos los estados</option>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="en proceso">En proceso</option>
+                                <option value="reconteo pendiente">Reconteo pendiente</option>
+                                <option value="conciliada">Conciliada</option>
+                                <option value="cerrada">Cerrada</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="filtrarMisConteos()" style="white-space:nowrap;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            Buscar
+                        </button>
+                        <button class="btn btn-secondary" onclick="recargarMisConteos()" style="white-space:nowrap;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                                <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/>
+                            </svg>
+                            Recargar
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tipo</th>
+                                    <th>Criterio</th>
+                                    <th>Asignado</th>
+                                    <th>Estado</th>
+                                    <th>Reconteo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mc-tabla-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- DETALLE RÁPIDO -->
+                <div class="card" style="width:300px; flex-shrink:0; position:sticky; top:80px;">
+                    <div class="card-header" style="border-bottom:1px solid var(--border-subtle); padding-bottom:1rem; margin-bottom:1.25rem;">
+                        <h2 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                            Detalle rápido
+                        </h2>
+                    </div>
+                    <div id="mc-detalle-panel">
+                        <div style="text-align:center; padding:2.5rem 1rem; color:var(--text-muted);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                                style="width:40px;height:40px; margin:0 auto 0.75rem; display:block; opacity:0.35;">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10 9 9 9 8 9"/>
+                            </svg>
+                            <p style="font-size:0.85rem;">Selecciona una tarea<br>para ver el detalle</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        `;
+        filtrarMisConteos();
+        return;
+    }
+
+    if (subId === 'conteos') {
+        content.innerHTML = `
+            <div style="margin-top:1.5rem;">
+
+                <!-- Tarjetas de resumen -->
+                <div class="stats-grid" style="margin-bottom:1.5rem;">
+                    <div class="card stat-card stat-emerald">
+                        <div class="stat-header">
+                            <span class="stat-title">Total conteos</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${(state.invConteos || []).length}</div>
+                        <div class="stat-meta"><span class="stat-trend up">Registrados</span></div>
+                    </div>
+                    <div class="card stat-card stat-cyan">
+                        <div class="stat-header">
+                            <span class="stat-title">En proceso</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${(state.invConteos || []).filter(c => c.estado === 'en proceso').length}</div>
+                        <div class="stat-meta"><span class="stat-trend up">Activos</span></div>
+                    </div>
+                    <div class="card stat-card stat-amber">
+                        <div class="stat-header">
+                            <span class="stat-title">Pendientes</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${(state.invConteos || []).filter(c => c.estado === 'pendiente').length}</div>
+                        <div class="stat-meta"><span class="stat-trend down">Sin finalizar</span></div>
+                    </div>
+                    <div class="card stat-card stat-rose">
+                        <div class="stat-header">
+                            <span class="stat-title">Completados</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${(state.invConteos || []).filter(c => c.estado === 'completado').length}</div>
+                        <div class="stat-meta"><span class="stat-trend up">Finalizados</span></div>
+                    </div>
+                </div>
+
+                <!-- Consulta de conteos -->
+                <div class="card">
+                    <div class="card-header" style="border-bottom:1px solid var(--border-subtle); padding-bottom:1rem; margin-bottom:1.25rem;">
+                        <h2 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            Consulta de conteos
+                        </h2>
+                    </div>
+
+                    <div class="table-controls" style="margin-bottom:1rem; flex-wrap:wrap; gap:0.6rem;">
+                        <div class="input-wrapper" style="flex:1; min-width:160px;">
+                            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <input type="text" class="form-input" id="cf-buscar-id"
+                                placeholder="ID de tarea...">
+                        </div>
+                        <div class="input-wrapper" style="flex:1; min-width:160px;">
+                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                            <input type="text" class="form-input" id="cf-buscar-usuario"
+                                placeholder="Usuario que registra...">
+                        </div>
+                        <button class="btn btn-primary" onclick="filtrarConteosF()" style="white-space:nowrap;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            Buscar
+                        </button>
+                        <button class="btn btn-secondary" onclick="recargarConteosF()" style="white-space:nowrap;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                                <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/>
+                            </svg>
+                            Recargar
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="custom-table" style="font-size:0.82rem;">
+                            <thead>
+                                <tr>
+                                    <th>Detalle</th>
+                                    <th>Ubicación</th>
+                                    <th>Zona</th>
+                                    <th>Cód. Material</th>
+                                    <th>Descripción</th>
+                                    <th>Lote Almacén</th>
+                                    <th>Lote Proveedor</th>
+                                    <th>FV</th>
+                                    <th>Cant. Contada</th>
+                                    <th>Observación</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cf-tabla-body"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div style="display:flex; gap:0.75rem; margin-top:1.5rem; flex-wrap:wrap;">
+                        <button class="btn btn-secondary" onclick="switchInventarioSub('mis-conteos')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                                <polyline points="15 18 9 12 15 6"/>
+                            </svg>
+                            Volver a mis conteos
+                        </button>
+                        <button class="btn btn-primary" onclick="guardarConteoF()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                <polyline points="17 21 17 13 7 13 7 21"/>
+                                <polyline points="7 3 7 8 15 8"/>
+                            </svg>
+                            Guardar conteo
+                        </button>
+                        <button class="btn btn-secondary" onclick="switchInventarioSub('conciliacion')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                                <line x1="18" y1="20" x2="18" y2="10"/>
+                                <line x1="12" y1="20" x2="12" y2="4"/>
+                                <line x1="6" y1="20" x2="6" y2="14"/>
+                            </svg>
+                            Ir a conciliación
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        `;
+        filtrarConteosF();
+        return;
+    }
+
+    if (subId === 'conciliacion') {
+        const conteos  = state.invConteos  || [];
+        const tareas   = state.invTareas   || [];
+        const totalItems     = conteos.length;
+        const sinDiferencia  = conteos.filter(c => (c.cantidadContada ?? 0) === (c.cantidadSistema ?? 0)).length;
+        const conDiferencia  = conteos.filter(c => (c.cantidadContada ?? 0) !== (c.cantidadSistema ?? 0)).length;
+        const pendConcil     = conteos.filter(c => c.estado === 'pendiente').length;
+
+        content.innerHTML = `
+            <div style="margin-top:1.5rem;">
+
+                <!-- Resumen -->
+                <div class="stats-grid" style="margin-bottom:1.5rem;">
+                    <div class="card stat-card stat-emerald">
+                        <div class="stat-header">
+                            <span class="stat-title">Total ítems</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+                                    <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
+                                    <line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${totalItems}</div>
+                        <div class="stat-meta"><span class="stat-trend up">En conciliación</span></div>
+                    </div>
+                    <div class="card stat-card stat-cyan">
+                        <div class="stat-header">
+                            <span class="stat-title">Sin diferencia</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${sinDiferencia}</div>
+                        <div class="stat-meta"><span class="stat-trend up">Cuadran</span></div>
+                    </div>
+                    <div class="card stat-card stat-rose">
+                        <div class="stat-header">
+                            <span class="stat-title">Con diferencia</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/>
+                                    <line x1="9" y1="9" x2="15" y2="15"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${conDiferencia}</div>
+                        <div class="stat-meta"><span class="stat-trend down">Requieren acción</span></div>
+                    </div>
+                    <div class="card stat-card stat-amber">
+                        <div class="stat-header">
+                            <span class="stat-title">Pend. conciliación</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${pendConcil}</div>
+                        <div class="stat-meta"><span class="stat-trend down">Sin resolver</span></div>
+                    </div>
+                </div>
+
+                <!-- Tabla comparativa -->
+                <div class="card">
+                    <div class="card-header" style="border-bottom:1px solid var(--border-subtle); padding-bottom:1rem; margin-bottom:1.25rem;">
+                        <h2 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+                            </svg>
+                            Comparativo Sistema vs Físico
+                        </h2>
+                    </div>
+
+                    <!-- Filtros -->
+                    <div class="table-controls" style="margin-bottom:1rem; flex-wrap:wrap; gap:0.6rem;">
+                        <div class="input-wrapper" style="flex:1; min-width:150px;">
+                            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <input type="text" class="form-input" id="conc-buscar-tarea"
+                                placeholder="ID de tarea...">
+                        </div>
+                        <div class="input-wrapper" style="flex:1; min-width:150px;">
+                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                            <input type="text" class="form-input" id="conc-buscar-usuario"
+                                placeholder="Usuario que finaliza...">
+                        </div>
+                        <div class="input-wrapper" style="flex:1; min-width:150px;">
+                            <svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                            <input type="text" class="form-input" id="conc-buscar-reconteo"
+                                placeholder="Asignado a reconteo (opcional)...">
+                        </div>
+                        <button class="btn btn-primary" onclick="filtrarConciliacion()" style="white-space:nowrap;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            Buscar
+                        </button>
+                        <button class="btn btn-secondary" onclick="recargarConciliacion()" style="white-space:nowrap;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                                <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/>
+                            </svg>
+                            Recargar
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="custom-table" style="font-size:0.82rem;">
+                            <thead>
+                                <tr>
+                                    <th>Detalle</th>
+                                    <th>Ubicación</th>
+                                    <th>Código</th>
+                                    <th>Descripción</th>
+                                    <th>Lote Almacén</th>
+                                    <th>Lote Proveedor</th>
+                                    <th>Sistema</th>
+                                    <th>Contado</th>
+                                    <th>Diferencia</th>
+                                    <th>Coincide</th>
+                                    <th>Observación</th>
+                                </tr>
+                            </thead>
+                            <tbody id="conc-tabla-body"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Botones de cierre -->
+                    <div style="display:flex; gap:0.75rem; margin-top:1.5rem; flex-wrap:wrap; align-items:center;">
+                        <button class="btn btn-secondary" onclick="switchInventarioSub('conteos')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                                <polyline points="15 18 9 12 15 6"/>
+                            </svg>
+                            Volver a conteos
+                        </button>
+                        <div style="flex:1;"></div>
+                        <button class="btn btn-secondary" onclick="generarReconteoAuto()" style="border-color:var(--accent-amber,#f59e0b); color:var(--accent-amber,#f59e0b);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                                <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                                <polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                            </svg>
+                            Generar reconteo automático
+                        </button>
+                        <button class="btn btn-primary" onclick="cerrarTareaConciliacion()" style="background:var(--accent-emerald,#10b981); border-color:var(--accent-emerald,#10b981);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Cerrar tarea
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        `;
+        filtrarConciliacion();
+        return;
+    }
+
+    content.innerHTML = `
+        <div class="card" style="margin-top: 1.5rem;">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        ${sub.icon}
+                    </svg>
+                    ${sub.label}
+                </h2>
+            </div>
+            <div style="padding: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
+                Módulo <strong>${sub.label}</strong> en construcción.
+            </div>
+        </div>
+    `;
+}
+
+function filtrarConteosF() {
+    const idTarea  = (document.getElementById('cf-buscar-id')?.value || '').toLowerCase().trim();
+    const usuario  = (document.getElementById('cf-buscar-usuario')?.value || '').toLowerCase().trim();
+    const tbody    = document.getElementById('cf-tabla-body');
+    if (!tbody) return;
+
+    const conteos = (state.invConteos || []).filter(c => {
+        if (idTarea && !(c.tareaId || '').toLowerCase().includes(idTarea))   return false;
+        if (usuario && !(c.usuario || '').toLowerCase().includes(usuario))   return false;
+        return true;
+    });
+
+    if (conteos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:var(--text-muted); padding:2rem;">No se encontraron conteos.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = [...conteos].reverse().map((c, idx) => `
+        <tr>
+            <td style="text-align:center;">
+                <button class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.75rem;"
+                    onclick="verDetalleConteoF(${idx})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                </button>
+            </td>
+            <td>${c.ubicacion      || '—'}</td>
+            <td>${c.zona           || '—'}</td>
+            <td><span class="badge badge-info">${c.codigoMaterial || '—'}</span></td>
+            <td>${c.descripcion    || '—'}</td>
+            <td>${c.loteAlmacen   || '—'}</td>
+            <td>${c.loteProveedor  || '—'}</td>
+            <td>${c.fv             || '—'}</td>
+            <td>
+                <input type="number" min="0"
+                    style="width:80px; padding:0.25rem 0.4rem; border:1px solid var(--border-subtle); border-radius:4px; font-size:0.82rem; background:var(--bg-primary); color:var(--text-primary);"
+                    value="${c.cantidadContada ?? ''}"
+                    onchange="actualizarCantidadConteoF(${idx}, this.value)"
+                    placeholder="0">
+            </td>
+            <td>
+                <input type="text"
+                    style="width:120px; padding:0.25rem 0.4rem; border:1px solid var(--border-subtle); border-radius:4px; font-size:0.82rem; background:var(--bg-primary); color:var(--text-primary);"
+                    value="${c.obs || ''}"
+                    onchange="actualizarObsConteoF(${idx}, this.value)"
+                    placeholder="Observación...">
+            </td>
+        </tr>
+    `).join('');
+}
+
+let _cf_filtrados = [];
+
+function actualizarCantidadConteoF(idx, valor) {
+    const conteos = (state.invConteos || []).filter((c, i, arr) => {
+        const idTarea = (document.getElementById('cf-buscar-id')?.value || '').toLowerCase().trim();
+        const usuario = (document.getElementById('cf-buscar-usuario')?.value || '').toLowerCase().trim();
+        if (idTarea && !(c.tareaId || '').toLowerCase().includes(idTarea)) return false;
+        if (usuario && !(c.usuario || '').toLowerCase().includes(usuario)) return false;
+        return true;
+    });
+    const real = [...conteos].reverse();
+    if (real[idx]) real[idx].cantidadContada = parseFloat(valor) || 0;
+    saveState();
+}
+
+function actualizarObsConteoF(idx, valor) {
+    const conteos = (state.invConteos || []).filter(c => {
+        const idTarea = (document.getElementById('cf-buscar-id')?.value || '').toLowerCase().trim();
+        const usuario = (document.getElementById('cf-buscar-usuario')?.value || '').toLowerCase().trim();
+        if (idTarea && !(c.tareaId || '').toLowerCase().includes(idTarea)) return false;
+        if (usuario && !(c.usuario || '').toLowerCase().includes(usuario)) return false;
+        return true;
+    });
+    const real = [...conteos].reverse();
+    if (real[idx]) real[idx].obs = valor;
+    saveState();
+}
+
+function guardarConteoF() {
+    saveState();
+    mostrarToast('Conteo guardado correctamente', 'emerald');
+}
+
+function verDetalleConteoF(idx) {
+    // Placeholder hasta desarrollar vista de detalle de conteo
+    alert('Vista de detalle de conteo en desarrollo.');
+}
+
+function recargarConteosF() {
+    const inputId      = document.getElementById('cf-buscar-id');
+    const inputUsuario = document.getElementById('cf-buscar-usuario');
+    if (inputId)      inputId.value      = '';
+    if (inputUsuario) inputUsuario.value = '';
+    filtrarConteosF();
+}
+
+// ==========================================================================
+//   CONCILIACIÓN
+// ==========================================================================
+
+function filtrarConciliacion() {
+    const idTarea  = (document.getElementById('conc-buscar-tarea')?.value    || '').toLowerCase().trim();
+    const usuario  = (document.getElementById('conc-buscar-usuario')?.value  || '').toLowerCase().trim();
+    const reconteo = (document.getElementById('conc-buscar-reconteo')?.value || '').toLowerCase().trim();
+    const tbody    = document.getElementById('conc-tabla-body');
+    if (!tbody) return;
+
+    const items = (state.invConteos || []).filter(c => {
+        if (idTarea  && !(c.tareaId         || '').toLowerCase().includes(idTarea))  return false;
+        if (usuario  && !(c.usuarioFinaliza  || '').toLowerCase().includes(usuario))  return false;
+        if (reconteo && !(c.asignadoReconteo || '').toLowerCase().includes(reconteo)) return false;
+        return true;
+    });
+
+    if (items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; color:var(--text-muted); padding:2rem;">No se encontraron ítems para conciliar.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = [...items].reverse().map(c => {
+        const sis  = parseFloat(c.cantidadSistema ?? 0);
+        const fis  = parseFloat(c.cantidadContada ?? 0);
+        const diff = fis - sis;
+        const ok   = diff === 0;
+
+        const diffColor = ok ? 'color:var(--accent-emerald,#10b981);' : 'color:var(--accent-rose,#f43f5e);';
+        const rowStyle  = ok ? '' : 'background:rgba(244,63,94,0.04);';
+        const coincide  = ok
+            ? '<span style="color:var(--accent-emerald,#10b981); font-size:1.15rem; font-weight:700;">&#10003;</span>'
+            : '<span style="color:var(--accent-rose,#f43f5e);   font-size:1.15rem; font-weight:700;">&#10007;</span>';
+
+        return `
+            <tr style="${rowStyle}">
+                <td style="text-align:center;">
+                    <button class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.75rem;"
+                        onclick="alert('Detalle de conciliación en desarrollo.')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;">
+                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </button>
+                </td>
+                <td>${c.ubicacion      || '—'}</td>
+                <td><span class="badge badge-info">${c.codigoMaterial || '—'}</span></td>
+                <td>${c.descripcion    || '—'}</td>
+                <td>${c.loteAlmacen   || '—'}</td>
+                <td>${c.loteProveedor  || '—'}</td>
+                <td style="text-align:right; font-weight:500;">${sis}</td>
+                <td style="text-align:right; font-weight:500;">${fis}</td>
+                <td style="text-align:right; font-weight:700; ${diffColor}">${diff > 0 ? '+' : ''}${diff}</td>
+                <td style="text-align:center;">${coincide}</td>
+                <td style="font-size:0.8rem; color:var(--text-secondary);">${c.obs || '—'}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function recargarConciliacion() {
+    const inputTarea    = document.getElementById('conc-buscar-tarea');
+    const inputUsuario  = document.getElementById('conc-buscar-usuario');
+    const inputReconteo = document.getElementById('conc-buscar-reconteo');
+    if (inputTarea)    inputTarea.value    = '';
+    if (inputUsuario)  inputUsuario.value  = '';
+    if (inputReconteo) inputReconteo.value = '';
+    filtrarConciliacion();
+}
+
+function cerrarTareaConciliacion() {
+    const idTarea = (document.getElementById('conc-buscar-tarea')?.value || '').trim();
+
+    if (!idTarea) {
+        mostrarToast('Ingresa el ID de tarea antes de cerrar', 'amber');
+        return;
+    }
+
+    const items   = (state.invConteos || []).filter(c => (c.tareaId || '') === idTarea);
+    const conDiff = items.some(c => (c.cantidadContada ?? 0) !== (c.cantidadSistema ?? 0));
+
+    if (conDiff) {
+        mostrarToast('Existen diferencias. Genera el reconteo antes de cerrar la tarea.', 'rose');
+        return;
+    }
+
+    if (!confirm(`¿Confirmas cerrar la tarea ${idTarea}? Esta acción es definitiva.`)) return;
+
+    items.forEach(c => { c.estado = 'completado'; });
+
+    const tarea = (state.invTareas || []).find(t => t.codigo === idTarea);
+    if (tarea) tarea.estado = 'cerrada';
+
+    saveState();
+    mostrarToast(`Tarea ${idTarea} cerrada correctamente`, 'emerald');
+    filtrarConciliacion();
+}
+
+function generarReconteoAuto() {
+    const idTarea = (document.getElementById('conc-buscar-tarea')?.value || '').trim();
+
+    if (!idTarea) {
+        mostrarToast('Ingresa el ID de tarea para generar el reconteo', 'amber');
+        return;
+    }
+
+    const tareaOrigen = (state.invTareas || []).find(t => t.codigo === idTarea);
+    const itemsConDiff = (state.invConteos || []).filter(c =>
+        (c.tareaId || '') === idTarea &&
+        (c.cantidadContada ?? 0) !== (c.cantidadSistema ?? 0)
+    );
+
+    if (itemsConDiff.length === 0) {
+        mostrarToast('No hay diferencias. La tarea puede cerrarse directamente.', 'cyan');
+        return;
+    }
+
+    // Generar código único para la nueva tarea de reconteo
+    const fecha     = new Date();
+    const sufijo    = Math.random().toString(36).slice(2, 6).toUpperCase();
+    const codigoRC  = `RC-${idTarea}-${sufijo}`;
+
+    // 1. Crear nueva tarea de reconteo en invTareas
+    if (!state.invTareas) state.invTareas = [];
+    state.invTareas.push({
+        codigo:     codigoRC,
+        tipo:       'Reconteo',
+        zona:       tareaOrigen?.zona       || '',
+        criterio:   tareaOrigen?.criterio   || '',
+        asignado:   tareaOrigen?.asignado   || '',
+        creadopor:  'Sistema',
+        estado:     'pendiente',
+        reconteo:   idTarea,
+        fecha:      fecha.toLocaleDateString('es-CO'),
+        obs:        `Reconteo automático generado desde tarea ${idTarea}`
+    });
+
+    // 2. Crear ítems de conteo para la nueva tarea (resetear cantidad contada)
+    if (!state.invConteos) state.invConteos = [];
+    itemsConDiff.forEach(c => {
+        state.invConteos.push({
+            tareaId:         codigoRC,
+            ubicacion:       c.ubicacion       || '',
+            zona:            c.zona            || '',
+            codigoMaterial:  c.codigoMaterial  || '',
+            descripcion:     c.descripcion     || '',
+            loteAlmacen:     c.loteAlmacen     || '',
+            loteProveedor:   c.loteProveedor   || '',
+            fv:              c.fv              || '',
+            cantidadSistema: c.cantidadSistema ?? 0,
+            cantidadContada: null,
+            estado:          'pendiente',
+            usuario:         '',
+            fecha:           fecha.toLocaleDateString('es-CO'),
+            obs:             ''
+        });
+        // Marcar ítem original como reconteo pendiente
+        c.estado = 'reconteo pendiente';
+    });
+
+    // 3. Cambiar estado de la tarea original
+    if (tareaOrigen) tareaOrigen.estado = 'reconteo pendiente';
+
+    // 4. Registrar en invReconteos para seguimiento
+    if (!state.invReconteos) state.invReconteos = [];
+    state.invReconteos.push({
+        id:          codigoRC,
+        tareaOrigen: idTarea,
+        items:       itemsConDiff.length,
+        estado:      'abierto',
+        fecha:       fecha.toLocaleDateString('es-CO')
+    });
+
+    saveState();
+    mostrarToast(`Reconteo ${codigoRC} creado con ${itemsConDiff.length} ítem(s)`, 'amber');
+    filtrarConciliacion();
+}
+
+function mostrarToast(msg, color) {
+    const colores = {
+        emerald: '#10b981',
+        amber:   '#f59e0b',
+        rose:    '#f43f5e',
+        cyan:    '#06b6d4'
+    };
+    const bg = colores[color] || colores.emerald;
+    const toast = document.createElement('div');
+    toast.textContent = msg;
+    toast.style.cssText = `position:fixed;bottom:1.5rem;right:1.5rem;background:${bg};color:#fff;padding:0.75rem 1.25rem;border-radius:8px;font-size:0.88rem;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.18);`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2800);
+}
+
+function invActualizarResumen() {
+    const codigo     = document.getElementById('inv-tarea-codigo')?.value || '';
+    const tipo       = document.getElementById('inv-tarea-tipo')?.value || '';
+    const zona       = document.getElementById('inv-tarea-zona')?.value || '';
+    const asignado   = document.getElementById('inv-tarea-asignado')?.value || '';
+    const creadopor  = document.getElementById('inv-tarea-creadopor')?.value || '';
+    const obs        = document.getElementById('inv-tarea-obs')?.value || '';
+
+    const body  = document.getElementById('inv-resumen-body');
+    const badge = document.getElementById('inv-resumen-badge');
+    if (!body) return;
+
+    const tieneData = tipo || zona || asignado || creadopor;
+
+    if (badge) {
+        badge.className = tieneData ? 'badge badge-success' : 'badge badge-info';
+        badge.textContent = tieneData ? 'En progreso' : 'Borrador';
+    }
+
+    if (!tieneData) {
+        body.innerHTML = `
+            <div style="text-align: center; color: var(--text-secondary); padding: 3rem 1rem; font-size: 0.88rem;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round" width="40" height="40"
+                    style="display: block; margin: 0 auto 1rem; opacity: 0.35;">
+                    <path d="M14 3v4a1 1 0 0 0 1 1h4"/>
+                    <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/>
+                </svg>
+                Completa el formulario para ver el resumen de la tarea.
+            </div>`;
+        return;
+    }
+
+    const fila = (label, valor) => valor
+        ? `<div style="display:flex; justify-content:space-between; align-items:flex-start; padding: 0.75rem 0; border-bottom: 1px solid var(--border-subtle);">
+               <span style="font-size:0.8rem; color:var(--text-secondary); min-width: 130px;">${label}</span>
+               <span style="font-size:0.88rem; color:var(--text-primary); font-weight:500; text-align:right;">${valor}</span>
+           </div>`
+        : '';
+
+    body.innerHTML = `
+        <div style="padding: 0 0.25rem;">
+            ${fila('Código', codigo)}
+            ${fila('Tipo de conteo', tipo)}
+            ${fila('Zona', zona)}
+            ${fila('Asignado a', asignado)}
+            ${fila('Creado por', creadopor)}
+            ${obs ? `<div style="margin-top: 1rem;">
+                <span style="font-size:0.8rem; color:var(--text-secondary);">Observación</span>
+                <p style="font-size:0.88rem; color:var(--text-primary); margin-top:0.4rem; line-height:1.5;">${obs}</p>
+            </div>` : ''}
+        </div>
+    `;
+}
+
+function invGuardarTarea() {
+    const codigo    = document.getElementById('inv-tarea-codigo')?.value;
+    const tipo      = document.getElementById('inv-tarea-tipo')?.value;
+    const zona      = document.getElementById('inv-tarea-zona')?.value;
+    const asignado  = document.getElementById('inv-tarea-asignado')?.value;
+    const creadopor = document.getElementById('inv-tarea-creadopor')?.value;
+    const obs       = document.getElementById('inv-tarea-obs')?.value;
+    const fecha     = new Date().toLocaleDateString('es-CO');
+
+    if (!tipo || !zona || !asignado || !creadopor) {
+        triggerToast('error', 'Completa Tipo de conteo, Zona, Asignado a y Creado por antes de guardar.');
+        return;
+    }
+
+    if (!state.invTareas) state.invTareas = [];
+    state.invTareas.push({ codigo, tipo, zona, asignado, creadopor, obs, fecha, estado: 'activa' });
+    localStorage.setItem('aureo_inv_tareas', JSON.stringify(state.invTareas));
+
+    triggerToast('success', `Tarea ${codigo} guardada correctamente.`);
+    switchInventarioSub('panel');
+}
+
+function invLimpiarFormTarea() {
+    ['inv-tarea-tipo', 'inv-tarea-zona', 'inv-tarea-asignado', 'inv-tarea-creadopor', 'inv-tarea-obs'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    invActualizarResumen();
+}
+
+let _mcTareas = [];
+
+function filtrarMisConteos() {
+    const asignado = (document.getElementById('mc-buscar-asignado')?.value || '').toLowerCase().trim();
+    const estado   = document.getElementById('mc-filtro-estado')?.value || 'todos';
+    const tbody    = document.getElementById('mc-tabla-body');
+    if (!tbody) return;
+
+    _mcTareas = [...(state.invTareas || [])].reverse().filter(t => {
+        if (estado !== 'todos' && t.estado !== estado) return false;
+        if (asignado && !(t.asignado || '').toLowerCase().includes(asignado)) return false;
+        return true;
+    });
+
+    if (_mcTareas.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:2rem;">No se encontraron tareas.</td></tr>`;
+        return;
+    }
+
+    const estadoBadge = e => {
+        if (e === 'pendiente')          return 'badge-warning';
+        if (e === 'en proceso')         return 'badge-success';
+        if (e === 'reconteo pendiente') return 'badge-danger';
+        if (e === 'conciliada')         return 'badge-info';
+        if (e === 'cerrada')            return 'badge-secondary';
+        return 'badge-info';
+    };
+
+    tbody.innerHTML = _mcTareas.map((t, idx) => `
+        <tr onclick="seleccionarTareaMC(${idx})" id="mc-row-${idx}"
+            style="cursor:pointer;">
+            <td><span class="badge badge-info">${t.codigo || '—'}</span></td>
+            <td>${t.tipo || '—'}</td>
+            <td>${t.criterio || '—'}</td>
+            <td>${t.asignado || '—'}</td>
+            <td><span class="badge ${estadoBadge(t.estado)}">${t.estado || '—'}</span></td>
+            <td>${t.reconteo || '—'}</td>
+        </tr>
+    `).join('');
+}
+
+function recargarMisConteos() {
+    const inputAsignado = document.getElementById('mc-buscar-asignado');
+    const selectEstado  = document.getElementById('mc-filtro-estado');
+    if (inputAsignado) inputAsignado.value = '';
+    if (selectEstado)  selectEstado.value  = 'todos';
+    _mcTareas = [];
+    const panel = document.getElementById('mc-detalle-panel');
+    if (panel) panel.innerHTML = `
+        <div style="text-align:center; padding:2.5rem 1rem; color:var(--text-muted);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                style="width:40px;height:40px; margin:0 auto 0.75rem; display:block; opacity:0.35;">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            <p style="font-size:0.85rem;">Selecciona una tarea<br>para ver el detalle</p>
+        </div>`;
+    filtrarMisConteos();
+}
+
+function seleccionarTareaMC(idx) {
+    document.querySelectorAll('#mc-tabla-body tr').forEach(r => r.classList.remove('row-selected'));
+    const row = document.getElementById(`mc-row-${idx}`);
+    if (row) row.classList.add('row-selected');
+    renderDetalleRapidoMC(_mcTareas[idx]);
+}
+
+function renderDetalleRapidoMC(t) {
+    const panel = document.getElementById('mc-detalle-panel');
+    if (!panel || !t) return;
+
+    const estadoBadge = e => {
+        if (e === 'pendiente')          return 'badge-warning';
+        if (e === 'en proceso')         return 'badge-success';
+        if (e === 'reconteo pendiente') return 'badge-danger';
+        if (e === 'conciliada')         return 'badge-info';
+        if (e === 'cerrada')            return 'badge-secondary';
+        return 'badge-info';
+    };
+
+    panel.innerHTML = `
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+            <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                <span class="badge badge-info" style="font-size:0.9rem; padding:0.3rem 0.7rem;">${t.codigo || '—'}</span>
+                <span class="badge ${estadoBadge(t.estado)}">${t.estado || '—'}</span>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem 0.9rem; font-size:0.82rem;">
+                <div>
+                    <div style="color:var(--text-muted); font-size:0.75rem; margin-bottom:2px;">Tipo</div>
+                    <div style="font-weight:500;">${t.tipo || '—'}</div>
+                </div>
+                <div>
+                    <div style="color:var(--text-muted); font-size:0.75rem; margin-bottom:2px;">Zona</div>
+                    <div style="font-weight:500;">${t.zona || '—'}</div>
+                </div>
+                <div>
+                    <div style="color:var(--text-muted); font-size:0.75rem; margin-bottom:2px;">Asignado a</div>
+                    <div style="font-weight:500;">${t.asignado || '—'}</div>
+                </div>
+                <div>
+                    <div style="color:var(--text-muted); font-size:0.75rem; margin-bottom:2px;">Creado por</div>
+                    <div style="font-weight:500;">${t.creadopor || '—'}</div>
+                </div>
+                <div style="grid-column:1/-1;">
+                    <div style="color:var(--text-muted); font-size:0.75rem; margin-bottom:2px;">Fecha</div>
+                    <div style="font-weight:500;">${t.fecha || '—'}</div>
+                </div>
+            </div>
+
+            ${t.obs ? `
+            <div style="font-size:0.81rem;">
+                <div style="color:var(--text-muted); font-size:0.75rem; margin-bottom:4px;">Observación</div>
+                <div style="background:var(--bg-secondary,#f5f5f5); border-radius:6px; padding:0.6rem 0.75rem; color:var(--text-secondary); line-height:1.45;">${t.obs}</div>
+            </div>` : ''}
+
+            <div style="display:flex; flex-direction:column; gap:0.5rem; padding-top:0.5rem; border-top:1px solid var(--border-subtle);">
+                <button class="btn btn-primary" style="justify-content:center; font-size:0.82rem;"
+                    onclick="alert('Sección Conteos Físicos en desarrollo');">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                        <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                    </svg>
+                    Ir a conteo
+                </button>
+                <button class="btn btn-secondary" style="justify-content:center; font-size:0.82rem;"
+                    onclick="alert('Sección Conciliación en desarrollo');">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                    Ver conciliación
+                </button>
+                <button class="btn btn-secondary" style="justify-content:center; font-size:0.82rem;"
+                    onclick="alert('Sección Informe Inventario en desarrollo');">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    Ver informe
+                </button>
+            </div>
+        </div>
+    `;
 }
 
 // ==========================================================================

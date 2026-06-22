@@ -17,8 +17,8 @@ const VULCAN_USERS = [
 
 // --- Mapa de permisos: qué pestañas puede ver cada rol ---
 const ROLE_TABS = {
-    admin: ["dashboard", "inventory", "invoicing", "logistics", "picking", "dataentry", "settings"],
-    warehouse: ["dashboard", "inventory", "logistics", "picking"],
+    admin: ["dashboard", "inventory", "invoicing", "logistics", "picking", "dataentry", "inventario", "settings"],
+    warehouse: ["dashboard", "inventory", "logistics", "picking", "inventario"],
     cashier: ["dashboard", "invoicing"]
 };
 
@@ -241,7 +241,7 @@ function initAppSession() {
     if (roleEl) roleEl.innerText = ROLE_LABELS[session.role] || session.role;
 
     // 2. Ocultar módulos (pestañas) no permitidos para el rol
-    const allTabs = ["dashboard", "inventory", "invoicing", "logistics", "picking", "settings"];
+    const allTabs = ["dashboard", "inventory", "invoicing", "logistics", "picking", "inventario", "settings"];
     allTabs.forEach(tab => {
         const link = document.getElementById(`nav-${tab}`);
         if (!link) return;

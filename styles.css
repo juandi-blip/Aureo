@@ -2210,6 +2210,15 @@ body::before {
     padding-left: calc(1.5rem - 2.5px);
 }
 
+/* Fila seleccionada en mis-conteos */
+.custom-table tbody tr.row-selected td {
+    background-color: rgba(46, 74, 110, 0.08);
+}
+.custom-table tbody tr.row-selected td:first-child {
+    border-left: 3px solid #2e4a6e;
+    padding-left: calc(1.5rem - 3px);
+}
+
 /* Nav link activo con gradiente horizontal más sutil y marcador angular */
 .nav-link.active {
     background: linear-gradient(
