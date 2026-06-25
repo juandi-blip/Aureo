@@ -9,10 +9,17 @@
 ## 1. Objetivo
 
 Construir el sitio de marketing de Aureo en `aureo.app` para captar clientela
-(dueños de ferreterías medianas en Colombia) mediante una **lista de espera**
-pre-lanzamiento. El sitio educa al prospecto sobre el dolor que Aureo resuelve,
-demuestra el diferenciador (logística empresarial accesible) y convierte el
-interés en un email registrado.
+mediante una **lista de espera** pre-lanzamiento. El sitio educa al prospecto
+sobre el dolor que Aureo resuelve, demuestra el diferenciador (logística
+empresarial accesible) y convierte el interés en un email registrado.
+
+**Público objetivo:** la ferretería mediana es la **punta de lanza** (origen del
+producto, dolor mejor entendido), pero la landing habla a **todo negocio con el
+mismo contexto operativo**: inventario físico + ventas/POS + bodega que
+gestionar. Esto incluye ferreterías, distribuidoras, depósitos de materiales de
+construcción, repuestos automotrices, ferro-eléctricos, agroinsumos y almacenes
+con SKUs y rotación. El mensaje principal usa la ferretería como ejemplo
+concreto, pero el copy y los planes no excluyen a esos negocios afines.
 
 **Meta primaria:** maximizar registros calificados en la waitlist.
 **Meta secundaria:** establecer la marca Aureo y servir de base SEO.
@@ -22,8 +29,10 @@ interés en un email registrado.
 ## 2. Contexto estratégico
 
 - **Etapa:** producto en desarrollo, **sin clientes ni testimonios todavía**.
-- **Mercado:** ferreterías medianas (5–20 empleados, 500–2000+ SKUs, bodega
-  propia) en Colombia primero; LATAM después.
+- **Mercado:** negocios con inventario físico + ventas + bodega (5–20 empleados,
+  500–2000+ SKUs) en Colombia primero; LATAM después. Cuña de entrada:
+  ferreterías medianas. Expansión natural: distribuidoras, materiales de
+  construcción, repuestos, ferro-eléctricos, agroinsumos, almacenes con rotación.
 - **Diferenciador real:** Aureo incluye WMS con mapa de calor de bodega,
   análisis ABC, rotación Pareto y flujo de picking — logística de nivel
   corporativo empaquetada para una PyME. La competencia directa (Alegra,
@@ -89,8 +98,10 @@ Orden de la página, de arriba hacia abajo:
    CTA "Unirse a la lista".
 2. **Hero** — headline de outcome + subhead + CTA primario (captura email inline)
    + visual del producto (dashboard real). Sin jerga.
-3. **Problema** — los 3–4 dolores del dueño de ferretería mediana (buscar
+3. **Problema** — los 3–4 dolores del dueño de negocio con bodega (buscar
    productos a ciegas, no saber qué rota, picking lento, inventario descuadrado).
+   Se ilustra con la ferretería como caso concreto pero el dolor es transversal
+   a cualquier negocio con inventario físico.
 4. **Solución / Cómo funciona** — 3 pasos simples de cómo Aureo lo resuelve.
 5. **Módulos / Features** — grid con los diferenciadores: POS, Inventario, WMS
    (mapa de calor), ABC/Pareto, Picking. Cada uno con captura real + beneficio.
