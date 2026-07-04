@@ -1862,44 +1862,6 @@ body {
 }
 
 /* Hover popup for racks */
-.warehouse-rack-slot .rack-tooltip {
-    display: none;
-    position: absolute;
-    bottom: 118%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(255, 255, 255, 0.98);
-    border: 1px solid var(--border-accent);
-    color: var(--text-primary);
-    padding: 0.85rem 1.15rem;
-    border-radius: var(--radius-md);
-    width: 250px;
-    text-align: left;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 15px rgba(46, 74, 110, 0.05);
-    z-index: 500;
-    pointer-events: none;
-    font-size: 0.82rem;
-    line-height: 1.45;
-}
-
-.warehouse-rack-slot:hover .rack-tooltip {
-    display: block;
-}
-
-.rack-tooltip h4 {
-    font-family: var(--font-display);
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--accent-gold);
-    margin-bottom: 0.45rem;
-    border-bottom: 1px solid rgba(46, 74, 110, 0.15);
-    padding-bottom: 0.3rem;
-}
-
-.rack-tooltip p {
-    margin-bottom: 0.3rem;
-    font-size: 0.78rem;
-}
 
 /* AI Recommendation cards */
 .abc-recommendation-card {
@@ -1939,6 +1901,12 @@ body {
     background-color: rgba(168, 68, 44, 0.08);
     color: var(--accent-rose);
     border: 1px solid rgba(168, 68, 44, 0.2);
+}
+
+.abc-rec-tag.tag-medium {
+    background-color: rgba(74, 122, 181, 0.08);
+    color: #4A7AB5;
+    border: 1px solid rgba(74, 122, 181, 0.2);
 }
 
 .abc-rec-tag.tag-low {

@@ -777,21 +777,6 @@
                 </div>
             </div>
 
-            <!-- Pareto Chart -->
-            <div class="card" style="margin-bottom: 2rem;">
-                <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem; margin-bottom: 1.5rem;">
-                    <h2 class="card-title">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /><line x1="2" y1="20" x2="22" y2="20" />
-                        </svg>
-                        Gráfico de Pareto ABC
-                    </h2>
-                </div>
-                <div style="overflow-x: auto;">
-                    <svg id="abc-pareto-svg" viewBox="0 0 500 280" style="width: 100%; min-width: 300px; height: auto; display: block;"></svg>
-                </div>
-            </div>
-
             <!-- Interactive Heatmap Map -->
             <div>
                 <!-- Warehouse heat map container -->
@@ -1053,7 +1038,7 @@
                 <div class="form-group">
                     <label class="form-label" for="product-modal-name">Nombre / Especificación Técnica</label>
                     <input type="text" class="form-input" id="product-modal-name" required
-                        placeholder="Ej: Rotomartillo SDS-Max Bosch 1500W">
+                        placeholder="Ej: Rotomartillo SDS-Max Ferrox 1500W">
                 </div>
 
                 <div class="form-row">
@@ -1145,7 +1130,7 @@
                     <div class="form-group">
                         <label class="form-label" for="product-modal-brand">Marca del Fabricante</label>
                         <input type="text" class="form-input" id="product-modal-brand" required
-                            placeholder="Ej: Bosch, DeWalt, Stanley">
+                            placeholder="Ej: Ferrox, Kratos, Andina Tools">
                     </div>
                 </div>
 
@@ -1195,6 +1180,8 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <!-- Guardia de sesión y control de acceso por rol (debe ir ANTES de app.js) -->
     <script src="auth.js"></script>
+    <!-- Data ficticia del demo comercial (debe ir ANTES de app.js) -->
+    <script src="demo-data.js"></script>
     <!-- Script Application Logic -->
     <script src="app.js"></script>
 </body>

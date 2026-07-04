@@ -30,7 +30,7 @@ function apiPut(endpoint, data) {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(data)
-    }).catch(() => {});
+    }).catch(() => { });
 }
 
 // --- CORE SYSTEM STATE ---
@@ -61,83 +61,9 @@ let state = {
     labels: []
 };
 
-// --- INITIAL INDUSTRIAL DEMO DATA ---
-const DEMO_PRODUCTS = [
-    { id: "1", name: "Rotomartillo Percutor SDS-Max 1500W (Bosch)", sku: "SKU-BOSC-1500", category: "Herramientas Eléctricas", price: 489.00, stock: 8, threshold: 3, lot: "L-2938", mfgDate: "2026-01-15", expDate: "2028-06-15", warehouse: "Bodega Principal", aisle: "D", shelf: 3, level: 1, pickingDistance: 32, brand: "Bosch", supplier: "Bosch Latam" , expiry: "2031-01-15" }, // Clase A - Mal ubicado (Pasillo D, muy lejos!)
-    { id: "2", name: "Disco Flap de Desbaste 4.5\" G60 (Caja x50) (3M)", sku: "SKU-3M-FLAP60", category: "Consumibles", price: 125.00, stock: 22, threshold: 5, lot: "L-1102", mfgDate: "2026-02-10", expDate: "2027-12-31", warehouse: "Bodega Principal", aisle: "A", shelf: 1, level: 2, pickingDistance: 8, brand: "3M", supplier: "3M Distribución" , expiry: "2026-08-15" }, // Clase A - Bien ubicado (Pasillo A)
-    { id: "3", name: "Juego de Llaves Alen de Titanio Profesional (Stanley)", sku: "SKU-STAN-ALLEN", category: "Herramientas Manuales", price: 49.00, stock: 35, threshold: 8, lot: "L-5524", mfgDate: "2025-11-01", expDate: "2027-11-01", warehouse: "Bodega Principal", aisle: "B", shelf: 2, level: 1, pickingDistance: 15, brand: "Stanley", supplier: "Stanley Tools" , expiry: "2035-11-01" }, // Clase B - Bien ubicado (Pasillo B)
-    { id: "4", name: "Compresor de Aire Trifásico 3HP 100L (Kraftwerk)", sku: "SKU-KRAFT-100L", category: "Maquinaria Pesada", price: 899.00, stock: 2, threshold: 1, lot: "L-0045", mfgDate: "2025-08-20", expDate: "2030-08-20", warehouse: "Bodega Principal", aisle: "A", shelf: 4, level: 1, pickingDistance: 6, brand: "Kraftwerk", supplier: "Importadora Alemana" , expiry: "2035-08-20" }, // Clase C - Mal ubicado (Ocupa Pasillo A de picking rápido con carga pesada!)
-    { id: "5", name: "Soldadora Inverter Turbo Profesional 250A (Lincoln Electric)", sku: "SKU-LINC-250A", category: "Herramientas Eléctricas", price: 649.00, stock: 0, threshold: 2, lot: "L-8821", mfgDate: "2025-10-15", expDate: "2027-10-15", warehouse: "Bodega Principal", aisle: "D", shelf: 5, level: 3, pickingDistance: 38, brand: "Lincoln Electric", supplier: "Lincoln Siderúrgica" , expiry: "2027-04-15" }, // Clase A - Bien ubicado (Agotado)
-    { id: "6", name: "Cerradura Digital Multianclaje de Alta Seguridad (Yale)", sku: "SKU-YALE-DIGI", category: "Fijaciones", price: 185.00, stock: 12, threshold: 3, lot: "L-9021", mfgDate: "2026-03-01", expDate: "2029-03-01", warehouse: "Bodega Principal", aisle: "C", shelf: 1, level: 2, pickingDistance: 24, brand: "Yale", supplier: "Yale Seguridad" , expiry: "2031-03-01" }, // Clase B - Bien ubicado (Pasillo C)
-    { id: "7", name: "Taladro Atornillador Inalámbrico 20V MAX (DeWalt)", sku: "SKU-DEWA-20V", category: "Herramientas Eléctricas", price: 219.00, stock: 14, threshold: 4, lot: "L-7001", mfgDate: "2026-01-20", expDate: "2029-01-20", warehouse: "Bodega Principal", aisle: "B", shelf: 1, level: 1, pickingDistance: 12, brand: "DeWalt", supplier: "DeWalt Pro Tools" , expiry: "2030-01-20" },
-    { id: "8", name: "Amoladora Angular 4.5\" 900W (Makita)", sku: "SKU-MAKI-900W", category: "Herramientas Eléctricas", price: 139.00, stock: 9, threshold: 3, lot: "L-7002", mfgDate: "2025-12-05", expDate: "2028-12-05", warehouse: "Bodega Principal", aisle: "B", shelf: 2, level: 1, pickingDistance: 14, brand: "Makita", supplier: "Makita Industrial" , expiry: "2026-10-05" },
-    { id: "9", name: "Sierra Circular 7-1/4\" 1800W (Skil)", sku: "SKU-SKIL-1800", category: "Herramientas Eléctricas", price: 169.00, stock: 6, threshold: 2, lot: "L-7003", mfgDate: "2025-11-18", expDate: "2028-11-18", warehouse: "Bodega Principal", aisle: "B", shelf: 3, level: 2, pickingDistance: 16, brand: "Skil", supplier: "Bosch Latam" , expiry: "2027-03-18" },
-    { id: "10", name: "Set Destornilladores Aislados 1000V x12 (Klein Tools)", sku: "SKU-KLEIN-12", category: "Herramientas Manuales", price: 89.00, stock: 21, threshold: 5, lot: "L-7004", mfgDate: "2026-02-01", expDate: "2030-02-01", warehouse: "Bodega Principal", aisle: "B", shelf: 1, level: 2, pickingDistance: 13, brand: "Klein Tools", supplier: "Klein Distribución" , expiry: "2031-02-01" },
-    { id: "11", name: "Llave de Impacto Neumática 1/2\" (Ingersoll Rand)", sku: "SKU-INGR-12", category: "Herramientas Eléctricas", price: 299.00, stock: 4, threshold: 2, lot: "L-7005", mfgDate: "2025-10-22", expDate: "2029-10-22", warehouse: "Bodega Principal", aisle: "B", shelf: 4, level: 1, pickingDistance: 18, brand: "Ingersoll Rand", supplier: "IR Neumática" , expiry: "2026-12-22" },
-    { id: "12", name: "Juego de Dados Cromo Vanadio 1/2\" x40 (Stanley)", sku: "SKU-STAN-D40", category: "Herramientas Manuales", price: 75.00, stock: 28, threshold: 6, lot: "L-7006", mfgDate: "2026-01-12", expDate: "2030-01-12", warehouse: "Bodega Principal", aisle: "B", shelf: 2, level: 2, pickingDistance: 15, brand: "Stanley", supplier: "Stanley Tools" , expiry: "2036-01-12" },
-    { id: "13", name: "Martillo de Uña Fibra de Vidrio 16oz (Truper)", sku: "SKU-TRUP-16OZ", category: "Herramientas Manuales", price: 18.50, stock: 42, threshold: 10, lot: "L-7007", mfgDate: "2026-03-08", expDate: "2031-03-08", warehouse: "Bodega Principal", aisle: "B", shelf: 3, level: 1, pickingDistance: 15, brand: "Truper", supplier: "Truper Mayorista" , expiry: "2036-03-08" },
-    { id: "14", name: "Flexómetro Profesional 8m Anti-impacto (Stanley)", sku: "SKU-STAN-8M", category: "Herramientas Manuales", price: 14.90, stock: 55, threshold: 12, lot: "L-7008", mfgDate: "2026-02-25", expDate: "2031-02-25", warehouse: "Bodega Principal", aisle: "A", shelf: 2, level: 1, pickingDistance: 9, brand: "Stanley", supplier: "Stanley Tools" , expiry: "2031-02-25" },
-    { id: "15", name: "Guantes Anticorte Nivel 5 (Caja x12 pares) (3M)", sku: "SKU-3M-GLOVE5", category: "Consumibles", price: 64.00, stock: 18, threshold: 5, lot: "L-7009", mfgDate: "2026-01-05", expDate: "2026-07-10", warehouse: "Bodega Principal", aisle: "A", shelf: 1, level: 1, pickingDistance: 7, brand: "3M", supplier: "3M Distribución" , expiry: "2026-05-20" },
-    { id: "16", name: "Casco de Seguridad con Ratchet (MSA V-Gard)", sku: "SKU-MSA-VGARD", category: "Consumibles", price: 32.00, stock: 30, threshold: 8, lot: "L-7010", mfgDate: "2026-02-14", expDate: "2029-02-14", warehouse: "Bodega Principal", aisle: "A", shelf: 1, level: 2, pickingDistance: 8, brand: "MSA", supplier: "MSA Safety" , expiry: "2031-02-14" },
-    { id: "17", name: "Lentes de Seguridad Antiempañe (Caja x20) (3M)", sku: "SKU-3M-LENS20", category: "Consumibles", price: 48.00, stock: 26, threshold: 6, lot: "L-7011", mfgDate: "2026-03-02", expDate: "2028-03-02", warehouse: "Bodega Principal", aisle: "A", shelf: 2, level: 2, pickingDistance: 9, brand: "3M", supplier: "3M Distribución" , expiry: "2026-08-20" },
-    { id: "18", name: "Cinta Aislante 3/4\" Negra (Pack x10) (3M Scotch)", sku: "SKU-3M-TAPE10", category: "Consumibles", price: 22.00, stock: 60, threshold: 15, lot: "L-7012", mfgDate: "2026-01-30", expDate: "2028-01-30", warehouse: "Bodega Principal", aisle: "A", shelf: 3, level: 1, pickingDistance: 10, brand: "3M", supplier: "3M Distribución" , expiry: "2026-11-15" },
-    { id: "19", name: "Electrodos de Soldadura 6013 1/8\" (5kg) (Lincoln Electric)", sku: "SKU-LINC-6013", category: "Consumibles", price: 38.50, stock: 9, threshold: 4, lot: "L-7013", mfgDate: "2025-12-28", expDate: "2026-06-28", warehouse: "Bodega Principal", aisle: "A", shelf: 4, level: 2, pickingDistance: 11, brand: "Lincoln Electric", supplier: "Lincoln Siderúrgica" , expiry: "2026-06-15" },
-    { id: "20", name: "Disco de Corte Metal 4.5\" (Caja x100) (Bosch)", sku: "SKU-BOSC-CUT100", category: "Consumibles", price: 95.00, stock: 0, threshold: 5, lot: "L-7014", mfgDate: "2025-11-10", expDate: "2027-11-10", warehouse: "Bodega Principal", aisle: "A", shelf: 5, level: 2, pickingDistance: 12, brand: "Bosch", supplier: "Bosch Latam" , expiry: "2027-02-10" },
-    { id: "21", name: "Tornillos Autoperforantes #8 x1\" (Caja x500) (Hilti)", sku: "SKU-HILT-SD500", category: "Fijaciones", price: 28.00, stock: 34, threshold: 8, lot: "L-7015", mfgDate: "2026-02-18", expDate: "2031-02-18", warehouse: "Bodega Principal", aisle: "C", shelf: 2, level: 1, pickingDistance: 22, brand: "Hilti", supplier: "Hilti Chile" , expiry: "2036-02-18" },
-    { id: "22", name: "Anclajes de Expansión 3/8\" (Caja x50) (Hilti)", sku: "SKU-HILT-EXP50", category: "Fijaciones", price: 41.00, stock: 19, threshold: 6, lot: "L-7016", mfgDate: "2026-01-08", expDate: "2031-01-08", warehouse: "Bodega Principal", aisle: "C", shelf: 3, level: 1, pickingDistance: 25, brand: "Hilti", supplier: "Hilti Chile" , expiry: "2036-01-08" },
-    { id: "23", name: "Tarugos Nylon 8mm (Bolsa x200) (Fischer)", sku: "SKU-FISC-N200", category: "Fijaciones", price: 12.00, stock: 48, threshold: 12, lot: "L-7017", mfgDate: "2026-03-15", expDate: "2032-03-15", warehouse: "Bodega Principal", aisle: "C", shelf: 4, level: 2, pickingDistance: 26, brand: "Fischer", supplier: "Fischer Anclajes" , expiry: "2036-03-15" },
-    { id: "24", name: "Pernos Hexagonales Grado 8 1/2\"x2\" (Caja x100) (Fixser)", sku: "SKU-FIXS-G8", category: "Fijaciones", price: 33.50, stock: 23, threshold: 6, lot: "L-7018", mfgDate: "2026-02-09", expDate: "2032-02-09", warehouse: "Bodega Secundaria", aisle: "C", shelf: 5, level: 1, pickingDistance: 28, brand: "Fixser", supplier: "Fixser Industrial" , expiry: "2036-02-09" },
-    { id: "25", name: "Generador Eléctrico a Gasolina 6500W (Honda)", sku: "SKU-HOND-6500", category: "Maquinaria Pesada", price: 1290.00, stock: 3, threshold: 1, lot: "L-7019", mfgDate: "2025-09-12", expDate: "2032-09-12", warehouse: "Bodega Secundaria", aisle: "D", shelf: 4, level: 1, pickingDistance: 36, brand: "Honda", supplier: "Honda Power Equipment" , expiry: "2035-09-12" },
-    { id: "26", name: "Hidrolavadora Industrial 2500PSI (Kärcher)", sku: "SKU-KARC-2500", category: "Maquinaria Pesada", price: 749.00, stock: 5, threshold: 2, lot: "L-7020", mfgDate: "2025-10-30", expDate: "2031-10-30", warehouse: "Bodega Secundaria", aisle: "D", shelf: 5, level: 1, pickingDistance: 40, brand: "Kärcher", supplier: "Kärcher Profesional" , expiry: "2032-10-30" }
-];
-
-const DEMO_INVOICES = [
-    {
-        id: "FACT-2026-0001",
-        clientName: "Juan Díaz",
-        clientId: "RUT-12.845.922-K",
-        date: "2026-05-28",
-        items: [{ productId: "1", name: "Rotomartillo Percutor SDS-Max 1500W (Bosch)", price: 489.00, qty: 2 }],
-        subtotal: 978.00,
-        discountPct: 5,
-        discountVal: 48.90,
-        taxRate: 19,
-        taxVal: 176.53,
-        total: 1105.63,
-        status: "paid"
-    },
-    {
-        id: "FACT-2026-0002",
-        clientName: "Constructora Andes SpA",
-        clientId: "RUT-76.338.229-5",
-        date: "2026-05-29",
-        items: [
-            { productId: "2", name: "Disco Flap de Desbaste 4.5\" G60 (Caja x50) (3M)", price: 125.00, qty: 8 },
-            { productId: "3", name: "Juego de Llaves Alen de Titanio Profesional (Stanley)", price: 49.00, qty: 3 }
-        ],
-        subtotal: 1147.00,
-        discountPct: 0,
-        discountVal: 0,
-        taxRate: 19,
-        taxVal: 217.93,
-        total: 1364.93,
-        status: "paid"
-    },
-    {
-        id: "FACT-2026-0003",
-        clientName: "Metalúrgica Maipú",
-        clientId: "RUT-88.321.442-9",
-        date: "2026-05-30",
-        items: [{ productId: "4", name: "Compresor de Aire Trifásico 3HP 100L (Kraftwerk)", price: 899.00, qty: 1 }],
-        subtotal: 899.00,
-        discountPct: 10,
-        discountVal: 89.90,
-        taxRate: 19,
-        taxVal: 153.73,
-        total: 962.83,
-        status: "paid"
-    }
-];
+// --- INITIAL INDUSTRIAL DEMO DATA (catalogo vive en demo-data.js) ---
+const DEMO_PRODUCTS = (typeof DEMO_DATA !== 'undefined') ? DEMO_DATA.products : [];
+const DEMO_INVOICES = (typeof DEMO_DATA !== 'undefined') ? DEMO_DATA.buildInvoices(new Date()) : [];
 
 // --- INITIALIZE APPLICATION ---
 document.addEventListener("DOMContentLoaded", async () => {
@@ -180,7 +106,7 @@ async function loadDatabase() {
             state.products = JSON.parse(storedProducts);
             let updated = false;
             state.products.forEach(p => {
-                if (!p.warehouse || ["Tecnología","Audio","Accesorios","Oficina"].includes(p.category)) {
+                if (!p.warehouse || ["Tecnología", "Audio", "Accesorios", "Oficina"].includes(p.category)) {
                     const catMap = { "Tecnología": "Herramientas Eléctricas", "Audio": "Consumibles", "Accesorios": "Herramientas Manuales", "Oficina": "Fijaciones" };
                     if (catMap[p.category]) p.category = catMap[p.category];
                     p.warehouse = p.warehouse || "Bodega Principal";
@@ -194,12 +120,16 @@ async function loadDatabase() {
                 }
             });
             if (updated) saveProductsToStorage();
+        } else {
+            // Sin productos en localStorage ni en API → cargar datos demo
+            state.products = [...DEMO_PRODUCTS];
+            saveProductsToStorage();
         }
         // Migrate expiry dates from DEMO_PRODUCTS catalog
         const _demoExpiryMap = {};
-        DEMO_PRODUCTS.forEach(function(dp) { if (dp.expiry) _demoExpiryMap[dp.id] = dp.expiry; });
+        DEMO_PRODUCTS.forEach(function (dp) { if (dp.expiry) _demoExpiryMap[dp.id] = dp.expiry; });
         let _expiryMigrated = false;
-        state.products.forEach(function(p) {
+        state.products.forEach(function (p) {
             if (!p.expiry && _demoExpiryMap[p.id]) { p.expiry = _demoExpiryMap[p.id]; _expiryMigrated = true; }
         });
         if (_expiryMigrated) saveProductsToStorage();
@@ -242,22 +172,48 @@ async function loadDatabase() {
         state.pickingLists = apiPicking;
         localStorage.setItem("aura_picking", JSON.stringify(apiPicking));
     } else {
+        if (!localStorage.getItem("aura_picking") && typeof DEMO_DATA !== 'undefined') {
+            state.pickingLists = DEMO_DATA.buildPicking(new Date(), state.products, state.invoices);
+            savePickingToStorage();
+        }
         loadPickingLists();
     }
 
     // --- Ingreso de Datos ---
-    const deKeys = ['materials','suppliers','locations','movements','transit','labels'];
+    const deKeys = ['materials', 'suppliers', 'locations', 'movements', 'transit', 'labels'];
+    let _demoDE = null;
     deKeys.forEach(k => {
         const raw = localStorage.getItem(`vf_de_${k}`);
-        if (raw) state[k] = JSON.parse(raw);
+        if (raw) {
+            state[k] = JSON.parse(raw);
+        } else if (typeof DEMO_DATA !== 'undefined') {
+            if (!_demoDE) _demoDE = DEMO_DATA.buildDE(new Date());
+            state[k] = _demoDE[k] || [];
+            saveDEKey(k);
+        }
     });
 
     loadWMSLog();
+    if (!localStorage.getItem('aura_wms_log') && typeof DEMO_DATA !== 'undefined') {
+        state.wmsLog = DEMO_DATA.buildWmsLog(new Date(), state.products);
+        localStorage.setItem('aura_wms_log', JSON.stringify(state.wmsLog));
+    }
     applyVisualSettings();
 
     // --- Inventario ---
     const invTareasRaw = localStorage.getItem('aureo_inv_tareas');
     if (invTareasRaw) state.invTareas = JSON.parse(invTareasRaw);
+    const invConteosRaw = localStorage.getItem('aureo_inv_conteos');
+    if (invConteosRaw) state.invConteos = JSON.parse(invConteosRaw);
+    const invReconteosRaw = localStorage.getItem('aureo_inv_reconteos');
+    if (invReconteosRaw) state.invReconteos = JSON.parse(invReconteosRaw);
+    if (!invTareasRaw && !invConteosRaw && typeof DEMO_DATA !== 'undefined') {
+        const _demoInv = DEMO_DATA.buildInvData(new Date());
+        state.invTareas = _demoInv.tareas;
+        state.invConteos = _demoInv.conteos;
+        state.invReconteos = _demoInv.reconteos;
+        saveState();
+    }
 }
 
 function saveProductsToStorage() {
@@ -267,7 +223,7 @@ function saveProductsToStorage() {
 
 // Versión del catálogo demo. Al subirla, los productos nuevos de DEMO_PRODUCTS
 // se inyectan una sola vez en inventarios ya guardados, sin tocar lo existente.
-const SEED_VERSION = 2;
+const SEED_VERSION = 3;
 function mergeSeedProducts() {
     const stored = parseInt(localStorage.getItem("aura_seed_version") || "1", 10);
     if (stored >= SEED_VERSION) return;
@@ -296,6 +252,12 @@ function saveSettingsToStorage() {
 
 function saveDEKey(key) {
     localStorage.setItem(`vf_de_${key}`, JSON.stringify(state[key]));
+}
+
+function saveState() {
+    localStorage.setItem('aureo_inv_tareas', JSON.stringify(state.invTareas || []));
+    localStorage.setItem('aureo_inv_conteos', JSON.stringify(state.invConteos || []));
+    localStorage.setItem('aureo_inv_reconteos', JSON.stringify(state.invReconteos || []));
 }
 
 function applyVisualSettings() {
@@ -342,11 +304,28 @@ function saveCompanySettings(event) {
 
 function resetSystemDatabase() {
     if (confirm("¿Estás seguro de que deseas formatear todos los datos del sistema? Se perderán las modificaciones personalizadas y el inventario volverá a su estado base.")) {
-        localStorage.removeItem("aura_products");
-        localStorage.removeItem("aura_invoices");
-        localStorage.removeItem("aura_settings");
-        localStorage.removeItem("aura_picking");
-        localStorage.removeItem("aura_seed_version");
+        [
+            "aura_products", "aura_invoices", "aura_settings", "aura_picking",
+            "aura_seed_version", "aura_wms_log",
+            "vf_de_materials", "vf_de_suppliers", "vf_de_locations",
+            "vf_de_movements", "vf_de_transit", "vf_de_labels",
+            "aureo_inv_tareas", "aureo_inv_conteos", "aureo_inv_reconteos"
+        ].forEach(k => localStorage.removeItem(k));
+
+        // Resetear estado en memoria para que loadDatabase re-siembre limpio
+        state.products = [];
+        state.invoices = [];
+        state.pickingLists = [];
+        state.materials = [];
+        state.suppliers = [];
+        state.locations = [];
+        state.movements = [];
+        state.transit = [];
+        state.labels = [];
+        state.invTareas = [];
+        state.invConteos = [];
+        state.invReconteos = [];
+        state.wmsLog = [];
 
         // Limpiar también el backend si está disponible
         const token = _apiToken();
@@ -354,7 +333,7 @@ function resetSystemDatabase() {
             fetch(`${API_BASE}/api/reset`, {
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${token}` }
-            }).catch(() => {});
+            }).catch(() => { });
         }
 
         loadDatabase().then(() => {
@@ -378,6 +357,7 @@ function formatCurrency(amount) {
 
 // --- TABS ROUTING SYSTEM ---
 function switchTab(tabId) {
+    console.log('[SWITCH]', tabId);
     state.activeTab = tabId;
 
     // Toggle active link class in sidebar
@@ -451,13 +431,13 @@ function switchTab(tabId) {
 // ==========================================================================
 
 const INV_SUBS = [
-    { id: 'panel',        label: 'Panel de inventarios', icon: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>' },
-    { id: 'crear-tarea',  label: 'Crear tarea',          icon: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>' },
-    { id: 'mis-conteos',  label: 'Mis conteos',          icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>' },
-    { id: 'conteos',      label: 'Conteos físicos',      icon: '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>' },
-    { id: 'conciliacion', label: 'Conciliación',         icon: '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>' },
-    { id: 'reconteos',    label: 'Reconteos',            icon: '<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>' },
-    { id: 'informe',      label: 'Informe inventario',   icon: '<path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="15" y2="11"/>' }
+    { id: 'panel', label: 'Panel de inventarios', icon: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>' },
+    { id: 'crear-tarea', label: 'Crear tarea', icon: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>' },
+    { id: 'mis-conteos', label: 'Mis conteos', icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>' },
+    { id: 'conteos', label: 'Conteos físicos', icon: '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>' },
+    { id: 'conciliacion', label: 'Conciliación', icon: '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>' },
+    { id: 'reconteos', label: 'Reconteos', icon: '<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>' },
+    { id: 'informe', label: 'Informe inventario', icon: '<path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="15" y2="11"/>' }
 ];
 
 let activeInventarioSub = null;
@@ -491,10 +471,10 @@ function switchInventarioSub(subId) {
     const content = document.getElementById('inventario-content');
 
     if (subId === 'panel') {
-        const tareasActivas     = (state.invTareas     || []).filter(t => t.estado === 'activa').length;
-        const pendientesConcil  = (state.invConteos    || []).filter(c => c.estado === 'pendiente').length;
-        const reconteosAbiertos = (state.invReconteos  || []).filter(r => r.estado === 'abierto').length;
-        const diferencias       = tareasActivas + pendientesConcil + reconteosAbiertos;
+        const tareasActivas = (state.invTareas || []).filter(t => t.estado === 'activa').length;
+        const pendientesConcil = (state.invConteos || []).filter(c => c.estado === 'pendiente').length;
+        const reconteosAbiertos = (state.invReconteos || []).filter(r => r.estado === 'abierto').length;
+        const diferencias = tareasActivas + pendientesConcil + reconteosAbiertos;
 
         content.innerHTML = `
             <div style="margin-top: 1.5rem;">
@@ -621,14 +601,14 @@ function switchInventarioSub(subId) {
                             </thead>
                             <tbody id="inv-panel-tabla">
                                 ${(() => {
-                                    const tareas = (state.invTareas || []).slice(-10).reverse();
-                                    if (tareas.length === 0) return `
+                const tareas = (state.invTareas || []).slice(-10).reverse();
+                if (tareas.length === 0) return `
                                         <tr>
                                             <td colspan="6" style="text-align:center; color:var(--text-secondary); padding: 2rem;">
                                                 No hay tareas registradas.
                                             </td>
                                         </tr>`;
-                                    return tareas.map(t => `
+                return tareas.map(t => `
                                         <tr>
                                             <td><span class="badge badge-info">${t.codigo || '—'}</span></td>
                                             <td>${t.tipo || '—'}</td>
@@ -637,7 +617,7 @@ function switchInventarioSub(subId) {
                                             <td>${t.responsable || '—'}</td>
                                             <td>${t.fecha || '—'}</td>
                                         </tr>`).join('');
-                                })()}
+            })()}
                             </tbody>
                         </table>
                     </div>
@@ -759,11 +739,11 @@ function switchInventarioSub(subId) {
     }
 
     if (subId === 'mis-conteos') {
-        const tareas     = state.invTareas || [];
-        const total      = tareas.length;
+        const tareas = state.invTareas || [];
+        const total = tareas.length;
         const pendientes = tareas.filter(t => t.estado === 'pendiente').length;
-        const enProceso  = tareas.filter(t => t.estado === 'activa').length;
-        const reconteos  = (state.invReconteos || []).length;
+        const enProceso = tareas.filter(t => t.estado === 'activa').length;
+        const reconteos = (state.invReconteos || []).length;
 
         content.innerHTML = `
             <div style="margin-top: 1.5rem;">
@@ -1077,12 +1057,12 @@ function switchInventarioSub(subId) {
     }
 
     if (subId === 'conciliacion') {
-        const conteos  = state.invConteos  || [];
-        const tareas   = state.invTareas   || [];
-        const totalItems     = conteos.length;
-        const sinDiferencia  = conteos.filter(c => (c.cantidadContada ?? 0) === (c.cantidadSistema ?? 0)).length;
-        const conDiferencia  = conteos.filter(c => (c.cantidadContada ?? 0) !== (c.cantidadSistema ?? 0)).length;
-        const pendConcil     = conteos.filter(c => c.estado === 'pendiente').length;
+        const conteos = state.invConteos || [];
+        const tareas = state.invTareas || [];
+        const totalItems = conteos.length;
+        const sinDiferencia = conteos.filter(c => (c.cantidadContada ?? 0) === (c.cantidadSistema ?? 0)).length;
+        const conDiferencia = conteos.filter(c => (c.cantidadContada ?? 0) !== (c.cantidadSistema ?? 0)).length;
+        const pendConcil = conteos.filter(c => c.estado === 'pendiente').length;
 
         content.innerHTML = `
             <div style="margin-top:1.5rem;">
@@ -1236,6 +1216,386 @@ function switchInventarioSub(subId) {
         return;
     }
 
+    if (subId === 'reconteos') {
+        const reconteos = state.invReconteos || [];
+        const total = reconteos.length;
+        const pendientes = reconteos.filter(r => r.estado === 'abierto' || r.estado === 'pendiente').length;
+        const enProceso = reconteos.filter(r => r.estado === 'en proceso').length;
+        const cerrados = reconteos.filter(r => r.estado === 'cerrado').length;
+
+        content.innerHTML = `
+            <div style="margin-top:1.5rem;">
+
+                <div class="stats-grid" style="margin-bottom:1.5rem;">
+                    <div class="card stat-card stat-cyan">
+                        <div class="stat-header">
+                            <span class="stat-title">Total reconteos</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="17 1 21 5 17 9"/>
+                                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                                    <polyline points="7 23 3 19 7 15"/>
+                                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${total}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend neutral">Generados</span>
+                            <span class="stat-period">desde conciliación</span>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card stat-amber">
+                        <div class="stat-header">
+                            <span class="stat-title">Pendientes</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${pendientes}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend ${pendientes > 0 ? 'down' : 'up'}">${pendientes > 0 ? 'Sin iniciar' : 'Al día'}</span>
+                            <span class="stat-period">por ejecutar</span>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card stat-gold">
+                        <div class="stat-header">
+                            <span class="stat-title">En proceso</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="2" x2="12" y2="6"/>
+                                    <line x1="12" y1="18" x2="12" y2="22"/>
+                                    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/>
+                                    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
+                                    <line x1="2" y1="12" x2="6" y2="12"/>
+                                    <line x1="18" y1="12" x2="22" y2="12"/>
+                                    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/>
+                                    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${enProceso}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend neutral">En ejecución</span>
+                            <span class="stat-period">conteos activos</span>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card stat-emerald">
+                        <div class="stat-header">
+                            <span class="stat-title">Cerrados</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${cerrados}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend up">Finalizados</span>
+                            <span class="stat-period">conciliados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dos columnas -->
+                <div style="display:flex; gap:1.25rem; align-items:flex-start;">
+
+                    <!-- IZQUIERDA: Consulta de reconteos -->
+                    <div class="card" style="flex:1; min-width:0;">
+                        <div class="card-header" style="border-bottom:1px solid var(--border-subtle); padding-bottom:1rem; margin-bottom:1.25rem;">
+                            <h2 class="card-title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                                Consulta de reconteos
+                            </h2>
+                        </div>
+
+                        <div style="display:flex; gap:0.6rem; margin-bottom:1rem; flex-wrap:wrap;">
+                            <div class="input-wrapper" style="flex:1; min-width:140px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                                </svg>
+                                <input type="text" class="form-input" id="rc-buscar-asignado" placeholder="Asignado a...">
+                            </div>
+                            <div style="min-width:155px;">
+                                <select class="form-select" id="rc-filtro-estado">
+                                    <option value="todos">Todos los estados</option>
+                                    <option value="pendiente">Pendiente</option>
+                                    <option value="en proceso">En proceso</option>
+                                    <option value="conciliada">Conciliada</option>
+                                    <option value="cerrada">Cerrada</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" onclick="filtrarReconteos()" style="white-space:nowrap;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                                Buscar
+                            </button>
+                        </div>
+
+                        <div style="overflow-x:auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Origen</th>
+                                        <th>Tipo</th>
+                                        <th>Criterio</th>
+                                        <th>Asignado</th>
+                                        <th>Estado</th>
+                                        <th style="text-align:center;">No coinciden</th>
+                                        <th style="text-align:center;">Exactitud</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rc-tabla-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- DERECHA: Acción rápida -->
+                    <div class="card" style="width:340px; flex-shrink:0;">
+                        <div class="card-header" style="border-bottom:1px solid var(--border-subtle); padding-bottom:1rem; margin-bottom:1.25rem;">
+                            <h2 class="card-title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                                </svg>
+                                Acción rápida
+                            </h2>
+                        </div>
+                        <div id="rc-accion-body">
+                            <div style="text-align:center; color:var(--text-secondary); padding:3rem 1rem; font-size:0.88rem;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="40" height="40" style="display:block; margin:0 auto 1rem; opacity:0.35;">
+                                    <polyline points="17 1 21 5 17 9"/>
+                                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                                    <polyline points="7 23 3 19 7 15"/>
+                                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                                </svg>
+                                Selecciona un reconteo de la tabla para ver las opciones.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+        filtrarReconteos();
+        return;
+    }
+
+    if (subId === 'informe') {
+        const tareas = state.invTareas || [];
+        const conteos = state.invConteos || [];
+        const reconteos = state.invReconteos || [];
+
+        const totalTareas = tareas.length;
+        const conciliadas = conteos.filter(c => c.estado === 'completado' && (c.cantidadContada ?? 0) === (c.cantidadSistema ?? 0)).length;
+        const totalReconteos = reconteos.length;
+        const abiertas = tareas.filter(t => t.estado === 'activa' || t.estado === 'pendiente').length;
+
+        const tareasRows = tareas.length === 0
+            ? '<tr><td colspan="6" style="text-align:center;color:var(--text-secondary);padding:2rem;">Sin tareas registradas</td></tr>'
+            : [...tareas].reverse().map(t => {
+                const its = conteos.filter(c => c.tareaId === t.codigo);
+                const cnt = its.filter(c => c.cantidadContada !== null && c.cantidadContada !== undefined);
+                const coi = cnt.filter(c => parseFloat(c.cantidadContada) === parseFloat(c.cantidadSistema)).length;
+                const ex = cnt.length > 0 ? Math.round((coi / cnt.length) * 100) : null;
+                const exHtml = ex === null
+                    ? '<span style="color:var(--text-secondary);">—</span>'
+                    : ex >= 95
+                        ? '<span style="color:var(--accent-emerald);font-weight:600;">' + ex + '%</span>'
+                        : ex >= 80
+                            ? '<span style="color:#d97706;font-weight:600;">' + ex + '%</span>'
+                            : '<span style="color:var(--accent-rose);font-weight:600;">' + ex + '%</span>';
+                const eb = t.estado === 'completado' ? 'badge-success' : t.estado === 'activa' ? 'badge-info' : 'badge-warning';
+                const rc = t.reconteo ? '<code style="font-size:0.79rem;">' + t.reconteo + '</code>' : '<span style="color:var(--text-secondary);">—</span>';
+                return '<tr>'
+                    + '<td><code style="font-size:0.8rem;">' + (t.codigo || '—') + '</code></td>'
+                    + '<td>' + (t.tipo || '—') + '</td>'
+                    + '<td>' + (t.criterio || '—') + '</td>'
+                    + '<td><span class="badge ' + eb + '">' + (t.estado || '—') + '</span></td>'
+                    + '<td style="text-align:center;">' + exHtml + '</td>'
+                    + '<td style="text-align:center;">' + rc + '</td>'
+                    + '</tr>';
+            }).join('');
+
+        content.innerHTML = `
+            <div style="margin-top:1.5rem;">
+
+                <div class="stats-grid" style="margin-bottom:1.5rem;">
+
+                    <div class="card stat-card stat-cyan">
+                        <div class="stat-header">
+                            <span class="stat-title">Total tareas</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${totalTareas}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend neutral">Registradas</span>
+                            <span class="stat-period">en sistema</span>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card stat-emerald">
+                        <div class="stat-header">
+                            <span class="stat-title">Conciliadas</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${conciliadas}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend up">Sin diferencias</span>
+                            <span class="stat-period">exactas</span>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card stat-amber">
+                        <div class="stat-header">
+                            <span class="stat-title">Reconteos</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="17 1 21 5 17 9"/>
+                                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                                    <polyline points="7 23 3 19 7 15"/>
+                                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${totalReconteos}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend ${totalReconteos > 0 ? 'down' : 'neutral'}">Generados</span>
+                            <span class="stat-period">por diferencias</span>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card stat-rose">
+                        <div class="stat-header">
+                            <span class="stat-title">Abiertas</span>
+                            <div class="stat-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">${abiertas}</div>
+                        <div class="stat-meta">
+                            <span class="stat-trend ${abiertas > 0 ? 'down' : 'up'}">${abiertas > 0 ? 'Pendientes' : 'Al día'}</span>
+                            <span class="stat-period">en proceso</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div style="display:flex; gap:1.25rem; align-items:flex-start;">
+
+                    <!-- IZQUIERDA: Listado de tareas -->
+                    <div class="card" style="flex:1; min-width:0;">
+                        <div class="card-header" style="border-bottom:1px solid var(--border-subtle); padding-bottom:1rem; margin-bottom:1.25rem;">
+                            <h2 class="card-title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="8" y1="6" x2="21" y2="6"/>
+                                    <line x1="8" y1="12" x2="21" y2="12"/>
+                                    <line x1="8" y1="18" x2="21" y2="18"/>
+                                    <line x1="3" y1="6" x2="3.01" y2="6"/>
+                                    <line x1="3" y1="12" x2="3.01" y2="12"/>
+                                    <line x1="3" y1="18" x2="3.01" y2="18"/>
+                                </svg>
+                                Listado de tareas
+                            </h2>
+                        </div>
+                        <div style="overflow-x:auto;">
+                            <table class="data-table" style="width:100%; border-collapse:collapse;">
+                                <colgroup>
+                                    <col style="width:110px;">
+                                    <col style="width:90px;">
+                                    <col>
+                                    <col style="width:100px;">
+                                    <col style="width:80px;">
+                                    <col style="width:100px;">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tipo</th>
+                                        <th>Criterio</th>
+                                        <th style="text-align:center;">Estado</th>
+                                        <th style="text-align:center;">Exactitud</th>
+                                        <th style="text-align:center;">Reconteo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${tareasRows}</tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- DERECHA: Consulta por ID -->
+                    <div class="card" style="width:320px; flex-shrink:0;">
+                        <div class="card-header" style="border-bottom:1px solid var(--border-subtle); padding-bottom:1rem; margin-bottom:1.25rem;">
+                            <h2 class="card-title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                                Consulta por ID
+                            </h2>
+                        </div>
+                        <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap;">
+                            <div class="input-wrapper" style="flex:1; min-width:120px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 6h16M4 12h16M4 18h7"/>
+                                </svg>
+                                <input type="text" class="form-input" id="inf-buscar-id" placeholder="INV-0001..." onkeydown="if(event.key==='Enter')buscarTareaInforme()">
+                            </div>
+                            <button class="btn btn-primary" onclick="buscarTareaInforme()" title="Consultar" style="padding:0 0.65rem;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+                                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                            </button>
+                            <button class="btn btn-secondary" onclick="document.getElementById('inf-buscar-id').value='';buscarTareaInforme();" title="Recargar" style="padding:0 0.65rem;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+                                    <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
+                                </svg>
+                            </button>
+                            <button class="btn btn-secondary" onclick="imprimirTareaInforme()" title="Imprimir tarea" style="padding:0 0.65rem;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+                                    <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="inf-detalle-tarea">
+                            <div style="text-align:center; color:var(--text-secondary); padding:2.5rem 1rem; font-size:0.88rem;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="38" height="38" style="display:block; margin:0 auto 0.75rem; opacity:0.3;">
+                                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                                Ingresa un ID de tarea para ver el detalle.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="inf-reporte-tarea" style="margin-top:1.5rem;"></div>
+
+            </div>
+        `;
+        return;
+    }
+
     content.innerHTML = `
         <div class="card" style="margin-top: 1.5rem;">
             <div class="card-header">
@@ -1254,15 +1614,263 @@ function switchInventarioSub(subId) {
     `;
 }
 
+function renderInformeCompletoTarea(tarea, items) {
+    const empresa = state.settings?.companyName || 'Áureo S.A.';
+    const slogan = state.settings?.companySlogan || 'Control logístico';
+    const initials = empresa.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    const BRAND = '#2E4A6E';
+    const BRAND_LT = '#EBF0F7';
+    const GRAY = '#6E6354';
+    const BORDER = '#D8D0C0';
+
+    const contados = items.filter(c => c.cantidadContada !== null && c.cantidadContada !== undefined);
+    const coinciden = contados.filter(c => parseFloat(c.cantidadContada) === parseFloat(c.cantidadSistema)).length;
+    const noCoinciden = contados.length - coinciden;
+    const exactitud = contados.length > 0 ? Math.round((coinciden / contados.length) * 100) : 0;
+    const totalSistema = items.reduce((s, c) => s + (parseFloat(c.cantidadSistema) || 0), 0);
+    const totalContado = contados.reduce((s, c) => s + (parseFloat(c.cantidadContada) || 0), 0);
+    const desviacion = contados.length > 0 ? totalContado - totalSistema : null;
+
+    const v = x => x || '—';
+
+    const metaCell = (label, value) =>
+        '<td style="border:1px solid ' + BORDER + '; padding:0.6rem 0.8rem; vertical-align:top; width:25%;">'
+        + '<div style="font-size:0.68rem; color:' + BRAND + '; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.25rem;">' + label + '</div>'
+        + '<div style="font-size:0.9rem; font-weight:700; color:#1a1a1a;">' + value + '</div>'
+        + '</td>';
+
+    const statCell = (label, value, color) =>
+        '<td style="border:1px solid ' + BORDER + '; padding:0.6rem 0.8rem; vertical-align:top; width:25%;">'
+        + '<div style="font-size:0.68rem; color:' + (color || BRAND) + '; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.25rem;">' + label + '</div>'
+        + '<div style="font-size:1rem; font-weight:700; color:' + (color || '#1a1a1a') + ';">' + value + '</div>'
+        + '</td>';
+
+    const hojaTh = col => '<th style="background:#f1ede3; border:1px solid ' + BORDER + '; padding:0.35rem 0.45rem; font-size:0.68rem; font-weight:700; color:' + BRAND + '; white-space:nowrap;">' + col + '</th>';
+    const hojaTd = val => '<td style="border:1px solid ' + BORDER + '; padding:0.32rem 0.45rem; font-size:0.72rem; color:#1a1a1a; white-space:nowrap;">' + v(val) + '</td>';
+
+    const difTh = col => '<th style="background:#f1ede3; border:1px solid ' + BORDER + '; padding:0.35rem 0.6rem; font-size:0.7rem; font-weight:700; color:' + BRAND + ';">' + col + '</th>';
+    const difTd = (val, extra) => '<td style="border:1px solid ' + BORDER + '; padding:0.32rem 0.6rem; font-size:0.73rem;' + (extra || '') + '">' + v(val) + '</td>';
+
+    const hojaRows = items.length === 0
+        ? '<tr><td colspan="14" style="text-align:center; padding:1rem; color:' + GRAY + '; font-size:0.8rem;">Sin líneas registradas</td></tr>'
+        : items.map((c, i) => '<tr>'
+            + hojaTd(c.detalle || (300 + i + 1))
+            + hojaTd(c.ubicacion)
+            + hojaTd(c.base)
+            + hojaTd(c.posicion)
+            + hojaTd(c.zona)
+            + hojaTd(c.codigoMaterial)
+            + hojaTd(c.descripcion)
+            + hojaTd(c.familia)
+            + hojaTd(c.um)
+            + hojaTd(c.loteAlmacen)
+            + hojaTd(c.loteProveedor)
+            + hojaTd(c.fechaVencimiento)
+            + hojaTd(c.cantidadSistema)
+            + hojaTd(c.obs)
+            + '</tr>').join('');
+
+    const difRows = items.length === 0
+        ? '<tr><td colspan="9" style="text-align:center; padding:1rem; color:' + GRAY + '; font-size:0.8rem;">Sin líneas</td></tr>'
+        : items.map((c, i) => {
+            const diff = (c.cantidadContada !== null && c.cantidadContada !== undefined)
+                ? parseFloat(c.cantidadContada) - parseFloat(c.cantidadSistema) : null;
+            const coinc = diff === null ? 'Pendiente' : diff === 0 ? 'Sí' : 'No';
+            const diffColor = diff === null ? GRAY : diff === 0 ? '#3a6e3a' : '#a8442c';
+            return '<tr>'
+                + difTd(c.detalle || (300 + i + 1))
+                + difTd(c.ubicacion)
+                + difTd(c.codigoMaterial)
+                + difTd(c.descripcion)
+                + difTd(c.cantidadSistema)
+                + difTd(c.cantidadContada)
+                + '<td style="border:1px solid ' + BORDER + '; padding:0.32rem 0.6rem; font-size:0.73rem; color:' + diffColor + '; font-weight:600;">' + (diff !== null ? (diff > 0 ? '+' : '') + diff : '—') + '</td>'
+                + '<td style="border:1px solid ' + BORDER + '; padding:0.32rem 0.6rem; font-size:0.73rem; color:' + diffColor + ';">' + coinc + '</td>'
+                + difTd(c.obs)
+                + '</tr>';
+        }).join('');
+
+    const hayDiferencias = noCoinciden > 0;
+    const resumenColor = hayDiferencias ? '#fff3cd' : '#d4edda';
+    const resumenBorder = hayDiferencias ? '#f0c65e' : '#92c49a';
+    const resumenText = hayDiferencias ? '#7a5c00' : '#1f5c2e';
+    const resumenMsg = hayDiferencias
+        ? 'Se detectaron <strong>' + noCoinciden + '</strong> diferencia(s) en la tarea. Se requiere revisión o reconteo.'
+        : 'No se detectaron diferencias en la tarea. El conteo coincide con el stock del sistema.';
+
+    const secTitle = (icon, label) =>
+        '<div style="display:flex; align-items:center; gap:0.5rem; font-size:0.95rem; font-weight:700; color:#1a1a1a; margin:1.5rem 0 0.75rem;">'
+        + '<svg viewBox="0 0 24 24" fill="none" stroke="' + BRAND + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="17" height="17">' + icon + '</svg>'
+        + label + '</div>';
+
+    const sigLine = label =>
+        '<div style="flex:1; text-align:center;">'
+        + '<div style="border-top:1px solid #999; margin-bottom:0.4rem;"></div>'
+        + '<div style="font-size:0.75rem; color:' + GRAY + ';">' + label + '</div>'
+        + '</div>';
+
+    return '<div style="background:#ffffff; border:1px solid ' + BORDER + '; border-radius:8px; padding:2rem; font-family:Arial,sans-serif; font-size:13px; color:#1a1a1a;">'
+
+        // ── HEADER ──
+        + '<div style="display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:1rem; margin-bottom:1.25rem; border-bottom:2.5px solid ' + BRAND + ';">'
+        + '<div style="display:flex; align-items:center; gap:0.9rem;">'
+        + '<div style="width:48px; height:48px; border-radius:50%; background:' + BRAND + '; display:flex; align-items:center; justify-content:center; flex-shrink:0;">'
+        + '<span style="color:#fff; font-size:1.2rem; font-weight:800; letter-spacing:-1px;">' + initials + '</span>'
+        + '</div>'
+        + '<div>'
+        + '<div style="font-size:1rem; font-weight:800; color:' + BRAND + '; line-height:1.1;">' + empresa + '</div>'
+        + '<div style="font-size:0.72rem; color:' + GRAY + '; margin-bottom:0.35rem;">' + slogan + '</div>'
+        + '<div style="font-size:1.15rem; font-weight:800; color:#1a1a1a; line-height:1.1;">INFORME DE INVENTARIO</div>'
+        + '<div style="font-size:0.7rem; color:' + GRAY + ';">Documento operativo de tarea de inventario</div>'
+        + '</div>'
+        + '</div>'
+        + '<div style="font-size:0.88rem; font-weight:800; color:' + BRAND + '; border:1.5px solid ' + BRAND + '; border-radius:5px; padding:0.3rem 0.75rem; white-space:nowrap;">TAREA ' + tarea.codigo + '</div>'
+        + '</div>'
+
+        // ── METADATA GRID ──
+        + '<table style="width:100%; border-collapse:collapse; margin-bottom:0;">'
+        + '<tr>' + metaCell('Estado', v(tarea.estado).toUpperCase()) + metaCell('Tipo de conteo', v(tarea.tipo)) + metaCell('Criterio', v(tarea.criterio)) + metaCell('Asignado a', v(tarea.asignado)) + '</tr>'
+        + '<tr>' + metaCell('Creado por', v(tarea.creadopor)) + metaCell('Reconteo', tarea.reconteo ? 'Sí' : 'No') + metaCell('Fecha creación', v(tarea.fecha)) + metaCell('Fecha inicio', v(tarea.fechaInicio)) + '</tr>'
+        + '<tr>' + metaCell('Fecha finalización', v(tarea.fechaFinalizacion)) + metaCell('Fecha conciliación', v(tarea.fechaConciliacion)) + metaCell('Fecha cierre', v(tarea.fechaCierre)) + metaCell('Tarea origen', v(tarea.tareaOrigen)) + '</tr>'
+        + '</table>'
+
+        // ── OBSERVACIÓN GENERAL ──
+        + (tarea.obs ? '<div style="margin-top:1rem; padding:0.75rem 1rem; background:' + BRAND_LT + '; border-radius:5px; border-left:3px solid ' + BRAND + ';">'
+            + '<div style="font-size:0.75rem; font-weight:700; color:' + BRAND + '; margin-bottom:0.25rem;">Observación general</div>'
+            + '<div style="font-size:0.82rem; color:#1a1a1a;">' + tarea.obs + '</div>'
+            + '</div>' : '')
+
+        // ── STATS GRID ──
+        + '<table style="width:100%; border-collapse:collapse; margin-top:1rem;">'
+        + '<tr>' + statCell('Total líneas', items.length) + statCell('Líneas contadas', contados.length) + statCell('Coinciden', coinciden, '#3a6e3a') + statCell('No coinciden', noCoinciden, noCoinciden > 0 ? '#a8442c' : GRAY) + '</tr>'
+        + '<tr>' + statCell('Exactitud', exactitud + '%', exactitud >= 95 ? '#3a6e3a' : exactitud >= 80 ? '#a87000' : '#a8442c') + statCell('Total sistema', totalSistema) + statCell('Total contado', contados.length > 0 ? totalContado : '—') + statCell('Desviación total', desviacion !== null ? (desviacion > 0 ? '+' : '') + desviacion : '—', desviacion !== null && desviacion !== 0 ? '#a8442c' : '#3a6e3a') + '</tr>'
+        + '</table>'
+
+        // ── HOJA DE CONTEO ──
+        + secTitle('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>', 'Hoja de conteo')
+        + '<div style="overflow-x:auto;">'
+        + '<table style="width:100%; border-collapse:collapse; font-size:0.72rem;">'
+        + '<thead><tr>' + ['Det.', 'Ubic.', 'Base', 'Pos.', 'Zona', 'Cod.', 'Desc.', 'Fam.', 'UM', 'Lote alm.', 'Lote prov.', 'FV', 'Cant.', 'Obs.'].map(hojaTh).join('') + '</tr></thead>'
+        + '<tbody>' + hojaRows + '</tbody>'
+        + '</table></div>'
+
+        // ── ANÁLISIS DE DIFERENCIAS ──
+        + secTitle('<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', 'Análisis de diferencias')
+        + '<div style="overflow-x:auto;">'
+        + '<table style="width:100%; border-collapse:collapse;">'
+        + '<thead><tr>' + ['Detalle', 'Ubicación', 'Código material', 'Descripción', 'Sistema', 'Contado', 'Diferencia', 'Coincide', 'Observación'].map(difTh).join('') + '</tr></thead>'
+        + '<tbody>' + difRows + '</tbody>'
+        + '</table></div>'
+        + '<div style="font-size:0.8rem; font-weight:700; color:#1a1a1a; margin:0.75rem 0 0.35rem;">Resumen de diferencias</div>'
+        + '<div style="background:' + resumenColor + '; border:1px solid ' + resumenBorder + '; border-radius:5px; padding:0.6rem 0.9rem; font-size:0.8rem; color:' + resumenText + ';">' + resumenMsg + '</div>'
+
+        // ── CIERRE DEL INFORME ──
+        + secTitle('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>', 'Cierre del informe')
+        + '<table style="width:100%; border-collapse:collapse;">'
+        + '<tr>' + statCell('Estado final', v(tarea.estado).toUpperCase()) + statCell('Total líneas', items.length) + statCell('Coinciden', coinciden, '#3a6e3a') + statCell('No coinciden', noCoinciden, noCoinciden > 0 ? '#a8442c' : GRAY) + '</tr>'
+        + '<tr>' + statCell('Exactitud', exactitud + '%') + statCell('Generó reconteo', tarea.reconteo ? 'Sí' : 'No') + statCell('ID reconteo generado', v(tarea.reconteo)) + '<td style="border:1px solid ' + BORDER + ';"></td>' + '</tr>'
+        + '</table>'
+
+        // ── FOOTER FIRMAS ──
+        + '<div style="display:flex; gap:3rem; margin-top:2.5rem;">'
+        + sigLine('Responsable conteo')
+        + sigLine('Supervisor / validación')
+        + sigLine('Aprobación final')
+        + '</div>'
+
+        + '</div>';
+}
+
+function buscarTareaInforme() {
+    const q = (document.getElementById('inf-buscar-id')?.value || '').trim().toUpperCase();
+    const panel = document.getElementById('inf-detalle-tarea');
+    if (!panel) return;
+
+    const clearRep = () => { const r = document.getElementById('inf-reporte-tarea'); if (r) r.innerHTML = ''; };
+
+    if (!q) {
+        panel.innerHTML = `
+            <div style="text-align:center; color:var(--text-secondary); padding:2.5rem 1rem; font-size:0.88rem;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="38" height="38" style="display:block; margin:0 auto 0.75rem; opacity:0.3;">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                Ingresa un ID de tarea para ver el detalle.
+            </div>`;
+        clearRep(); return;
+    }
+
+    const tarea = (state.invTareas || []).find(t => (t.codigo || '').toUpperCase().includes(q));
+    if (!tarea) {
+        panel.innerHTML = '<div style="text-align:center; color:var(--accent-rose); padding:2rem 1rem; font-size:0.88rem;">No se encontró ninguna tarea con ID <strong>' + q + '</strong>.</div>';
+        clearRep(); return;
+    }
+
+    const conteos = state.invConteos || [];
+    const items = conteos.filter(c => c.tareaId === tarea.codigo);
+    const contados = items.filter(c => c.cantidadContada !== null && c.cantidadContada !== undefined);
+    const coinciden = contados.filter(c => parseFloat(c.cantidadContada) === parseFloat(c.cantidadSistema)).length;
+    const exactitud = contados.length > 0 ? Math.round((coinciden / contados.length) * 100) : null;
+    const exactColor = exactitud === null ? 'var(--text-secondary)' : exactitud >= 95 ? 'var(--accent-emerald)' : exactitud >= 80 ? '#d97706' : 'var(--accent-rose)';
+    const estadoBadge = tarea.estado === 'completado' ? 'badge-success' : tarea.estado === 'activa' ? 'badge-info' : 'badge-warning';
+
+    const noCoinciden = contados.length - coinciden;
+    const tieneReconteo = !!tarea.reconteo;
+
+    const kpi = (label, value, sub = '', color = 'var(--text-primary)') => `
+        <div class="card" style="padding:0.75rem 0.9rem; flex:1; min-width:120px;">
+            <div style="font-size:0.7rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.3rem;">${label}</div>
+            <div style="font-size:1.15rem; font-weight:700; color:${color}; line-height:1.2;">${value}</div>
+            ${sub ? `<div style="font-size:0.7rem; color:var(--text-secondary); margin-top:0.2rem;">${sub}</div>` : ''}
+        </div>`;
+
+    panel.innerHTML = `
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.5rem;">
+            ${kpi('Tarea', '<code style="font-size:0.9rem;">' + tarea.codigo + '</code>')}
+            ${kpi('Estado', '<span class="badge ' + estadoBadge + '" style="font-size:0.75rem;">' + (tarea.estado || '—') + '</span>')}
+            ${kpi('Total líneas', items.length, 'ítems registrados')}
+            ${kpi('Coinciden', coinciden, 'sin diferencia', 'var(--accent-emerald)')}
+        </div>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            ${kpi('No coinciden', noCoinciden, 'con diferencia', noCoinciden > 0 ? 'var(--accent-rose)' : 'var(--text-secondary)')}
+            ${kpi('Exactitud', exactitud !== null ? exactitud + '%' : '—', 'precisión conteo', exactColor)}
+            ${kpi('Genera reconteo', tieneReconteo ? 'Sí' : 'No', '', tieneReconteo ? '#d97706' : 'var(--text-secondary)')}
+            ${kpi('ID reconteo', tarea.reconteo ? '<code style="font-size:0.8rem;">' + tarea.reconteo + '</code>' : '—')}
+        </div>`;
+
+    const rep = document.getElementById('inf-reporte-tarea');
+    if (rep) rep.innerHTML = renderInformeCompletoTarea(tarea, items);
+}
+
+function imprimirTareaInforme() {
+    const q = (document.getElementById('inf-buscar-id')?.value || '').trim().toUpperCase();
+    const tarea = q ? (state.invTareas || []).find(t => (t.codigo || '').toUpperCase().includes(q)) : null;
+    if (!tarea) { triggerToast('warning', 'Consulta una tarea antes de imprimir.'); return; }
+    const items = (state.invConteos || []).filter(c => c.tareaId === tarea.codigo);
+    const body = renderInformeCompletoTarea(tarea, items);
+    const win = window.open('', '_blank', 'width=1100,height=900');
+    win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Tarea ' + tarea.codigo + '</title>'
+        + '<style>body{margin:2rem;background:#fff;}@media print{body{margin:1rem;}}</style>'
+        + '</head><body>' + body + '<script>window.onload=function(){window.print();}<\/script></body></html>');
+    win.document.close();
+}
+
+function verInformeTarea(codigo) {
+    switchInventarioSub('informe');
+    setTimeout(() => {
+        const input = document.getElementById('inf-buscar-id');
+        if (input) { input.value = codigo; buscarTareaInforme(); }
+    }, 80);
+}
+
 function filtrarConteosF() {
-    const idTarea  = (document.getElementById('cf-buscar-id')?.value || '').toLowerCase().trim();
-    const usuario  = (document.getElementById('cf-buscar-usuario')?.value || '').toLowerCase().trim();
-    const tbody    = document.getElementById('cf-tabla-body');
+    const idTarea = (document.getElementById('cf-buscar-id')?.value || '').toLowerCase().trim();
+    const usuario = (document.getElementById('cf-buscar-usuario')?.value || '').toLowerCase().trim();
+    const tbody = document.getElementById('cf-tabla-body');
     if (!tbody) return;
 
     const conteos = (state.invConteos || []).filter(c => {
-        if (idTarea && !(c.tareaId || '').toLowerCase().includes(idTarea))   return false;
-        if (usuario && !(c.usuario || '').toLowerCase().includes(usuario))   return false;
+        if (idTarea && !(c.tareaId || '').toLowerCase().includes(idTarea)) return false;
+        if (usuario && !(c.usuario || '').toLowerCase().includes(usuario)) return false;
         return true;
     });
 
@@ -1281,13 +1889,13 @@ function filtrarConteosF() {
                     </svg>
                 </button>
             </td>
-            <td>${c.ubicacion      || '—'}</td>
-            <td>${c.zona           || '—'}</td>
+            <td>${c.ubicacion || '—'}</td>
+            <td>${c.zona || '—'}</td>
             <td><span class="badge badge-info">${c.codigoMaterial || '—'}</span></td>
-            <td>${c.descripcion    || '—'}</td>
-            <td>${c.loteAlmacen   || '—'}</td>
-            <td>${c.loteProveedor  || '—'}</td>
-            <td>${c.fv             || '—'}</td>
+            <td>${c.descripcion || '—'}</td>
+            <td>${c.loteAlmacen || '—'}</td>
+            <td>${c.loteProveedor || '—'}</td>
+            <td>${c.fv || '—'}</td>
             <td>
                 <input type="number" min="0"
                     style="width:80px; padding:0.25rem 0.4rem; border:1px solid var(--border-subtle); border-radius:4px; font-size:0.82rem; background:var(--bg-primary); color:var(--text-primary);"
@@ -1345,9 +1953,9 @@ function verDetalleConteoF(idx) {
 }
 
 function recargarConteosF() {
-    const inputId      = document.getElementById('cf-buscar-id');
+    const inputId = document.getElementById('cf-buscar-id');
     const inputUsuario = document.getElementById('cf-buscar-usuario');
-    if (inputId)      inputId.value      = '';
+    if (inputId) inputId.value = '';
     if (inputUsuario) inputUsuario.value = '';
     filtrarConteosF();
 }
@@ -1357,15 +1965,15 @@ function recargarConteosF() {
 // ==========================================================================
 
 function filtrarConciliacion() {
-    const idTarea  = (document.getElementById('conc-buscar-tarea')?.value    || '').toLowerCase().trim();
-    const usuario  = (document.getElementById('conc-buscar-usuario')?.value  || '').toLowerCase().trim();
+    const idTarea = (document.getElementById('conc-buscar-tarea')?.value || '').toLowerCase().trim();
+    const usuario = (document.getElementById('conc-buscar-usuario')?.value || '').toLowerCase().trim();
     const reconteo = (document.getElementById('conc-buscar-reconteo')?.value || '').toLowerCase().trim();
-    const tbody    = document.getElementById('conc-tabla-body');
+    const tbody = document.getElementById('conc-tabla-body');
     if (!tbody) return;
 
     const items = (state.invConteos || []).filter(c => {
-        if (idTarea  && !(c.tareaId         || '').toLowerCase().includes(idTarea))  return false;
-        if (usuario  && !(c.usuarioFinaliza  || '').toLowerCase().includes(usuario))  return false;
+        if (idTarea && !(c.tareaId || '').toLowerCase().includes(idTarea)) return false;
+        if (usuario && !(c.usuarioFinaliza || '').toLowerCase().includes(usuario)) return false;
         if (reconteo && !(c.asignadoReconteo || '').toLowerCase().includes(reconteo)) return false;
         return true;
     });
@@ -1376,14 +1984,14 @@ function filtrarConciliacion() {
     }
 
     tbody.innerHTML = [...items].reverse().map(c => {
-        const sis  = parseFloat(c.cantidadSistema ?? 0);
-        const fis  = parseFloat(c.cantidadContada ?? 0);
+        const sis = parseFloat(c.cantidadSistema ?? 0);
+        const fis = parseFloat(c.cantidadContada ?? 0);
         const diff = fis - sis;
-        const ok   = diff === 0;
+        const ok = diff === 0;
 
         const diffColor = ok ? 'color:var(--accent-emerald,#10b981);' : 'color:var(--accent-rose,#f43f5e);';
-        const rowStyle  = ok ? '' : 'background:rgba(244,63,94,0.04);';
-        const coincide  = ok
+        const rowStyle = ok ? '' : 'background:rgba(244,63,94,0.04);';
+        const coincide = ok
             ? '<span style="color:var(--accent-emerald,#10b981); font-size:1.15rem; font-weight:700;">&#10003;</span>'
             : '<span style="color:var(--accent-rose,#f43f5e);   font-size:1.15rem; font-weight:700;">&#10007;</span>';
 
@@ -1397,11 +2005,11 @@ function filtrarConciliacion() {
                         </svg>
                     </button>
                 </td>
-                <td>${c.ubicacion      || '—'}</td>
+                <td>${c.ubicacion || '—'}</td>
                 <td><span class="badge badge-info">${c.codigoMaterial || '—'}</span></td>
-                <td>${c.descripcion    || '—'}</td>
-                <td>${c.loteAlmacen   || '—'}</td>
-                <td>${c.loteProveedor  || '—'}</td>
+                <td>${c.descripcion || '—'}</td>
+                <td>${c.loteAlmacen || '—'}</td>
+                <td>${c.loteProveedor || '—'}</td>
                 <td style="text-align:right; font-weight:500;">${sis}</td>
                 <td style="text-align:right; font-weight:500;">${fis}</td>
                 <td style="text-align:right; font-weight:700; ${diffColor}">${diff > 0 ? '+' : ''}${diff}</td>
@@ -1413,11 +2021,11 @@ function filtrarConciliacion() {
 }
 
 function recargarConciliacion() {
-    const inputTarea    = document.getElementById('conc-buscar-tarea');
-    const inputUsuario  = document.getElementById('conc-buscar-usuario');
+    const inputTarea = document.getElementById('conc-buscar-tarea');
+    const inputUsuario = document.getElementById('conc-buscar-usuario');
     const inputReconteo = document.getElementById('conc-buscar-reconteo');
-    if (inputTarea)    inputTarea.value    = '';
-    if (inputUsuario)  inputUsuario.value  = '';
+    if (inputTarea) inputTarea.value = '';
+    if (inputUsuario) inputUsuario.value = '';
     if (inputReconteo) inputReconteo.value = '';
     filtrarConciliacion();
 }
@@ -1430,7 +2038,7 @@ function cerrarTareaConciliacion() {
         return;
     }
 
-    const items   = (state.invConteos || []).filter(c => (c.tareaId || '') === idTarea);
+    const items = (state.invConteos || []).filter(c => (c.tareaId || '') === idTarea);
     const conDiff = items.some(c => (c.cantidadContada ?? 0) !== (c.cantidadSistema ?? 0));
 
     if (conDiff) {
@@ -1470,43 +2078,43 @@ function generarReconteoAuto() {
     }
 
     // Generar código único para la nueva tarea de reconteo
-    const fecha     = new Date();
-    const sufijo    = Math.random().toString(36).slice(2, 6).toUpperCase();
-    const codigoRC  = `RC-${idTarea}-${sufijo}`;
+    const fecha = new Date();
+    const sufijo = Math.random().toString(36).slice(2, 6).toUpperCase();
+    const codigoRC = `RC-${idTarea}-${sufijo}`;
 
     // 1. Crear nueva tarea de reconteo en invTareas
     if (!state.invTareas) state.invTareas = [];
     state.invTareas.push({
-        codigo:     codigoRC,
-        tipo:       'Reconteo',
-        zona:       tareaOrigen?.zona       || '',
-        criterio:   tareaOrigen?.criterio   || '',
-        asignado:   tareaOrigen?.asignado   || '',
-        creadopor:  'Sistema',
-        estado:     'pendiente',
-        reconteo:   idTarea,
-        fecha:      fecha.toLocaleDateString('es-CO'),
-        obs:        `Reconteo automático generado desde tarea ${idTarea}`
+        codigo: codigoRC,
+        tipo: 'Reconteo',
+        zona: tareaOrigen?.zona || '',
+        criterio: tareaOrigen?.criterio || '',
+        asignado: tareaOrigen?.asignado || '',
+        creadopor: 'Sistema',
+        estado: 'pendiente',
+        reconteo: idTarea,
+        fecha: fecha.toLocaleDateString('es-CO'),
+        obs: `Reconteo automático generado desde tarea ${idTarea}`
     });
 
     // 2. Crear ítems de conteo para la nueva tarea (resetear cantidad contada)
     if (!state.invConteos) state.invConteos = [];
     itemsConDiff.forEach(c => {
         state.invConteos.push({
-            tareaId:         codigoRC,
-            ubicacion:       c.ubicacion       || '',
-            zona:            c.zona            || '',
-            codigoMaterial:  c.codigoMaterial  || '',
-            descripcion:     c.descripcion     || '',
-            loteAlmacen:     c.loteAlmacen     || '',
-            loteProveedor:   c.loteProveedor   || '',
-            fv:              c.fv              || '',
+            tareaId: codigoRC,
+            ubicacion: c.ubicacion || '',
+            zona: c.zona || '',
+            codigoMaterial: c.codigoMaterial || '',
+            descripcion: c.descripcion || '',
+            loteAlmacen: c.loteAlmacen || '',
+            loteProveedor: c.loteProveedor || '',
+            fv: c.fv || '',
             cantidadSistema: c.cantidadSistema ?? 0,
             cantidadContada: null,
-            estado:          'pendiente',
-            usuario:         '',
-            fecha:           fecha.toLocaleDateString('es-CO'),
-            obs:             ''
+            estado: 'pendiente',
+            usuario: '',
+            fecha: fecha.toLocaleDateString('es-CO'),
+            obs: ''
         });
         // Marcar ítem original como reconteo pendiente
         c.estado = 'reconteo pendiente';
@@ -1518,11 +2126,11 @@ function generarReconteoAuto() {
     // 4. Registrar en invReconteos para seguimiento
     if (!state.invReconteos) state.invReconteos = [];
     state.invReconteos.push({
-        id:          codigoRC,
+        id: codigoRC,
         tareaOrigen: idTarea,
-        items:       itemsConDiff.length,
-        estado:      'abierto',
-        fecha:       fecha.toLocaleDateString('es-CO')
+        items: itemsConDiff.length,
+        estado: 'abierto',
+        fecha: fecha.toLocaleDateString('es-CO')
     });
 
     saveState();
@@ -1530,12 +2138,153 @@ function generarReconteoAuto() {
     filtrarConciliacion();
 }
 
+// ==========================================================================
+//   RECONTEOS
+// ==========================================================================
+
+function filtrarReconteos() {
+    const asignado = (document.getElementById('rc-buscar-asignado')?.value || '').toLowerCase().trim();
+    const estado = document.getElementById('rc-filtro-estado')?.value || 'todos';
+    const tbody = document.getElementById('rc-tabla-body');
+    if (!tbody) return;
+
+    const tareas = state.invTareas || [];
+
+    let lista = (state.invReconteos || []).filter(r => {
+        const tarea = tareas.find(t => t.codigo === r.id) || {};
+        const asig = (tarea.asignado || r.asignado || '').toLowerCase();
+        if (asignado && !asig.includes(asignado)) return false;
+        if (estado !== 'todos') {
+            const est = (r.estado || '').toLowerCase();
+            if (estado === 'pendiente' && est !== 'abierto' && est !== 'pendiente') return false;
+            if (estado !== 'pendiente' && est !== estado) return false;
+        }
+        return true;
+    });
+
+    if (lista.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:2rem;">No se encontraron reconteos.</td></tr>`;
+        return;
+    }
+
+    const estadoBadge = est => {
+        const map = {
+            'abierto': ['badge-warning', 'Pendiente'],
+            'pendiente': ['badge-warning', 'Pendiente'],
+            'en proceso': ['badge-info', 'En proceso'],
+            'conciliada': ['badge-info', 'Conciliada'],
+            'cerrada': ['badge-success', 'Cerrada'],
+            'cerrado': ['badge-success', 'Cerrado'],
+        };
+        const [cls, label] = map[(est || '').toLowerCase()] || ['badge-secondary', est || '—'];
+        return `<span class="badge ${cls}">${label}</span>`;
+    };
+
+    tbody.innerHTML = [...lista].reverse().map(r => {
+        const tarea = tareas.find(t => t.codigo === r.id) || {};
+        const itemsRC = (state.invConteos || []).filter(c => c.tareaId === r.id);
+        const contados = itemsRC.filter(c => c.cantidadContada !== null && c.cantidadContada !== undefined);
+        const coinciden = contados.filter(c => parseFloat(c.cantidadContada) === parseFloat(c.cantidadSistema)).length;
+        const exactitud = contados.length > 0 ? `${Math.round((coinciden / contados.length) * 100)}%` : '—';
+
+        return `
+            <tr style="cursor:pointer;" onclick="seleccionarReconteo('${r.id}')"
+                onmouseover="this.style.background='var(--bg-hover,rgba(255,255,255,0.04))'"
+                onmouseout="this.style.background=''">
+                <td><span class="badge badge-info">${r.id}</span></td>
+                <td style="font-size:0.82rem; color:var(--text-secondary);">${r.tareaOrigen || '—'}</td>
+                <td>${tarea.tipo || '—'}</td>
+                <td>${tarea.criterio || '—'}</td>
+                <td>${tarea.asignado || r.asignado || '—'}</td>
+                <td>${estadoBadge(r.estado)}</td>
+                <td style="text-align:center; font-weight:600; color:var(--accent-rose,#f43f5e);">${r.items ?? '—'}</td>
+                <td style="text-align:center; font-weight:600;">${exactitud}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function seleccionarReconteo(id) {
+    const panel = document.getElementById('rc-accion-body');
+    if (!panel) return;
+
+    document.querySelectorAll('#rc-tabla-body tr').forEach(tr => tr.style.background = '');
+    const rowEl = [...document.querySelectorAll('#rc-tabla-body tr')]
+        .find(tr => tr.querySelector('.badge')?.textContent === id);
+    if (rowEl) rowEl.style.background = 'var(--bg-hover,rgba(255,255,255,0.06))';
+
+    const r = (state.invReconteos || []).find(r => r.id === id);
+    const tarea = (state.invTareas || []).find(t => t.codigo === id) || {};
+
+    if (!r) {
+        panel.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:2rem;">Reconteo no encontrado.</p>`;
+        return;
+    }
+
+    const estadoBadge = est => {
+        const map = {
+            'abierto': ['badge-warning', 'Pendiente'],
+            'pendiente': ['badge-warning', 'Pendiente'],
+            'en proceso': ['badge-info', 'En proceso'],
+            'conciliada': ['badge-info', 'Conciliada'],
+            'cerrada': ['badge-success', 'Cerrada'],
+            'cerrado': ['badge-success', 'Cerrado'],
+        };
+        const [cls, label] = map[(est || '').toLowerCase()] || ['badge-secondary', est || '—'];
+        return `<span class="badge ${cls}">${label}</span>`;
+    };
+
+    const fila = (label, valor) => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:0.65rem 0; border-bottom:1px solid var(--border-subtle);">
+            <span style="font-size:0.8rem; color:var(--text-secondary);">${label}</span>
+            <span style="font-size:0.88rem; font-weight:500; color:var(--text-primary); text-align:right;">${valor}</span>
+        </div>`;
+
+    panel.innerHTML = `
+        <div style="padding:0 0.25rem 1.25rem;">
+            ${fila('ID Reconteo', `<span class="badge badge-info">${r.id}</span>`)}
+            ${fila('Tarea origen', r.tareaOrigen || '—')}
+            ${fila('Categoría', tarea.zona || '—')}
+            ${fila('Asignado', tarea.asignado || r.asignado || '—')}
+            ${fila('Estado', estadoBadge(r.estado))}
+        </div>
+        <div style="display:flex; flex-direction:column; gap:0.6rem; padding-top:0.25rem;">
+            <button class="btn btn-primary" onclick="switchInventarioSub('conteos')" style="justify-content:center;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                    <polyline points="17 1 21 5 17 9"/>
+                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                    <polyline points="7 23 3 19 7 15"/>
+                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                </svg>
+                Ir a reconteo
+            </button>
+            <button class="btn btn-secondary" onclick="switchInventarioSub('conciliacion')" style="justify-content:center;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                Ver conciliación
+            </button>
+            <button class="btn btn-secondary" onclick="switchInventarioSub('informe')" style="justify-content:center;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                    <path d="M14 3v4a1 1 0 0 0 1 1h4"/>
+                    <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/>
+                    <line x1="9" y1="15" x2="15" y2="15"/>
+                    <line x1="9" y1="11" x2="15" y2="11"/>
+                </svg>
+                Ver informe
+            </button>
+        </div>
+    `;
+}
+
 function mostrarToast(msg, color) {
     const colores = {
         emerald: '#10b981',
-        amber:   '#f59e0b',
-        rose:    '#f43f5e',
-        cyan:    '#06b6d4'
+        amber: '#f59e0b',
+        rose: '#f43f5e',
+        cyan: '#06b6d4'
     };
     const bg = colores[color] || colores.emerald;
     const toast = document.createElement('div');
@@ -1546,14 +2295,14 @@ function mostrarToast(msg, color) {
 }
 
 function invActualizarResumen() {
-    const codigo     = document.getElementById('inv-tarea-codigo')?.value || '';
-    const tipo       = document.getElementById('inv-tarea-tipo')?.value || '';
-    const zona       = document.getElementById('inv-tarea-zona')?.value || '';
-    const asignado   = document.getElementById('inv-tarea-asignado')?.value || '';
-    const creadopor  = document.getElementById('inv-tarea-creadopor')?.value || '';
-    const obs        = document.getElementById('inv-tarea-obs')?.value || '';
+    const codigo = document.getElementById('inv-tarea-codigo')?.value || '';
+    const tipo = document.getElementById('inv-tarea-tipo')?.value || '';
+    const zona = document.getElementById('inv-tarea-zona')?.value || '';
+    const asignado = document.getElementById('inv-tarea-asignado')?.value || '';
+    const creadopor = document.getElementById('inv-tarea-creadopor')?.value || '';
+    const obs = document.getElementById('inv-tarea-obs')?.value || '';
 
-    const body  = document.getElementById('inv-resumen-body');
+    const body = document.getElementById('inv-resumen-body');
     const badge = document.getElementById('inv-resumen-badge');
     if (!body) return;
 
@@ -1601,13 +2350,13 @@ function invActualizarResumen() {
 }
 
 function invGuardarTarea() {
-    const codigo    = document.getElementById('inv-tarea-codigo')?.value;
-    const tipo      = document.getElementById('inv-tarea-tipo')?.value;
-    const zona      = document.getElementById('inv-tarea-zona')?.value;
-    const asignado  = document.getElementById('inv-tarea-asignado')?.value;
+    const codigo = document.getElementById('inv-tarea-codigo')?.value;
+    const tipo = document.getElementById('inv-tarea-tipo')?.value;
+    const zona = document.getElementById('inv-tarea-zona')?.value;
+    const asignado = document.getElementById('inv-tarea-asignado')?.value;
     const creadopor = document.getElementById('inv-tarea-creadopor')?.value;
-    const obs       = document.getElementById('inv-tarea-obs')?.value;
-    const fecha     = new Date().toLocaleDateString('es-CO');
+    const obs = document.getElementById('inv-tarea-obs')?.value;
+    const fecha = new Date().toLocaleDateString('es-CO');
 
     if (!tipo || !zona || !asignado || !creadopor) {
         triggerToast('error', 'Completa Tipo de conteo, Zona, Asignado a y Creado por antes de guardar.');
@@ -1634,8 +2383,8 @@ let _mcTareas = [];
 
 function filtrarMisConteos() {
     const asignado = (document.getElementById('mc-buscar-asignado')?.value || '').toLowerCase().trim();
-    const estado   = document.getElementById('mc-filtro-estado')?.value || 'todos';
-    const tbody    = document.getElementById('mc-tabla-body');
+    const estado = document.getElementById('mc-filtro-estado')?.value || 'todos';
+    const tbody = document.getElementById('mc-tabla-body');
     if (!tbody) return;
 
     _mcTareas = [...(state.invTareas || [])].reverse().filter(t => {
@@ -1650,11 +2399,11 @@ function filtrarMisConteos() {
     }
 
     const estadoBadge = e => {
-        if (e === 'pendiente')          return 'badge-warning';
-        if (e === 'en proceso')         return 'badge-success';
+        if (e === 'pendiente') return 'badge-warning';
+        if (e === 'en proceso') return 'badge-success';
         if (e === 'reconteo pendiente') return 'badge-danger';
-        if (e === 'conciliada')         return 'badge-info';
-        if (e === 'cerrada')            return 'badge-secondary';
+        if (e === 'conciliada') return 'badge-info';
+        if (e === 'cerrada') return 'badge-secondary';
         return 'badge-info';
     };
 
@@ -1673,9 +2422,9 @@ function filtrarMisConteos() {
 
 function recargarMisConteos() {
     const inputAsignado = document.getElementById('mc-buscar-asignado');
-    const selectEstado  = document.getElementById('mc-filtro-estado');
+    const selectEstado = document.getElementById('mc-filtro-estado');
     if (inputAsignado) inputAsignado.value = '';
-    if (selectEstado)  selectEstado.value  = 'todos';
+    if (selectEstado) selectEstado.value = 'todos';
     _mcTareas = [];
     const panel = document.getElementById('mc-detalle-panel');
     if (panel) panel.innerHTML = `
@@ -1704,11 +2453,11 @@ function renderDetalleRapidoMC(t) {
     if (!panel || !t) return;
 
     const estadoBadge = e => {
-        if (e === 'pendiente')          return 'badge-warning';
-        if (e === 'en proceso')         return 'badge-success';
+        if (e === 'pendiente') return 'badge-warning';
+        if (e === 'en proceso') return 'badge-success';
         if (e === 'reconteo pendiente') return 'badge-danger';
-        if (e === 'conciliada')         return 'badge-info';
-        if (e === 'cerrada')            return 'badge-secondary';
+        if (e === 'conciliada') return 'badge-info';
+        if (e === 'cerrada') return 'badge-secondary';
         return 'badge-info';
     };
 
@@ -1764,7 +2513,7 @@ function renderDetalleRapidoMC(t) {
                     Ver conciliación
                 </button>
                 <button class="btn btn-secondary" style="justify-content:center; font-size:0.82rem;"
-                    onclick="alert('Sección Informe Inventario en desarrollo');">
+                    onclick="verInformeTarea('${t.codigo}')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                         <polyline points="14 2 14 8 20 8"/>
@@ -1782,12 +2531,12 @@ function renderDetalleRapidoMC(t) {
 // ==========================================================================
 
 const DE_SUBS = [
-    { id: 'materiales',  label: 'Materiales',           icon: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>' },
-    { id: 'proveedores', label: 'Proveedores',           icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>' },
-    { id: 'ubicaciones', label: 'Ubicaciones',           icon: '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/>' },
-    { id: 'movimientos', label: 'Movimientos',           icon: '<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>' },
-    { id: 'transito',    label: 'En Tránsito',           icon: '<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>' },
-    { id: 'rotulos',     label: 'Historial de Rótulos',  icon: '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>' }
+    { id: 'materiales', label: 'Materiales', icon: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>' },
+    { id: 'proveedores', label: 'Proveedores', icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>' },
+    { id: 'ubicaciones', label: 'Ubicaciones', icon: '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/>' },
+    { id: 'movimientos', label: 'Movimientos', icon: '<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>' },
+    { id: 'transito', label: 'En Tránsito', icon: '<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>' },
+    { id: 'rotulos', label: 'Historial de Rótulos', icon: '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>' }
 ];
 
 let activeDataEntrySub = null;
@@ -1817,12 +2566,12 @@ function switchDataEntrySub(subId) {
         btn.classList.toggle('active', btn.dataset.sub === subId);
     });
     const renderers = {
-        materiales:  renderDE_Materiales,
+        materiales: renderDE_Materiales,
         proveedores: renderDE_Proveedores,
         ubicaciones: renderDE_Ubicaciones,
         movimientos: renderDE_Movimientos,
-        transito:    renderDE_Transito,
-        rotulos:     renderDE_Rotulos
+        transito: renderDE_Transito,
+        rotulos: renderDE_Rotulos
     };
     if (renderers[subId]) renderers[subId]();
 }
@@ -1893,15 +2642,15 @@ function renderDE_Materiales() {
             <div class="form-group">
               <label class="form-label">Unidad de Medida</label>
               <select class="form-select" id="de-mat-uom">
-                ${['UN','KG','MT','LT','M²','M³','CM','MM','GL','TON','GR','ML','PKT','JGO']
-                  .map(u => `<option${isEdit && editing.uom === u ? ' selected' : ''}>${u}</option>`).join('')}
+                ${['UN', 'KG', 'MT', 'LT', 'M²', 'M³', 'CM', 'MM', 'GL', 'TON', 'GR', 'ML', 'PKT', 'JGO']
+            .map(u => `<option${isEdit && editing.uom === u ? ' selected' : ''}>${u}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
               <label class="form-label">Categoría</label>
               <select class="form-select" id="de-mat-category">
-                ${['Herramientas Eléctricas','Herramientas Manuales','Consumibles y EPP','Fijaciones y Anclajes','Maquinaria Pesada','Materiales de Construcción','Pinturas y Acabados','Eléctrico y Cableado','Plomería','Otros']
-                  .map(c => `<option${isEdit && editing.category === c ? ' selected' : ''}>${c}</option>`).join('')}
+                ${['Herramientas Eléctricas', 'Herramientas Manuales', 'Consumibles y EPP', 'Fijaciones y Anclajes', 'Maquinaria Pesada', 'Materiales de Construcción', 'Pinturas y Acabados', 'Eléctrico y Cableado', 'Plomería', 'Otros']
+            .map(c => `<option${isEdit && editing.category === c ? ' selected' : ''}>${c}</option>`).join('')}
               </select>
             </div>
           </div>
@@ -1994,11 +2743,11 @@ function saveDE_Material(e) {
     e.preventDefault();
     const editId = document.getElementById('de-mat-edit-id').value;
     const mat = {
-        id:       editId || 'MAT-' + String(state.materials.length + 1).padStart(4, '0'),
-        code:     document.getElementById('de-mat-code').value.trim(),
-        desc:     document.getElementById('de-mat-desc').value.trim(),
-        unit:     document.getElementById('de-mat-unit').value,
-        uom:      document.getElementById('de-mat-uom').value,
+        id: editId || 'MAT-' + String(state.materials.length + 1).padStart(4, '0'),
+        code: document.getElementById('de-mat-code').value.trim(),
+        desc: document.getElementById('de-mat-desc').value.trim(),
+        unit: document.getElementById('de-mat-unit').value,
+        uom: document.getElementById('de-mat-uom').value,
         category: document.getElementById('de-mat-category').value
     };
     if (editId) {
@@ -2066,11 +2815,11 @@ function filterDE_Mat(query) {
     _deMatSearch = query.toLowerCase().trim();
     const filtered = _deMatSearch
         ? state.materials.filter(m =>
-            m.id.toLowerCase().includes(_deMatSearch)           ||
-            m.code.toLowerCase().includes(_deMatSearch)         ||
-            m.desc.toLowerCase().includes(_deMatSearch)         ||
+            m.id.toLowerCase().includes(_deMatSearch) ||
+            m.code.toLowerCase().includes(_deMatSearch) ||
+            m.desc.toLowerCase().includes(_deMatSearch) ||
             String(m.unit).toLowerCase().includes(_deMatSearch) ||
-            m.uom.toLowerCase().includes(_deMatSearch)          ||
+            m.uom.toLowerCase().includes(_deMatSearch) ||
             m.category.toLowerCase().includes(_deMatSearch))
         : state.materials;
 
@@ -2086,11 +2835,11 @@ function filterDE_Mat(query) {
 
 // Mapa flexible de nombres de columna → campo interno
 const _DE_MAT_COL_MAP = {
-    codigo:       'code',  código:       'code',  code:         'code',
-    descripcion:  'desc',  descripción:  'desc',  description:  'desc',  desc: 'desc',
-    unidad:       'unit',  cantidad:     'unit',  qty:          'unit',  quantity: 'unit',
-    unidadmedida: 'uom',   'unidad de medida': 'uom', uom: 'uom', um: 'uom', 'u.m.': 'uom',
-    categoria:    'category', categoría: 'category', category: 'category', cat: 'category'
+    codigo: 'code', código: 'code', code: 'code',
+    descripcion: 'desc', descripción: 'desc', description: 'desc', desc: 'desc',
+    unidad: 'unit', cantidad: 'unit', qty: 'unit', quantity: 'unit',
+    unidadmedida: 'uom', 'unidad de medida': 'uom', uom: 'uom', um: 'uom', 'u.m.': 'uom',
+    categoria: 'category', categoría: 'category', category: 'category', cat: 'category'
 };
 
 function _normalizeHeader(h) {
@@ -2099,7 +2848,7 @@ function _normalizeHeader(h) {
 
 function _parseSheetToMaterials(workbook) {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows  = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
     if (rows.length === 0) return [];
 
     // Mapear cabeceras del archivo a campos internos
@@ -2111,8 +2860,8 @@ function _parseSheetToMaterials(workbook) {
     });
 
     const required = ['code', 'desc'];
-    const mapped   = Object.values(colMap);
-    const missing  = required.filter(f => !mapped.includes(f));
+    const mapped = Object.values(colMap);
+    const missing = required.filter(f => !mapped.includes(f));
     if (missing.length > 0) {
         throw new Error(`Columnas requeridas no encontradas: ${missing.join(', ')}. Verifica los encabezados del archivo.`);
     }
@@ -2141,7 +2890,7 @@ function _readDE_MatFile(file) {
     if (!previewEl) return;
 
     const ext = file.name.split('.').pop().toLowerCase();
-    if (!['xlsx','xls','csv'].includes(ext)) {
+    if (!['xlsx', 'xls', 'csv'].includes(ext)) {
         previewEl.innerHTML = `<p style="color:var(--accent-rose);font-size:.85rem;">Formato no admitido. Usa .xlsx, .xls o .csv.</p>`;
         return;
     }
@@ -2150,7 +2899,7 @@ function _readDE_MatFile(file) {
     reader.onload = e => {
         try {
             const data = new Uint8Array(e.target.result);
-            const wb   = XLSX.read(data, { type: 'array' });
+            const wb = XLSX.read(data, { type: 'array' });
             _deMatImportRows = _parseSheetToMaterials(wb);
             _renderDE_MatImportPreview(file.name);
         } catch (err) {
@@ -2173,7 +2922,7 @@ function _renderDE_MatImportPreview(filename) {
     }
 
     const preview = _deMatImportRows.slice(0, 5);
-    const more    = _deMatImportRows.length - preview.length;
+    const more = _deMatImportRows.length - preview.length;
 
     el.innerHTML = `
     <div class="de-import-preview-box">
@@ -2220,11 +2969,11 @@ function confirmDE_MatImport() {
         if (existingCodes.has((row.code || '').toLowerCase())) return; // evitar duplicados por código
         const nextNum = state.materials.length + added + 1;
         state.materials.push({
-            id:       'MAT-' + String(nextNum).padStart(4, '0'),
-            code:     row.code     || '',
-            desc:     row.desc     || '',
-            unit:     row.unit     || '0',
-            uom:      row.uom      || 'UN',
+            id: 'MAT-' + String(nextNum).padStart(4, '0'),
+            code: row.code || '',
+            desc: row.desc || '',
+            unit: row.unit || '0',
+            uom: row.uom || 'UN',
             category: row.category || 'Otros'
         });
         existingCodes.add((row.code || '').toLowerCase());
@@ -2260,9 +3009,9 @@ function downloadDE_MatTemplate() {
 //   APARTADO: PROVEEDORES
 // --------------------------------------------------------------------------
 function renderDE_Proveedores() {
-    const isEdit  = _deProvEditId !== null;
+    const isEdit = _deProvEditId !== null;
     const editing = isEdit ? state.suppliers.find(s => s.id === _deProvEditId) : null;
-    const nextId  = 'PROV-' + String(state.suppliers.length + 1).padStart(4, '0');
+    const nextId = 'PROV-' + String(state.suppliers.length + 1).padStart(4, '0');
 
     const el = document.getElementById('dataentry-content');
     el.innerHTML = `
@@ -2289,7 +3038,7 @@ function renderDE_Proveedores() {
             <div class="form-group">
               <label class="form-label">Proveedor</label>
               <input type="text" class="form-input" id="de-prov-name" required
-                placeholder="Ej: Bosch Herramientas Ltda."
+                placeholder="Ej: Ferrox Andina Ltda."
                 value="${isEdit ? editing.name : ''}">
             </div>
             <div class="form-group">
@@ -2407,14 +3156,14 @@ function filterDE_Prov(query) {
     _deProvSearch = query.toLowerCase().trim();
     const filtered = _deProvSearch
         ? state.suppliers.filter(s =>
-            (s.id       || '').toLowerCase().includes(_deProvSearch) ||
-            (s.name     || '').toLowerCase().includes(_deProvSearch) ||
+            (s.id || '').toLowerCase().includes(_deProvSearch) ||
+            (s.name || '').toLowerCase().includes(_deProvSearch) ||
             (s.acreedor || '').toLowerCase().includes(_deProvSearch))
         : state.suppliers;
 
-    const tbody   = document.getElementById('de-prov-tbody');
+    const tbody = document.getElementById('de-prov-tbody');
     const counter = document.getElementById('de-prov-count');
-    if (tbody)   tbody.innerHTML = buildDE_ProvRows(filtered);
+    if (tbody) tbody.innerHTML = buildDE_ProvRows(filtered);
     if (counter) counter.innerText = `${filtered.length} ${_deProvSearch ? 'resultado' + (filtered.length !== 1 ? 's' : '') : 'registros'}`;
 }
 
@@ -2422,8 +3171,8 @@ function saveDE_Proveedor(e) {
     e.preventDefault();
     const editId = document.getElementById('de-prov-edit-id').value;
     const prov = {
-        id:       editId || 'PROV-' + String(state.suppliers.length + 1).padStart(4, '0'),
-        name:     document.getElementById('de-prov-name').value.trim(),
+        id: editId || 'PROV-' + String(state.suppliers.length + 1).padStart(4, '0'),
+        name: document.getElementById('de-prov-name').value.trim(),
         acreedor: document.getElementById('de-prov-acreedor').value.trim()
     };
     if (editId) {
@@ -2462,8 +3211,8 @@ function deleteDE_Proveedor(id) {
 
 // --- Importación Excel Proveedores ---
 const _DE_PROV_COL_MAP = {
-    proveedor: 'name',  provider: 'name',  nombre: 'name',  name: 'name',
-    acreedor:  'acreedor',  creditor: 'acreedor',  codigo: 'acreedor',  code: 'acreedor'
+    proveedor: 'name', provider: 'name', nombre: 'name', name: 'name',
+    acreedor: 'acreedor', creditor: 'acreedor', codigo: 'acreedor', code: 'acreedor'
 };
 
 function handleDE_ProvFileInput(input) {
@@ -2482,16 +3231,16 @@ function _readDE_ProvFile(file) {
     const previewEl = document.getElementById('de-prov-import-preview');
     if (!previewEl) return;
     const ext = file.name.split('.').pop().toLowerCase();
-    if (!['xlsx','xls','csv'].includes(ext)) {
+    if (!['xlsx', 'xls', 'csv'].includes(ext)) {
         previewEl.innerHTML = `<div class="de-import-error">Formato no admitido. Usa .xlsx, .xls o .csv.</div>`;
         return;
     }
     const reader = new FileReader();
     reader.onload = e => {
         try {
-            const wb    = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+            const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
             const sheet = wb.Sheets[wb.SheetNames[0]];
-            const rows  = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+            const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
             if (rows.length === 0) throw new Error('El archivo no contiene filas con datos.');
 
             const colMap = {};
@@ -2521,7 +3270,7 @@ function _renderDE_ProvImportPreview(filename) {
     const el = document.getElementById('de-prov-import-preview');
     if (!el || _deProvImportRows.length === 0) return;
     const preview = _deProvImportRows.slice(0, 5);
-    const more    = _deProvImportRows.length - preview.length;
+    const more = _deProvImportRows.length - preview.length;
     el.innerHTML = `
     <div class="de-import-preview-box">
       <div class="de-import-preview-header">
@@ -2562,8 +3311,8 @@ function confirmDE_ProvImport() {
         if (acr && existingAcreedores.has(acr)) return;
         const nextNum = state.suppliers.length + added + 1;
         state.suppliers.push({
-            id:       'PROV-' + String(nextNum).padStart(4, '0'),
-            name:     row.name     || '',
+            id: 'PROV-' + String(nextNum).padStart(4, '0'),
+            name: row.name || '',
             acreedor: row.acreedor || ''
         });
         if (acr) existingAcreedores.add(acr);
@@ -2584,8 +3333,8 @@ function cancelDE_ProvImport() {
 function downloadDE_ProvTemplate() {
     const ws = XLSX.utils.aoa_to_sheet([
         ['Proveedor', 'Acreedor'],
-        ['Bosch Herramientas Ltda.', 'ACR-0001'],
-        ['3M Distribución S.A.',     'ACR-0002']
+        ['Ferrox Andina Ltda.', 'ACR-0001'],
+        ['TitanPro Abrasivos S.A.', 'ACR-0002']
     ]);
     ws['!cols'] = [{ wch: 32 }, { wch: 14 }];
     const wb = XLSX.utils.book_new();
@@ -2605,9 +3354,9 @@ function _calcUbicFinal(base, position) {
 }
 
 function renderDE_Ubicaciones() {
-    const isEdit  = _deUbicEditId !== null;
+    const isEdit = _deUbicEditId !== null;
     const editing = isEdit ? state.locations.find(l => l.id === _deUbicEditId) : null;
-    const nextId  = 'UBIC-' + String(state.locations.length + 1).padStart(4, '0');
+    const nextId = 'UBIC-' + String(state.locations.length + 1).padStart(4, '0');
 
     const v = (field, fallback = '') => isEdit ? (editing[field] ?? fallback) : fallback;
 
@@ -2774,42 +3523,42 @@ function buildDE_UbicRows(list) {
 }
 
 function updateDE_UbicFinal() {
-    const base     = document.getElementById('de-loc-base')?.value     || '';
+    const base = document.getElementById('de-loc-base')?.value || '';
     const position = document.getElementById('de-loc-position')?.value || '';
-    const final    = _calcUbicFinal(base, position);
-    const finalEl  = document.getElementById('de-loc-final');
-    const zonaEl   = document.getElementById('de-loc-zona');
+    const final = _calcUbicFinal(base, position);
+    const finalEl = document.getElementById('de-loc-final');
+    const zonaEl = document.getElementById('de-loc-zona');
     if (finalEl) finalEl.value = final;
-    if (zonaEl)  zonaEl.value  = base;
+    if (zonaEl) zonaEl.value = base;
 }
 
 function filterDE_Ubic(query) {
     _deUbicSearch = query.toLowerCase().trim();
     const filtered = _deUbicSearch
         ? state.locations.filter(l =>
-            (l.id        || '').toLowerCase().includes(_deUbicSearch) ||
-            String(l.base|| '').includes(_deUbicSearch)               ||
-            (l.position  || '').toLowerCase().includes(_deUbicSearch) ||
-            (l.final     || '').toLowerCase().includes(_deUbicSearch) ||
+            (l.id || '').toLowerCase().includes(_deUbicSearch) ||
+            String(l.base || '').includes(_deUbicSearch) ||
+            (l.position || '').toLowerCase().includes(_deUbicSearch) ||
+            (l.final || '').toLowerCase().includes(_deUbicSearch) ||
             (l.warehouse || '').toLowerCase().includes(_deUbicSearch))
         : state.locations;
 
-    const tbody   = document.getElementById('de-ubic-tbody');
+    const tbody = document.getElementById('de-ubic-tbody');
     const counter = document.getElementById('de-ubic-count');
-    if (tbody)   tbody.innerHTML = buildDE_UbicRows(filtered);
+    if (tbody) tbody.innerHTML = buildDE_UbicRows(filtered);
     if (counter) counter.innerText = `${filtered.length} ${_deUbicSearch ? 'resultado' + (filtered.length !== 1 ? 's' : '') : 'registros'}`;
 }
 
 function saveDE_Ubicacion(e) {
     e.preventDefault();
-    const editId   = document.getElementById('de-loc-edit-id').value;
-    const base     = parseInt(document.getElementById('de-loc-base').value) || 0;
+    const editId = document.getElementById('de-loc-edit-id').value;
+    const base = parseInt(document.getElementById('de-loc-base').value) || 0;
     const position = document.getElementById('de-loc-position').value.trim();
     const loc = {
-        id:        editId || 'UBIC-' + String(state.locations.length + 1).padStart(4, '0'),
+        id: editId || 'UBIC-' + String(state.locations.length + 1).padStart(4, '0'),
         base,
         position,
-        final:     _calcUbicFinal(base, position),
+        final: _calcUbicFinal(base, position),
         warehouse: document.getElementById('de-loc-warehouse').value
     };
     if (editId) {
@@ -2848,10 +3597,10 @@ function deleteDE_Ubicacion(id) {
 
 // --- Importación Excel Ubicaciones ---
 const _DE_UBIC_COL_MAP = {
-    ubicacion: 'base',      ubicación: 'base',          base: 'base',
-    posiciones: 'position', posicion: 'position',        posición: 'position', position: 'position',
+    ubicacion: 'base', ubicación: 'base', base: 'base',
+    posiciones: 'position', posicion: 'position', posición: 'position', position: 'position',
     zona: 'zona',
-    bodega: 'warehouse',    warehouse: 'warehouse'
+    bodega: 'warehouse', warehouse: 'warehouse'
 };
 
 function handleDE_UbicFileInput(input) {
@@ -2870,16 +3619,16 @@ function _readDE_UbicFile(file) {
     const previewEl = document.getElementById('de-ubic-import-preview');
     if (!previewEl) return;
     const ext = file.name.split('.').pop().toLowerCase();
-    if (!['xlsx','xls','csv'].includes(ext)) {
+    if (!['xlsx', 'xls', 'csv'].includes(ext)) {
         previewEl.innerHTML = `<div class="de-import-error">Formato no admitido. Usa .xlsx, .xls o .csv.</div>`;
         return;
     }
     const reader = new FileReader();
     reader.onload = e => {
         try {
-            const wb    = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+            const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
             const sheet = wb.Sheets[wb.SheetNames[0]];
-            const rows  = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+            const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
             if (rows.length === 0) throw new Error('El archivo no contiene filas con datos.');
 
             const colMap = {};
@@ -2911,7 +3660,7 @@ function _renderDE_UbicImportPreview(filename) {
     const el = document.getElementById('de-ubic-import-preview');
     if (!el || _deUbicImportRows.length === 0) return;
     const preview = _deUbicImportRows.slice(0, 5);
-    const more    = _deUbicImportRows.length - preview.length;
+    const more = _deUbicImportRows.length - preview.length;
     el.innerHTML = `
     <div class="de-import-preview-box">
       <div class="de-import-preview-header">
@@ -2955,10 +3704,10 @@ function confirmDE_UbicImport() {
         const nextNum = state.locations.length + added + 1;
         const base = parseInt(row.base) || 0;
         state.locations.push({
-            id:        'UBIC-' + String(nextNum).padStart(4, '0'),
+            id: 'UBIC-' + String(nextNum).padStart(4, '0'),
             base,
-            position:  row.position || '',
-            final:     row.final || _calcUbicFinal(base, row.position),
+            position: row.position || '',
+            final: row.final || _calcUbicFinal(base, row.position),
             warehouse: row.warehouse || 'Bodegas Externas'
         });
         if (final) existingFinals.add(final);
@@ -2981,7 +3730,7 @@ function downloadDE_UbicTemplate() {
         ['Ubicacion', 'Posiciones', 'Zona', 'Bodega'],
         ['100', 'A', '100', 'Bodegas Externas'],
         ['200', 'B', '200', 'Bodegas Internas'],
-        ['300', '',  '300', 'Bodegas Externas']
+        ['300', '', '300', 'Bodegas Externas']
     ]);
     ws['!cols'] = [{ wch: 12 }, { wch: 14 }, { wch: 10 }, { wch: 20 }];
     const wb = XLSX.utils.book_new();
@@ -2996,11 +3745,11 @@ function downloadDE_UbicTemplate() {
 function _nowDatetimeLocal() {
     const d = new Date();
     const pad = n => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
 function renderDE_Movimientos() {
-    const isEdit  = _deMovEditId !== null;
+    const isEdit = _deMovEditId !== null;
     const editing = isEdit ? state.movements.find(m => m.id === _deMovEditId) : null;
     const v = (f, fb = '') => isEdit ? (editing[f] ?? fb) : fb;
 
@@ -3008,7 +3757,7 @@ function renderDE_Movimientos() {
         `<option value="${m.id}" ${isEdit && editing.materialId === m.id ? 'selected' : ''}>${m.id} — ${m.desc}</option>`
     ).join('');
 
-    const ubicOptions = [...new Set(state.locations.map(l => l.base))].sort((a,b)=>a-b).map(b =>
+    const ubicOptions = [...new Set(state.locations.map(l => l.base))].sort((a, b) => a - b).map(b =>
         `<option value="${b}" ${isEdit && String(editing.ubicBase) === String(b) ? 'selected' : ''}>${b}</option>`
     ).join('');
 
@@ -3037,15 +3786,15 @@ function renderDE_Movimientos() {
             <div class="form-group">
               <label class="form-label">Tipo</label>
               <select class="form-select" id="de-mov-type">
-                <option value="Entrada" ${v('type') === 'Entrada' || !isEdit ? 'selected':''}>Entrada</option>
-                <option value="Salida"  ${v('type') === 'Salida'  ? 'selected':''}>Salida</option>
+                <option value="Entrada" ${v('type') === 'Entrada' || !isEdit ? 'selected' : ''}>Entrada</option>
+                <option value="Salida"  ${v('type') === 'Salida' ? 'selected' : ''}>Salida</option>
               </select>
             </div>
             <div class="form-group">
               <label class="form-label">Estado</label>
               <select class="form-select" id="de-mov-status">
-                <option value="Almacenado"  ${v('status','Almacenado') === 'Almacenado'  ? 'selected':''}>Almacenado</option>
-                <option value="En Tránsito" ${v('status') === 'En Tránsito' ? 'selected':''}>En Tránsito</option>
+                <option value="Almacenado"  ${v('status', 'Almacenado') === 'Almacenado' ? 'selected' : ''}>Almacenado</option>
+                <option value="En Tránsito" ${v('status') === 'En Tránsito' ? 'selected' : ''}>En Tránsito</option>
               </select>
             </div>
           </div>
@@ -3117,8 +3866,8 @@ function renderDE_Movimientos() {
             <div class="form-group">
               <label class="form-label">Bodega</label>
               <select class="form-select" id="de-mov-bodega">
-                <option value="Bodegas Externas" ${v('bodega','Bodegas Externas') === 'Bodegas Externas' ? 'selected':''}>Bodegas Externas</option>
-                <option value="Bodegas Internas" ${v('bodega') === 'Bodegas Internas' ? 'selected':''}>Bodegas Internas</option>
+                <option value="Bodegas Externas" ${v('bodega', 'Bodegas Externas') === 'Bodegas Externas' ? 'selected' : ''}>Bodegas Externas</option>
+                <option value="Bodegas Internas" ${v('bodega') === 'Bodegas Internas' ? 'selected' : ''}>Bodegas Internas</option>
               </select>
             </div>
             <div class="form-group">
@@ -3177,7 +3926,7 @@ function renderDE_Movimientos() {
           <div class="de-mov-filter-group">
             <span class="de-mov-filter-label">Tipo</span>
             <div class="de-filter-pills" data-group="tipo">
-              ${['todos','Entrada','Salida','Stock'].map(v => `
+              ${['todos', 'Entrada', 'Salida', 'Stock'].map(v => `
               <button class="de-filter-pill ${_deMovFilters.tipo === v ? 'active' : ''}"
                 data-value="${v}" onclick="setDE_MovFilter('tipo','${v}')">
                 ${v === 'todos' ? 'Todos' : v}
@@ -3189,7 +3938,7 @@ function renderDE_Movimientos() {
           <div class="de-mov-filter-group">
             <span class="de-mov-filter-label">Estado</span>
             <div class="de-filter-pills" data-group="estado">
-              ${['todos','Almacenado','En Tránsito'].map(v => `
+              ${['todos', 'Almacenado', 'En Tránsito'].map(v => `
               <button class="de-filter-pill ${_deMovFilters.estado === v ? 'active' : ''}"
                 data-value="${v}" onclick="setDE_MovFilter('estado','${v}')">
                 ${v === 'todos' ? 'Todos' : v}
@@ -3201,9 +3950,9 @@ function renderDE_Movimientos() {
           <div class="de-mov-filter-group">
             <span class="de-mov-filter-label">Bodega</span>
             <select class="form-select de-mov-filter-select" onchange="setDE_MovFilter('bodega',this.value)">
-              <option value="todas"  ${_deMovFilters.bodega==='todas'            ? 'selected':''}>Todas las Bodegas</option>
-              <option value="Bodegas Externas" ${_deMovFilters.bodega==='Bodegas Externas' ? 'selected':''}>Bodegas Externas</option>
-              <option value="Bodegas Internas" ${_deMovFilters.bodega==='Bodegas Internas' ? 'selected':''}>Bodegas Internas</option>
+              <option value="todas"  ${_deMovFilters.bodega === 'todas' ? 'selected' : ''}>Todas las Bodegas</option>
+              <option value="Bodegas Externas" ${_deMovFilters.bodega === 'Bodegas Externas' ? 'selected' : ''}>Bodegas Externas</option>
+              <option value="Bodegas Internas" ${_deMovFilters.bodega === 'Bodegas Internas' ? 'selected' : ''}>Bodegas Internas</option>
             </select>
           </div>
 
@@ -3211,13 +3960,13 @@ function renderDE_Movimientos() {
           <div class="de-mov-filter-group">
             <span class="de-mov-filter-label">Zona</span>
             <select class="form-select de-mov-filter-select" onchange="setDE_MovFilter('zona',this.value)">
-              <option value="todas" ${_deMovFilters.zona==='todas' ? 'selected':''}>Todas las Zonas</option>
+              <option value="todas" ${_deMovFilters.zona === 'todas' ? 'selected' : ''}>Todas las Zonas</option>
               ${[...new Set([
-                  ...state.locations.map(l => String(l.base)),
-                  ...state.movements.map(m => String(m.ubicBase||'')).filter(Boolean)
-                ])].sort((a,b)=>Number(a)-Number(b)).map(z =>
-                `<option value="${z}" ${_deMovFilters.zona===z ? 'selected':''}>${z}</option>`
-              ).join('')}
+        ...state.locations.map(l => String(l.base)),
+        ...state.movements.map(m => String(m.ubicBase || '')).filter(Boolean)
+    ])].sort((a, b) => Number(a) - Number(b)).map(z =>
+        `<option value="${z}" ${_deMovFilters.zona === z ? 'selected' : ''}>${z}</option>`
+    ).join('')}
             </select>
           </div>
 
@@ -3262,52 +4011,52 @@ function renderDE_Movimientos() {
 }
 
 function autoFillDE_MovMaterial() {
-    const id  = document.getElementById('de-mov-material')?.value;
+    const id = document.getElementById('de-mov-material')?.value;
     const mat = state.materials.find(m => m.id === id);
     if (!mat) return;
     const descEl = document.getElementById('de-mov-desc');
-    const umEl   = document.getElementById('de-mov-um');
-    const catEl  = document.getElementById('de-mov-category');
-    if (descEl) descEl.value = mat.desc     || '';
-    if (umEl)   umEl.value   = mat.uom      || '';
-    if (catEl)  catEl.value  = mat.category || '';
+    const umEl = document.getElementById('de-mov-um');
+    const catEl = document.getElementById('de-mov-category');
+    if (descEl) descEl.value = mat.desc || '';
+    if (umEl) umEl.value = mat.uom || '';
+    if (catEl) catEl.value = mat.category || '';
 }
 
 function updateDE_MovUbicFinal() {
     const base = document.getElementById('de-mov-ubic-base')?.value || '';
-    const pos  = document.getElementById('de-mov-position')?.value  || '';
+    const pos = document.getElementById('de-mov-position')?.value || '';
     const finalEl = document.getElementById('de-mov-ubic-final');
-    const zonaEl  = document.getElementById('de-mov-zona');
+    const zonaEl = document.getElementById('de-mov-zona');
     if (finalEl) finalEl.value = _calcUbicFinal(base, pos);
-    if (zonaEl)  zonaEl.value  = base;
+    if (zonaEl) zonaEl.value = base;
 }
 
 function buildDE_MovRows(list) {
     if (list.length === 0) {
         return `<tr><td colspan="19" style="text-align:center;color:var(--text-muted);padding:2.5rem 0;">Sin movimientos registrados.</td></tr>`;
     }
-    const typeBadge = { 'Entrada':'badge-success', 'Salida':'badge-danger' };
-    const statBadge = { 'Almacenado':'badge-info',  'En Tránsito':'badge-warning' };
+    const typeBadge = { 'Entrada': 'badge-success', 'Salida': 'badge-danger' };
+    const statBadge = { 'Almacenado': 'badge-info', 'En Tránsito': 'badge-warning' };
     return [...list].reverse().map(m => `
     <tr>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;white-space:nowrap;">${(m.datetime||'').replace('T',' ')}</td>
-      <td><span class="badge ${typeBadge[m.type]||'badge-info'}">${m.type||'—'}</span></td>
-      <td><span class="badge ${statBadge[m.status]||'badge-info'}">${m.status||'—'}</span></td>
-      <td style="font-size:.82rem;">${m.user||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${m.doc||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent-gold);font-weight:700;">${m.materialId||'—'}</td>
-      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem;">${m.desc||'—'}</td>
-      <td><span class="badge badge-info">${m.um||'—'}</span></td>
-      <td style="font-size:.82rem;">${m.category||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;text-align:center;font-weight:700;">${m.ubicBase||'—'}</td>
-      <td style="font-size:.82rem;color:var(--text-muted);font-style:italic;">${m.position||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent-gold);">${m.ubicFinal||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;text-align:center;">${m.ubicBase||'—'}</td>
-      <td><span class="badge ${m.bodega==='Bodegas Externas'?'badge-info':'badge-success'}">${m.bodega||'—'}</span></td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${m.lotAlm||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${m.lotProv||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${m.expiry||'—'}</td>
-      <td style="text-align:center;font-weight:700;font-size:.95rem;">${m.qty||'—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;white-space:nowrap;">${(m.datetime || '').replace('T', ' ')}</td>
+      <td><span class="badge ${typeBadge[m.type] || 'badge-info'}">${m.type || '—'}</span></td>
+      <td><span class="badge ${statBadge[m.status] || 'badge-info'}">${m.status || '—'}</span></td>
+      <td style="font-size:.82rem;">${m.user || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${m.doc || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent-gold);font-weight:700;">${m.materialId || '—'}</td>
+      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem;">${m.desc || '—'}</td>
+      <td><span class="badge badge-info">${m.um || '—'}</span></td>
+      <td style="font-size:.82rem;">${m.category || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:center;font-weight:700;">${m.ubicBase || '—'}</td>
+      <td style="font-size:.82rem;color:var(--text-muted);font-style:italic;">${m.position || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent-gold);">${m.ubicFinal || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;text-align:center;">${m.ubicBase || '—'}</td>
+      <td><span class="badge ${m.bodega === 'Bodegas Externas' ? 'badge-info' : 'badge-success'}">${m.bodega || '—'}</span></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${m.lotAlm || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${m.lotProv || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${m.expiry || '—'}</td>
+      <td style="text-align:center;font-weight:700;font-size:.95rem;">${m.qty || '—'}</td>
       <td style="text-align:center;">
         <div style="display:inline-flex;gap:.5rem;">
           <button class="btn btn-secondary btn-icon-only" onclick="editDE_Movimiento('${m.id}')" title="Editar">
@@ -3348,10 +4097,10 @@ function applyDE_MovFilters() {
     const query = (document.getElementById('de-mov-search')?.value || '').toLowerCase().trim();
 
     const filtered = state.movements.filter(m => {
-        if (tipo   !== 'todos'  && m.type   !== tipo)   return false;
-        if (estado !== 'todos'  && m.status !== estado)  return false;
-        if (bodega !== 'todas'  && m.bodega !== bodega)  return false;
-        if (zona   !== 'todas'  && String(m.ubicBase||'') !== zona) return false;
+        if (tipo !== 'todos' && m.type !== tipo) return false;
+        if (estado !== 'todos' && m.status !== estado) return false;
+        if (bodega !== 'todas' && m.bodega !== bodega) return false;
+        if (zona !== 'todas' && String(m.ubicBase || '') !== zona) return false;
         if (desde) {
             const d = (m.datetime || '').split('T')[0];
             if (d < desde) return false;
@@ -3362,23 +4111,23 @@ function applyDE_MovFilters() {
         }
         if (query) {
             return (
-                (m.user      ||'').toLowerCase().includes(query) ||
-                (m.doc       ||'').toLowerCase().includes(query) ||
-                (m.materialId||'').toLowerCase().includes(query) ||
-                (m.desc      ||'').toLowerCase().includes(query) ||
-                (m.category  ||'').toLowerCase().includes(query) ||
-                (m.lotAlm    ||'').toLowerCase().includes(query) ||
-                (m.lotProv   ||'').toLowerCase().includes(query) ||
-                (m.ubicFinal ||'').toLowerCase().includes(query) ||
-                String(m.ubicBase||'').includes(query)
+                (m.user || '').toLowerCase().includes(query) ||
+                (m.doc || '').toLowerCase().includes(query) ||
+                (m.materialId || '').toLowerCase().includes(query) ||
+                (m.desc || '').toLowerCase().includes(query) ||
+                (m.category || '').toLowerCase().includes(query) ||
+                (m.lotAlm || '').toLowerCase().includes(query) ||
+                (m.lotProv || '').toLowerCase().includes(query) ||
+                (m.ubicFinal || '').toLowerCase().includes(query) ||
+                String(m.ubicBase || '').includes(query)
             );
         }
         return true;
     });
 
-    const tbody   = document.getElementById('de-mov-tbody');
+    const tbody = document.getElementById('de-mov-tbody');
     const counter = document.getElementById('de-mov-count');
-    if (tbody)   tbody.innerHTML = buildDE_MovRows(filtered);
+    if (tbody) tbody.innerHTML = buildDE_MovRows(filtered);
     if (counter) counter.innerText = `${filtered.length} resultado${filtered.length !== 1 ? 's' : ''}`;
 }
 
@@ -3386,24 +4135,24 @@ function saveDE_Movimiento(e) {
     e.preventDefault();
     const editId = document.getElementById('de-mov-edit-id').value;
     const mov = {
-        id:         editId || Date.now().toString(),
-        datetime:   document.getElementById('de-mov-datetime').value,
-        type:       document.getElementById('de-mov-type').value,
-        status:     document.getElementById('de-mov-status').value,
-        user:       document.getElementById('de-mov-user').value.trim(),
-        doc:        document.getElementById('de-mov-doc').value.trim(),
+        id: editId || Date.now().toString(),
+        datetime: document.getElementById('de-mov-datetime').value,
+        type: document.getElementById('de-mov-type').value,
+        status: document.getElementById('de-mov-status').value,
+        user: document.getElementById('de-mov-user').value.trim(),
+        doc: document.getElementById('de-mov-doc').value.trim(),
         materialId: document.getElementById('de-mov-material').value,
-        desc:       document.getElementById('de-mov-desc').value.trim(),
-        um:         document.getElementById('de-mov-um').value.trim(),
-        category:   document.getElementById('de-mov-category').value.trim(),
-        ubicBase:   document.getElementById('de-mov-ubic-base').value,
-        position:   document.getElementById('de-mov-position').value.trim(),
-        ubicFinal:  document.getElementById('de-mov-ubic-final').value,
-        bodega:     document.getElementById('de-mov-bodega').value,
-        lotAlm:     document.getElementById('de-mov-lot-alm').value.trim(),
-        lotProv:    document.getElementById('de-mov-lot-prov').value.trim(),
-        expiry:     document.getElementById('de-mov-expiry').value,
-        qty:        parseInt(document.getElementById('de-mov-qty').value) || 0
+        desc: document.getElementById('de-mov-desc').value.trim(),
+        um: document.getElementById('de-mov-um').value.trim(),
+        category: document.getElementById('de-mov-category').value.trim(),
+        ubicBase: document.getElementById('de-mov-ubic-base').value,
+        position: document.getElementById('de-mov-position').value.trim(),
+        ubicFinal: document.getElementById('de-mov-ubic-final').value,
+        bodega: document.getElementById('de-mov-bodega').value,
+        lotAlm: document.getElementById('de-mov-lot-alm').value.trim(),
+        lotProv: document.getElementById('de-mov-lot-prov').value.trim(),
+        expiry: document.getElementById('de-mov-expiry').value,
+        qty: parseInt(document.getElementById('de-mov-qty').value) || 0
     };
     if (editId) {
         const idx = state.movements.findIndex(m => m.id === editId);
@@ -3540,37 +4289,37 @@ function buildDE_TrRows(list) {
     }
 
     return [...list].reverse().map(m => {
-        const mat      = state.materials.find(x => x.id === m.materialId);
-        const unidad   = mat?.unit       || '—';
-        const valid    = m.transitValidation || 'Pendiente';
+        const mat = state.materials.find(x => x.id === m.materialId);
+        const unidad = mat?.unit || '—';
+        const valid = m.transitValidation || 'Pendiente';
         const validBadge = valid === 'Admitido' ? 'badge-success' : 'badge-warning';
         const assigned = m.transitLocation || '';
 
         return `<tr>
-          <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;white-space:nowrap;">${(m.datetime||'').replace('T',' ')}</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;white-space:nowrap;">${(m.datetime || '').replace('T', ' ')}</td>
           <td><span class="badge badge-warning">En Tránsito</span></td>
-          <td style="font-size:.82rem;">${m.user||'—'}</td>
-          <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent-gold);font-weight:700;">${m.materialId||'—'}</td>
-          <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem;">${m.desc||'—'}</td>
+          <td style="font-size:.82rem;">${m.user || '—'}</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent-gold);font-weight:700;">${m.materialId || '—'}</td>
+          <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem;">${m.desc || '—'}</td>
           <td style="text-align:center;font-weight:600;">${unidad}</td>
-          <td style="font-size:.82rem;">${m.category||'—'}</td>
-          <td><span class="badge badge-info">${m.um||'—'}</span></td>
+          <td style="font-size:.82rem;">${m.category || '—'}</td>
+          <td><span class="badge badge-info">${m.um || '—'}</span></td>
           <td>
             <input type="text" id="de-tr-umb-${m.id}"
-              value="${m.transitUMB||''}"
+              value="${m.transitUMB || ''}"
               class="form-input" placeholder="UMB"
               style="width:72px;padding:.3rem .4rem;font-size:.78rem;font-family:'JetBrains Mono',monospace;">
           </td>
-          <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${m.lotAlm||'—'}</td>
-          <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${m.lotProv||'—'}</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${m.lotAlm || '—'}</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${m.lotProv || '—'}</td>
           <td>
             <input type="date" id="de-tr-fab-${m.id}"
-              value="${m.transitFab||''}"
+              value="${m.transitFab || ''}"
               class="form-input"
               style="width:136px;padding:.3rem .4rem;font-size:.78rem;">
           </td>
-          <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${m.expiry||'—'}</td>
-          <td style="text-align:center;font-weight:700;font-size:.95rem;">${m.qty||'—'}</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${m.expiry || '—'}</td>
+          <td style="text-align:center;font-weight:700;font-size:.95rem;">${m.qty || '—'}</td>
           <td>
             <input type="text" id="de-tr-loc-${m.id}"
               list="de-tr-loc-list"
@@ -3595,7 +4344,7 @@ function buildDE_TrRows(list) {
 function asignarDE_Tr(movId) {
     const loc = (document.getElementById(`de-tr-loc-${movId}`)?.value || '').trim();
     const umb = (document.getElementById(`de-tr-umb-${movId}`)?.value || '').trim();
-    const fab =  document.getElementById(`de-tr-fab-${movId}`)?.value || '';
+    const fab = document.getElementById(`de-tr-fab-${movId}`)?.value || '';
 
     if (!loc) {
         triggerToast('error', 'Debes ingresar o seleccionar una ubicación antes de asignar.');
@@ -3605,9 +4354,9 @@ function asignarDE_Tr(movId) {
     const idx = state.movements.findIndex(m => m.id === movId);
     if (idx === -1) return;
 
-    state.movements[idx].transitLocation   = loc;
-    state.movements[idx].transitUMB        = umb;
-    state.movements[idx].transitFab        = fab;
+    state.movements[idx].transitLocation = loc;
+    state.movements[idx].transitUMB = umb;
+    state.movements[idx].transitFab = fab;
     state.movements[idx].transitValidation = 'Admitido';
 
     saveDEKey('movements');
@@ -3622,24 +4371,24 @@ function filterDE_Tr(query) {
         ? records.filter(m => {
             const mat = state.materials.find(x => x.id === m.materialId);
             return (
-                (m.datetime        ||'').toLowerCase().includes(_deTrSearch) ||
-                (m.user            ||'').toLowerCase().includes(_deTrSearch) ||
-                (m.materialId      ||'').toLowerCase().includes(_deTrSearch) ||
-                (m.desc            ||'').toLowerCase().includes(_deTrSearch) ||
-                (m.category        ||'').toLowerCase().includes(_deTrSearch) ||
-                (m.um              ||'').toLowerCase().includes(_deTrSearch) ||
-                (m.lotAlm          ||'').toLowerCase().includes(_deTrSearch) ||
-                (m.lotProv         ||'').toLowerCase().includes(_deTrSearch) ||
-                (m.transitLocation ||'').toLowerCase().includes(_deTrSearch) ||
-                (m.transitValidation||'').toLowerCase().includes(_deTrSearch) ||
-                (mat?.unit         ||'').toString().toLowerCase().includes(_deTrSearch)
+                (m.datetime || '').toLowerCase().includes(_deTrSearch) ||
+                (m.user || '').toLowerCase().includes(_deTrSearch) ||
+                (m.materialId || '').toLowerCase().includes(_deTrSearch) ||
+                (m.desc || '').toLowerCase().includes(_deTrSearch) ||
+                (m.category || '').toLowerCase().includes(_deTrSearch) ||
+                (m.um || '').toLowerCase().includes(_deTrSearch) ||
+                (m.lotAlm || '').toLowerCase().includes(_deTrSearch) ||
+                (m.lotProv || '').toLowerCase().includes(_deTrSearch) ||
+                (m.transitLocation || '').toLowerCase().includes(_deTrSearch) ||
+                (m.transitValidation || '').toLowerCase().includes(_deTrSearch) ||
+                (mat?.unit || '').toString().toLowerCase().includes(_deTrSearch)
             );
-          })
+        })
         : records;
 
-    const tbody   = document.getElementById('de-tr-tbody');
+    const tbody = document.getElementById('de-tr-tbody');
     const counter = document.getElementById('de-tr-count');
-    if (tbody)   tbody.innerHTML = buildDE_TrRows(filtered);
+    if (tbody) tbody.innerHTML = buildDE_TrRows(filtered);
     if (counter) counter.innerText = `${filtered.length} registro${filtered.length !== 1 ? 's' : ''} en tránsito`;
 }
 
@@ -3647,35 +4396,35 @@ function exportDE_TrCSV() {
     const records = state.movements.filter(m => m.status === 'En Tránsito');
     if (records.length === 0) { triggerToast('error', 'No hay registros en tránsito para exportar.'); return; }
 
-    const headers = ['Fecha','Estado','Usuario','Material','Descripcion','Unidad','Categoria','UM','UMB',
-                     'LoteAlmacen','LoteProveedor','F.Fabricacion','F.Vencimiento','Cantidad',
-                     'UbicacionAsignada','Validacion'];
+    const headers = ['Fecha', 'Estado', 'Usuario', 'Material', 'Descripcion', 'Unidad', 'Categoria', 'UM', 'UMB',
+        'LoteAlmacen', 'LoteProveedor', 'F.Fabricacion', 'F.Vencimiento', 'Cantidad',
+        'UbicacionAsignada', 'Validacion'];
     const rows = [...records].reverse().map(m => {
         const mat = state.materials.find(x => x.id === m.materialId);
         return [
-            `"${(m.datetime||'').replace('T',' ')}"`,
+            `"${(m.datetime || '').replace('T', ' ')}"`,
             'En Tránsito',
-            m.user||'',
-            m.materialId||'',
-            `"${m.desc||''}"`,
-            mat?.unit||'',
-            `"${m.category||''}"`,
-            m.um||'',
-            m.transitUMB||'',
-            m.lotAlm||'',
-            m.lotProv||'',
-            m.transitFab||'',
-            m.expiry||'',
-            m.qty||'',
-            m.transitLocation||'',
-            m.transitValidation||'Pendiente'
+            m.user || '',
+            m.materialId || '',
+            `"${m.desc || ''}"`,
+            mat?.unit || '',
+            `"${m.category || ''}"`,
+            m.um || '',
+            m.transitUMB || '',
+            m.lotAlm || '',
+            m.lotProv || '',
+            m.transitFab || '',
+            m.expiry || '',
+            m.qty || '',
+            m.transitLocation || '',
+            m.transitValidation || 'Pendiente'
         ];
     });
 
-    const csv  = '﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const csv = '﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    link.href  = URL.createObjectURL(blob);
+    link.href = URL.createObjectURL(blob);
     link.download = `EnTransito_Aureo_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     triggerToast('success', `CSV exportado (${records.length} registros).`);
@@ -3685,31 +4434,31 @@ function printDE_TrSoporte() {
     const records = state.movements.filter(m => m.status === 'En Tránsito');
     if (records.length === 0) { triggerToast('error', 'No hay registros en tránsito para imprimir.'); return; }
 
-    const company   = state.settings?.companyName || 'AUREO';
+    const company = state.settings?.companyName || 'AUREO';
     const printDate = new Date().toLocaleString('es-ES');
-    const sorted    = [...records].reverse();
+    const sorted = [...records].reverse();
 
     const rows = sorted.map((m, i) => {
-        const mat   = state.materials.find(x => x.id === m.materialId);
+        const mat = state.materials.find(x => x.id === m.materialId);
         const valid = m.transitValidation || 'Pendiente';
         return `
         <tr class="${i % 2 === 0 ? 'even' : 'odd'}">
           <td class="center">${i + 1}</td>
-          <td class="mono">${(m.datetime||'').replace('T',' ')}</td>
+          <td class="mono">${(m.datetime || '').replace('T', ' ')}</td>
           <td class="center badge-cell admitido-${valid === 'Admitido'}">${valid}</td>
-          <td>${m.user||'—'}</td>
-          <td class="mono">${m.materialId||'—'}</td>
-          <td>${m.desc||'—'}</td>
-          <td class="center">${mat?.unit||'—'}</td>
-          <td>${m.category||'—'}</td>
-          <td class="center mono">${m.um||'—'}</td>
-          <td class="center mono">${m.transitUMB||'—'}</td>
-          <td class="mono">${m.lotAlm||'—'}</td>
-          <td class="mono">${m.lotProv||'—'}</td>
-          <td class="mono">${m.transitFab||'—'}</td>
-          <td class="mono">${m.expiry||'—'}</td>
-          <td class="center bold">${m.qty||'—'}</td>
-          <td class="mono">${m.transitLocation||'_______________'}</td>
+          <td>${m.user || '—'}</td>
+          <td class="mono">${m.materialId || '—'}</td>
+          <td>${m.desc || '—'}</td>
+          <td class="center">${mat?.unit || '—'}</td>
+          <td>${m.category || '—'}</td>
+          <td class="center mono">${m.um || '—'}</td>
+          <td class="center mono">${m.transitUMB || '—'}</td>
+          <td class="mono">${m.lotAlm || '—'}</td>
+          <td class="mono">${m.lotProv || '—'}</td>
+          <td class="mono">${m.transitFab || '—'}</td>
+          <td class="mono">${m.expiry || '—'}</td>
+          <td class="center bold">${m.qty || '—'}</td>
+          <td class="mono">${m.transitLocation || '_______________'}</td>
         </tr>`;
     }).join('');
 
@@ -3817,7 +4566,7 @@ function _getWeekNumber(dateStr) {
     if (!dateStr) return '';
     const d = new Date(dateStr + 'T00:00:00');
     const start = new Date(d.getFullYear(), 0, 1);
-    const week  = Math.ceil(((d - start) / 86400000 + start.getDay() + 1) / 7);
+    const week = Math.ceil(((d - start) / 86400000 + start.getDay() + 1) / 7);
     return `S${String(week).padStart(2, '0')}-${d.getFullYear()}`;
 }
 
@@ -3926,26 +4675,26 @@ function buildDE_RotRows(list) {
     }
     return [...list].reverse().map(l => `
     <tr>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:700;color:var(--accent-gold);">${l.serialImp||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.serialCita||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.fechaRec||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;">${l.semana||'—'}</td>
-      <td style="font-size:.82rem;">${l.proveedor||'—'}</td>
-      <td style="font-size:.82rem;">${l.auxiliar||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.documento||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.remesa||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.ordenCompra||'—'}</td>
-      <td style="text-align:center;font-weight:700;">${l.cantidad||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.sku||'—'}</td>
-      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem;">${l.textoBreve||'—'}</td>
-      <td><span class="badge badge-info">${l.um||'—'}</span></td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.umb||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.fFabricacion||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.fVencimiento||'—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.loteProv||'—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:700;color:var(--accent-gold);">${l.serialImp || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.serialCita || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.fechaRec || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;">${l.semana || '—'}</td>
+      <td style="font-size:.82rem;">${l.proveedor || '—'}</td>
+      <td style="font-size:.82rem;">${l.auxiliar || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.documento || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.remesa || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.ordenCompra || '—'}</td>
+      <td style="text-align:center;font-weight:700;">${l.cantidad || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.sku || '—'}</td>
+      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem;">${l.textoBreve || '—'}</td>
+      <td><span class="badge badge-info">${l.um || '—'}</span></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.umb || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.fFabricacion || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.fVencimiento || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.loteProv || '—'}</td>
       <td>
         <div style="display:inline-flex;align-items:center;gap:.5rem;">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.loteAlm||'—'}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.loteAlm || '—'}</span>
           <button class="btn btn-secondary btn-icon-only" onclick="printDE_RotLabel('${l.id}')" title="Imprimir rótulo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="6 9 6 2 18 2 18 9"/>
@@ -3964,33 +4713,33 @@ function buildDE_RotRows(list) {
 }
 
 function applyDE_RotFilters() {
-    _deRotSearch = (document.getElementById('de-rot-search')?.value       || '').toLowerCase().trim();
+    _deRotSearch = (document.getElementById('de-rot-search')?.value || '').toLowerCase().trim();
     _deRotSerial = (document.getElementById('de-rot-serial-filter')?.value || '').toLowerCase().trim();
 
     const filtered = state.labels.filter(l => {
         if (_deRotSerial && !(l.serialImp || '').toLowerCase().includes(_deRotSerial)) return false;
         if (_deRotSearch) {
             return (
-                (l.serialCita ||'').toLowerCase().includes(_deRotSearch) ||
-                (l.semana     ||'').toLowerCase().includes(_deRotSearch) ||
-                (l.proveedor  ||'').toLowerCase().includes(_deRotSearch) ||
-                (l.auxiliar   ||'').toLowerCase().includes(_deRotSearch) ||
-                (l.documento  ||'').toLowerCase().includes(_deRotSearch) ||
-                (l.remesa     ||'').toLowerCase().includes(_deRotSearch) ||
-                (l.ordenCompra||'').toLowerCase().includes(_deRotSearch) ||
-                (l.sku        ||'').toLowerCase().includes(_deRotSearch) ||
-                (l.textoBreve ||'').toLowerCase().includes(_deRotSearch) ||
-                (l.loteProv   ||'').toLowerCase().includes(_deRotSearch) ||
-                (l.loteAlm    ||'').toLowerCase().includes(_deRotSearch) ||
-                (l.fechaRec   ||'').includes(_deRotSearch)
+                (l.serialCita || '').toLowerCase().includes(_deRotSearch) ||
+                (l.semana || '').toLowerCase().includes(_deRotSearch) ||
+                (l.proveedor || '').toLowerCase().includes(_deRotSearch) ||
+                (l.auxiliar || '').toLowerCase().includes(_deRotSearch) ||
+                (l.documento || '').toLowerCase().includes(_deRotSearch) ||
+                (l.remesa || '').toLowerCase().includes(_deRotSearch) ||
+                (l.ordenCompra || '').toLowerCase().includes(_deRotSearch) ||
+                (l.sku || '').toLowerCase().includes(_deRotSearch) ||
+                (l.textoBreve || '').toLowerCase().includes(_deRotSearch) ||
+                (l.loteProv || '').toLowerCase().includes(_deRotSearch) ||
+                (l.loteAlm || '').toLowerCase().includes(_deRotSearch) ||
+                (l.fechaRec || '').includes(_deRotSearch)
             );
         }
         return true;
     });
 
-    const tbody   = document.getElementById('de-rot-tbody');
+    const tbody = document.getElementById('de-rot-tbody');
     const counter = document.getElementById('de-rot-count');
-    if (tbody)   tbody.innerHTML = buildDE_RotRows(filtered);
+    if (tbody) tbody.innerHTML = buildDE_RotRows(filtered);
     if (counter) counter.innerText = `${filtered.length} ${(_deRotSearch || _deRotSerial) ? 'resultado' + (filtered.length !== 1 ? 's' : '') : 'registros'}`;
 }
 
@@ -4002,9 +4751,9 @@ function clearDE_RotFilters() {
     if (searchEl) searchEl.value = '';
     if (serialEl) serialEl.value = '';
 
-    const tbody   = document.getElementById('de-rot-tbody');
+    const tbody = document.getElementById('de-rot-tbody');
     const counter = document.getElementById('de-rot-count');
-    if (tbody)   tbody.innerHTML = buildDE_RotRows(state.labels);
+    if (tbody) tbody.innerHTML = buildDE_RotRows(state.labels);
     if (counter) counter.innerText = `${state.labels.length} registros`;
 }
 
@@ -4057,30 +4806,30 @@ function triggerToast(type, message) {
 //   MÓDULO: ÍNDICES DE OCUPACIÓN DE BODEGA
 // ==========================================================================
 
-const WH_GRID      = { aisles: ['A','B','C','D'], shelvesPerAisle: 5, levelsPerShelf: 3 };
-const WH_CAPACITY  = 300;                          // total warehouse slots
+const WH_GRID = { aisles: ['A', 'B', 'C', 'D'], shelvesPerAisle: 5, levelsPerShelf: 3 };
+const WH_CAPACITY = 300;                          // total warehouse slots
 const WH_AISLE_CAP = Math.round(WH_CAPACITY / 4); // 75 per aisle
 
-const OCC_AISLE_CLR = { A:'#2E4A6E', B:'#4A7AB5', C:'#1E3352', D:'#A8442C' };
-const OCC_ABC_CLR   = { A:'#2E4A6E', B:'#4A7AB5', C:'#7BA3D0' };
-const OCC_CAT_CLR   = ['#2E4A6E','#4A7AB5','#1E3352','#A8442C','#3A6090','#5E7D52','#7BA3D0'];
+const OCC_AISLE_CLR = { A: '#2E4A6E', B: '#4A7AB5', C: '#1E3352', D: '#A8442C' };
+const OCC_ABC_CLR = { A: '#2E4A6E', B: '#4A7AB5', C: '#7BA3D0' };
+const OCC_CAT_CLR = ['#2E4A6E', '#4A7AB5', '#1E3352', '#A8442C', '#3A6090', '#5E7D52', '#7BA3D0'];
 
-let _occMode       = 'general'; // 'general' | 'diario' | 'mensual'
-let _occFilter     = 'todo';    // 'todo' | 'pasillo' | 'categoria' | 'abc'
+let _occMode = 'general'; // 'general' | 'diario' | 'mensual'
+let _occFilter = 'todo';    // 'todo' | 'pasillo' | 'categoria' | 'abc'
 let _occOpenAisles = new Set();
-let _occOpenCats   = new Set();
+let _occOpenCats = new Set();
 
 // ── Donut SVG via stroke-dasharray ────────────────────────────────────────────
 function buildDonutSVG(segments, { size = 150, thick = 26 } = {}) {
     const total = segments.reduce((s, g) => s + g.value, 0);
     const cx = size / 2, cy = size / 2;
-    const r  = (size - thick) / 2;
-    const C  = 2 * Math.PI * r;
+    const r = (size - thick) / 2;
+    const C = 2 * Math.PI * r;
 
     if (total === 0) {
         return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
             <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(36,31,26,.06)" stroke-width="${thick}"/>
-            <text x="${cx}" y="${cy+5}" text-anchor="middle" fill="rgba(36,31,26,.25)" font-size="11">Sin datos</text>
+            <text x="${cx}" y="${cy + 5}" text-anchor="middle" fill="rgba(36,31,26,.25)" font-size="11">Sin datos</text>
         </svg>`;
     }
 
@@ -4117,38 +4866,40 @@ function computeOccupancyData() {
     });
 
     let classification = [];
-    try { classification = calculateABCClassification(); } catch (e) {}
+    try { classification = calculateABCClassification(); } catch (e) { }
     const byABC = { A: 0, B: 0, C: 0 };
     classification.forEach(p => { if (byABC[p.abcClass] !== undefined) byABC[p.abcClass]++; });
     const classifiedIds = new Set(classification.map(p => p.id));
     prods.forEach(p => { if (!classifiedIds.has(p.id)) byABC.C++; });
 
     const totalOccupied = prods.length;
-    const occupancyPct  = Math.round((totalOccupied / WH_CAPACITY) * 100);
+    const occupancyPct = Math.round((totalOccupied / WH_CAPACITY) * 100);
 
     const today = new Date().toISOString().split('T')[0];
     const todayInv = state.invoices.filter(i => i.date === today);
     const dailyOrders = todayInv.length;
-    const dailyUnits  = todayInv.reduce((s, i) => s + (i.items||[]).reduce((ss, it) => ss + (it.qty||0), 0), 0);
+    const dailyUnits = todayInv.reduce((s, i) => s + (i.items || []).reduce((ss, it) => ss + (it.qty || 0), 0), 0);
 
     const now = new Date();
-    const monthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const byDay = {};
     state.invoices.filter(i => i.date && i.date.startsWith(monthStr)).forEach(i => {
-        const u = (i.items||[]).reduce((s, it) => s + (it.qty||0), 0);
+        const u = (i.items || []).reduce((s, it) => s + (it.qty || 0), 0);
         byDay[i.date] = (byDay[i.date] || 0) + u;
     });
-    const dayEntries    = Object.entries(byDay).sort((a,b) => b[1]-a[1]);
+    const dayEntries = Object.entries(byDay).sort((a, b) => b[1] - a[1]);
     const monthlyRecord = dayEntries[0] ? dayEntries[0][1] : 0;
-    const recordDate    = dayEntries[0] ? dayEntries[0][0] : '—';
+    const recordDate = dayEntries[0] ? dayEntries[0][0] : '—';
 
-    return { byAisle, byCategory, byABC, totalOccupied, occupancyPct,
-             dailyOrders, dailyUnits, monthlyRecord, recordDate,
-             freeSlots: Math.max(0, WH_CAPACITY - totalOccupied) };
+    return {
+        byAisle, byCategory, byABC, totalOccupied, occupancyPct,
+        dailyOrders, dailyUnits, monthlyRecord, recordDate,
+        freeSlots: Math.max(0, WH_CAPACITY - totalOccupied)
+    };
 }
 
 // ── Mode / filter controls ────────────────────────────────────────────────────
-function setOccMode(m)   { _occMode   = m; _renderOccChart(); }
+function setOccMode(m) { _occMode = m; _renderOccChart(); }
 function setOccFilter(f) { _occFilter = f; _renderOccChart(); }
 
 function _getOccSegments(d) {
@@ -4160,7 +4911,7 @@ function _getOccSegments(d) {
 
     const free = Math.max(0, WH_CAPACITY - occupied);
     const freeLabel = _occMode === 'general' ? 'Disponible' : 'Sin actividad';
-    const freeSeg   = { label: freeLabel, value: free, color: 'rgba(36,31,26,0.09)' };
+    const freeSeg = { label: freeLabel, value: free, color: 'rgba(36,31,26,0.09)' };
 
     let segments, centerVal, centerSub;
 
@@ -4182,7 +4933,7 @@ function _getOccSegments(d) {
                 ? new Date().toISOString().split('T')[0]
                 : d.recordDate;
             state.invoices.filter(i => i.date === targetDate).forEach(inv => {
-                (inv.items||[]).forEach(it => {
+                (inv.items || []).forEach(it => {
                     const prod = state.products.find(p =>
                         p.sku === it.sku || p.name === it.name || p.id === it.productId);
                     if (prod && prod.aisle && WH_GRID.aisles.includes(prod.aisle))
@@ -4190,7 +4941,7 @@ function _getOccSegments(d) {
                 });
             });
         }
-        segments = WH_GRID.aisles.map(a => ({ label: 'Pasillo ' + a, value: byAisle[a]||0, color: OCC_AISLE_CLR[a] }));
+        segments = WH_GRID.aisles.map(a => ({ label: 'Pasillo ' + a, value: byAisle[a] || 0, color: OCC_AISLE_CLR[a] }));
         segments.push(freeSeg);
         centerVal = occupied;
         centerSub = _occMode === 'general' ? 'productos' : 'unidades';
@@ -4204,18 +4955,18 @@ function _getOccSegments(d) {
                 ? new Date().toISOString().split('T')[0]
                 : d.recordDate;
             state.invoices.filter(i => i.date === targetDate).forEach(inv => {
-                (inv.items||[]).forEach(it => {
+                (inv.items || []).forEach(it => {
                     const prod = state.products.find(p =>
                         p.sku === it.sku || p.name === it.name || p.id === it.productId);
                     const cat = (prod && prod.category) ? prod.category : 'Sin categoría';
-                    byCat[cat] = (byCat[cat]||0) + (it.qty||0);
+                    byCat[cat] = (byCat[cat] || 0) + (it.qty || 0);
                 });
             });
         }
-        const entries = Object.entries(byCat).sort((a,b) => b[1]-a[1]);
-        const top = entries.slice(0,6).map(function(e,i){ return { label:e[0], value:e[1], color:OCC_CAT_CLR[i] }; });
+        const entries = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+        const top = entries.slice(0, 6).map(function (e, i) { return { label: e[0], value: e[1], color: OCC_CAT_CLR[i] }; });
         if (entries.length > 6)
-            top.push({ label:'Otras categorías', value: entries.slice(6).reduce((s,e)=>s+e[1],0), color:'#6b7280' });
+            top.push({ label: 'Otras categorías', value: entries.slice(6).reduce((s, e) => s + e[1], 0), color: '#6b7280' });
         segments = top;
         segments.push(freeSeg);
         centerVal = occupied;
@@ -4226,26 +4977,26 @@ function _getOccSegments(d) {
         if (_occMode === 'general') {
             byABC = Object.assign({}, d.byABC);
         } else {
-            byABC = { A:0, B:0, C:0 };
+            byABC = { A: 0, B: 0, C: 0 };
             let cls = [];
-            try { cls = calculateABCClassification(); } catch(e) {}
+            try { cls = calculateABCClassification(); } catch (e) { }
             const classMap = {};
             cls.forEach(p => { classMap[p.id] = p.abcClass; });
             const targetDate = _occMode === 'diario'
                 ? new Date().toISOString().split('T')[0]
                 : d.recordDate;
             state.invoices.filter(i => i.date === targetDate).forEach(inv => {
-                (inv.items||[]).forEach(it => {
+                (inv.items || []).forEach(it => {
                     const prod = state.products.find(p =>
                         p.sku === it.sku || p.name === it.name || p.id === it.productId);
-                    if (prod) { const c = classMap[prod.id] || 'C'; byABC[c] = (byABC[c]||0) + (it.qty||0); }
+                    if (prod) { const c = classMap[prod.id] || 'C'; byABC[c] = (byABC[c] || 0) + (it.qty || 0); }
                 });
             });
         }
         segments = [
-            { label:'Clase A · Alto mov.', value: byABC.A, color: OCC_ABC_CLR.A },
-            { label:'Clase B · Medio',     value: byABC.B, color: OCC_ABC_CLR.B },
-            { label:'Clase C · Bajo mov.', value: byABC.C, color: OCC_ABC_CLR.C },
+            { label: 'Clase A · Alto mov.', value: byABC.A, color: OCC_ABC_CLR.A },
+            { label: 'Clase B · Medio', value: byABC.B, color: OCC_ABC_CLR.B },
+            { label: 'Clase C · Bajo mov.', value: byABC.C, color: OCC_ABC_CLR.C },
             freeSeg
         ];
         centerVal = occupied;
@@ -4258,21 +5009,21 @@ function _getOccSegments(d) {
 // ── Partial chart re-render (no full page rebuild) ────────────────────────────
 function _renderOccChart() {
     // Sync mode button styles
-    ['general','diario','mensual'].forEach(function(m) {
+    ['general', 'diario', 'mensual'].forEach(function (m) {
         const btn = document.getElementById('occ-mode-' + m);
         if (!btn) return;
         const on = _occMode === m;
-        btn.style.background  = on ? 'var(--primary,#2E4A6E)' : 'rgba(36,31,26,0.04)';
-        btn.style.color       = on ? '#fff' : 'var(--text-secondary)';
+        btn.style.background = on ? 'var(--primary,#2E4A6E)' : 'rgba(36,31,26,0.04)';
+        btn.style.color = on ? '#fff' : 'var(--text-secondary)';
         btn.style.borderColor = on ? 'transparent' : 'rgba(36,31,26,0.1)';
     });
     // Sync filter button styles
-    ['todo','pasillo','categoria','abc'].forEach(function(f) {
+    ['todo', 'pasillo', 'categoria', 'abc'].forEach(function (f) {
         const btn = document.getElementById('occ-filter-' + f);
         if (!btn) return;
         const on = _occFilter === f;
-        btn.style.background  = on ? 'rgba(192,138,45,0.2)' : 'transparent';
-        btn.style.color       = on ? '#2E2208' : 'var(--text-muted)';
+        btn.style.background = on ? 'rgba(192,138,45,0.2)' : 'transparent';
+        btn.style.color = on ? '#2E2208' : 'var(--text-muted)';
         btn.style.borderColor = on ? '#2E4A6E' : 'rgba(36,31,26,0.08)';
     });
 
@@ -4281,9 +5032,9 @@ function _renderOccChart() {
 
     const d = computeOccupancyData();
     const { segments, centerVal, centerSub } = _getOccSegments(d);
-    const totalSeg = segments.reduce(function(s,g){ return s+g.value; }, 0);
+    const totalSeg = segments.reduce(function (s, g) { return s + g.value; }, 0);
 
-    const legend = segments.filter(function(s){ return s.value > 0; }).map(function(seg) {
+    const legend = segments.filter(function (s) { return s.value > 0; }).map(function (seg) {
         const pct = totalSeg > 0 ? Math.round((seg.value / totalSeg) * 100) : 0;
         const isAvail = seg.label === 'Disponible' || seg.label === 'Sin actividad';
         return '<div style="display:flex;align-items:center;justify-content:space-between;padding:.3rem 0;border-bottom:1px solid rgba(36,31,26,.04);">'
@@ -4299,30 +5050,30 @@ function _renderOccChart() {
     }).join('');
 
     const stockPct = Math.min(100, Math.round((state.products.length / WH_CAPACITY) * 100));
-    const barClr   = stockPct >= 85 ? '#A8442C' : stockPct >= 60 ? '#4A7AB5' : '#5E7D52';
+    const barClr = stockPct >= 85 ? '#A8442C' : stockPct >= 60 ? '#4A7AB5' : '#5E7D52';
 
     chartEl.innerHTML =
         '<div style="display:flex;align-items:center;gap:2.5rem;flex-wrap:wrap;justify-content:center;padding:1.25rem 0 .75rem;">'
-      + '<div style="position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
-      + buildDonutSVG(segments, { size: 230, thick: 34 })
-      + '<div style="position:absolute;text-align:center;pointer-events:none;line-height:1.2;">'
-      + '<div style="font-size:2rem;font-weight:900;color:var(--text-primary);">' + centerVal + '</div>'
-      + '<div style="font-size:.7rem;color:var(--text-muted);margin-top:2px;max-width:85px;">' + centerSub + '</div>'
-      + '</div></div>'
-      + '<div style="flex:1;min-width:200px;max-width:300px;">'
-      + '<div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:.65rem;">Distribución</div>'
-      + (legend || '<div style="color:var(--text-muted);font-size:.8rem;padding:.5rem 0;">Sin actividad para este período.</div>')
-      + '<div style="margin-top:.9rem;padding-top:.8rem;border-top:1px solid rgba(36,31,26,.06);">'
-      + '<div style="display:flex;justify-content:space-between;margin-bottom:.35rem;">'
-      + '<span style="font-size:.68rem;color:var(--text-muted);">Ocupación real · ' + WH_CAPACITY + ' slots</span>'
-      + '<span style="font-size:.74rem;font-weight:700;color:' + barClr + ';">' + stockPct + '%</span>'
-      + '</div>'
-      + '<div style="background:rgba(36,31,26,.07);border-radius:4px;height:6px;overflow:hidden;">'
-      + '<div style="width:' + stockPct + '%;background:' + barClr + ';height:100%;border-radius:4px;"></div>'
-      + '</div>'
-      + '<div style="font-size:.67rem;color:var(--text-muted);margin-top:.3rem;">'
-      + state.products.length + ' ocupados · ' + (WH_CAPACITY - state.products.length) + ' libres</div>'
-      + '</div></div></div>';
+        + '<div style="position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
+        + buildDonutSVG(segments, { size: 230, thick: 34 })
+        + '<div style="position:absolute;text-align:center;pointer-events:none;line-height:1.2;">'
+        + '<div style="font-size:2rem;font-weight:900;color:var(--text-primary);">' + centerVal + '</div>'
+        + '<div style="font-size:.7rem;color:var(--text-muted);margin-top:2px;max-width:85px;">' + centerSub + '</div>'
+        + '</div></div>'
+        + '<div style="flex:1;min-width:200px;max-width:300px;">'
+        + '<div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:.65rem;">Distribución</div>'
+        + (legend || '<div style="color:var(--text-muted);font-size:.8rem;padding:.5rem 0;">Sin actividad para este período.</div>')
+        + '<div style="margin-top:.9rem;padding-top:.8rem;border-top:1px solid rgba(36,31,26,.06);">'
+        + '<div style="display:flex;justify-content:space-between;margin-bottom:.35rem;">'
+        + '<span style="font-size:.68rem;color:var(--text-muted);">Ocupación real · ' + WH_CAPACITY + ' slots</span>'
+        + '<span style="font-size:.74rem;font-weight:700;color:' + barClr + ';">' + stockPct + '%</span>'
+        + '</div>'
+        + '<div style="background:rgba(36,31,26,.07);border-radius:4px;height:6px;overflow:hidden;">'
+        + '<div style="width:' + stockPct + '%;background:' + barClr + ';height:100%;border-radius:4px;"></div>'
+        + '</div>'
+        + '<div style="font-size:.67rem;color:var(--text-muted);margin-top:.3rem;">'
+        + state.products.length + ' ocupados · ' + (WH_CAPACITY - state.products.length) + ' libres</div>'
+        + '</div></div></div>';
 }
 
 // ── Accordion: toggle helpers ─────────────────────────────────────────────────
@@ -4343,35 +5094,35 @@ function _renderOccAccordion() {
     if (!el) return;
 
     let classification = [];
-    try { classification = calculateABCClassification(); } catch(e) {}
+    try { classification = calculateABCClassification(); } catch (e) { }
     const classMap = {};
-    classification.forEach(function(p) { classMap[p.id] = p.abcClass; });
+    classification.forEach(function (p) { classMap[p.id] = p.abcClass; });
 
-    const rows = WH_GRID.aisles.map(function(aisle) {
-        const prods = state.products.filter(function(p) { return p.aisle === aisle; });
+    const rows = WH_GRID.aisles.map(function (aisle) {
+        const prods = state.products.filter(function (p) { return p.aisle === aisle; });
         const isOpen = _occOpenAisles.has(aisle);
         const pct = Math.round((prods.length / WH_AISLE_CAP) * 100);
         const barClr = pct >= 90 ? '#A8442C' : pct >= 65 ? '#4A7AB5' : '#5E7D52';
 
         // Group by category
         const byCat = {};
-        prods.forEach(function(p) {
+        prods.forEach(function (p) {
             const cat = p.category || 'Sin categoría';
             if (!byCat[cat]) byCat[cat] = [];
             byCat[cat].push(p);
         });
 
-        const catsHtml = Object.entries(byCat).map(function(entry) {
+        const catsHtml = Object.entries(byCat).map(function (entry) {
             const cat = entry[0], catProds = entry[1];
             const catKey = aisle + '::' + cat;
             const catOpen = _occOpenCats.has(catKey);
 
-            const prodsHtml = catProds.map(function(p) {
+            const prodsHtml = catProds.map(function (p) {
                 const abcCls = classMap[p.id] || 'C';
                 const abcClr = OCC_ABC_CLR[abcCls];
                 const stockLow = Number(p.stock) <= Number(p.threshold);
                 const today = new Date().toISOString().split('T')[0];
-                const expNear = p.expiry && p.expiry <= new Date(Date.now() + 30*86400000).toISOString().split('T')[0];
+                const expNear = p.expiry && p.expiry <= new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
 
                 return `<div style="background:rgba(36,31,26,.04);border-radius:8px;padding:.75rem 1rem;margin:.3rem 0;border-left:3px solid ${abcClr};">
                     <div style="display:grid;grid-template-columns:90px 1fr 90px 1fr;gap:.3rem .6rem;font-size:.78rem;align-items:start;">
@@ -4435,7 +5186,7 @@ function _renderOccAccordion() {
                 </div>
                 <div style="display:flex;align-items:center;gap:.75rem;">
                     <div style="background:rgba(36,31,26,.08);border-radius:4px;height:6px;width:80px;overflow:hidden;">
-                        <div style="width:${Math.min(100,pct)}%;background:${barClr};height:100%;border-radius:4px;"></div>
+                        <div style="width:${Math.min(100, pct)}%;background:${barClr};height:100%;border-radius:4px;"></div>
                     </div>
                     <span style="font-size:.78rem;font-weight:700;color:${barClr};">${pct}%</span>
                     <span style="font-size:.74rem;color:var(--text-muted);">${WH_AISLE_CAP - prods.length} libres</span>
@@ -4455,10 +5206,10 @@ function renderOccupancySection() {
 
     const d = computeOccupancyData();
     const stockPct = Math.min(100, Math.round((state.products.length / WH_CAPACITY) * 100));
-    const genClr   = stockPct >= 85 ? '#A8442C' : stockPct >= 60 ? '#4A7AB5' : '#5E7D52';
+    const genClr = stockPct >= 85 ? '#A8442C' : stockPct >= 60 ? '#4A7AB5' : '#5E7D52';
     const freeSlots = Math.max(0, WH_CAPACITY - state.products.length);
 
-    const kpi = function(lbl, val, sub, clr) {
+    const kpi = function (lbl, val, sub, clr) {
         return '<div style="background:var(--bg-secondary,#16162a);border-radius:10px;padding:1rem 1.2rem;border-left:3px solid ' + clr + ';">'
             + '<div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:600;margin-bottom:.3rem;">' + lbl + '</div>'
             + '<div style="font-size:1.75rem;font-weight:900;color:' + clr + ';line-height:1;">' + val + '</div>'
@@ -4467,53 +5218,53 @@ function renderOccupancySection() {
     };
 
 
-    const tabBase    = 'padding:.45rem 1.1rem;border-radius:6px;border:1px solid;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;';
+    const tabBase = 'padding:.45rem 1.1rem;border-radius:6px;border:1px solid;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;';
     const filterBase = 'padding:.35rem .85rem;border-radius:5px;border:1px solid;font-size:.74rem;font-weight:600;cursor:pointer;transition:all .2s;';
 
     el.innerHTML =
         '<div class="card">'
-      + '<div class="card-header" style="border-bottom:1px solid var(--border-subtle);padding-bottom:1rem;margin-bottom:1.25rem;">'
-      + '<h2 class="card-title">'
-      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="20" height="20" style="margin-right:.4rem;">'
-      + '<rect x="2" y="3" width="6" height="10" rx="1"/><rect x="10" y="3" width="6" height="6" rx="1"/>'
-      + '<rect x="10" y="13" width="6" height="8" rx="1"/><rect x="18" y="3" width="4" height="18" rx="1"/>'
-      + '<rect x="2" y="17" width="6" height="4" rx="1"/></svg>'
-      + 'Índices de Ocupación de Bodega</h2>'
-      + '<span class="badge badge-info">' + state.products.length + ' / ' + WH_CAPACITY + ' posiciones</span>'
-      + '</div>'
+        + '<div class="card-header" style="border-bottom:1px solid var(--border-subtle);padding-bottom:1rem;margin-bottom:1.25rem;">'
+        + '<h2 class="card-title">'
+        + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="20" height="20" style="margin-right:.4rem;">'
+        + '<rect x="2" y="3" width="6" height="10" rx="1"/><rect x="10" y="3" width="6" height="6" rx="1"/>'
+        + '<rect x="10" y="13" width="6" height="8" rx="1"/><rect x="18" y="3" width="4" height="18" rx="1"/>'
+        + '<rect x="2" y="17" width="6" height="4" rx="1"/></svg>'
+        + 'Índices de Ocupación de Bodega</h2>'
+        + '<span class="badge badge-info">' + state.products.length + ' / ' + WH_CAPACITY + ' posiciones</span>'
+        + '</div>'
 
-      // Mode selector
-      + '<div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem;">'
-      + '<span style="font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-right:.25rem;">Vista:</span>'
-      + "<button id=\"occ-mode-general\"  onclick=\"setOccMode('general')\"  style=\"" + tabBase + "\">General</button>"
-      + "<button id=\"occ-mode-diario\"   onclick=\"setOccMode('diario')\"   style=\"" + tabBase + "\">Diario</button>"
-      + "<button id=\"occ-mode-mensual\"  onclick=\"setOccMode('mensual')\"  style=\"" + tabBase + "\">Récord Mensual</button>"
-      + '</div>'
+        // Mode selector
+        + '<div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem;">'
+        + '<span style="font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-right:.25rem;">Vista:</span>'
+        + "<button id=\"occ-mode-general\"  onclick=\"setOccMode('general')\"  style=\"" + tabBase + "\">General</button>"
+        + "<button id=\"occ-mode-diario\"   onclick=\"setOccMode('diario')\"   style=\"" + tabBase + "\">Diario</button>"
+        + "<button id=\"occ-mode-mensual\"  onclick=\"setOccMode('mensual')\"  style=\"" + tabBase + "\">Récord Mensual</button>"
+        + '</div>'
 
-      // Filter selector
-      + '<div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-bottom:1.4rem;">'
-      + '<span style="font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-right:.25rem;">Filtrar:</span>'
-      + "<button id=\"occ-filter-todo\"      onclick=\"setOccFilter('todo')\"      style=\"" + filterBase + "\">Sin filtro</button>"
-      + "<button id=\"occ-filter-pasillo\"   onclick=\"setOccFilter('pasillo')\"   style=\"" + filterBase + "\">Por Pasillo</button>"
-      + "<button id=\"occ-filter-categoria\" onclick=\"setOccFilter('categoria')\" style=\"" + filterBase + "\">Por Categoría</button>"
-      + "<button id=\"occ-filter-abc\"       onclick=\"setOccFilter('abc')\"       style=\"" + filterBase + "\">Por ABC</button>"
-      + '</div>'
+        // Filter selector
+        + '<div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-bottom:1.4rem;">'
+        + '<span style="font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-right:.25rem;">Filtrar:</span>'
+        + "<button id=\"occ-filter-todo\"      onclick=\"setOccFilter('todo')\"      style=\"" + filterBase + "\">Sin filtro</button>"
+        + "<button id=\"occ-filter-pasillo\"   onclick=\"setOccFilter('pasillo')\"   style=\"" + filterBase + "\">Por Pasillo</button>"
+        + "<button id=\"occ-filter-categoria\" onclick=\"setOccFilter('categoria')\" style=\"" + filterBase + "\">Por Categoría</button>"
+        + "<button id=\"occ-filter-abc\"       onclick=\"setOccFilter('abc')\"       style=\"" + filterBase + "\">Por ABC</button>"
+        + '</div>'
 
-      // Chart area
-      + '<div id="occ-chart-area" style="background:var(--bg-secondary,#16162a);border-radius:12px;padding:1rem 1.5rem;margin-bottom:1.5rem;"></div>'
+        // Chart area
+        + '<div id="occ-chart-area" style="background:var(--bg-secondary,#16162a);border-radius:12px;padding:1rem 1.5rem;margin-bottom:1.5rem;"></div>'
 
-      // KPI row
-      + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem;">'
-      + kpi('Ocupación General', stockPct + '%', state.products.length + ' de ' + WH_CAPACITY + ' slots', genClr)
-      + kpi('Despachos Hoy', d.dailyOrders, d.dailyUnits + ' uds · ' + new Date().toLocaleDateString('es-CL'), '#2E4A6E')
-      + kpi('Récord Mensual', d.monthlyRecord + ' uds', 'Pico del mes · ' + d.recordDate, '#4A7AB5')
-      + kpi('Posiciones Libres', freeSlots, freeSlots + ' de ' + WH_CAPACITY + ' disponibles', '#5E7D52')
-      + '</div>'
+        // KPI row
+        + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem;">'
+        + kpi('Ocupación General', stockPct + '%', state.products.length + ' de ' + WH_CAPACITY + ' slots', genClr)
+        + kpi('Despachos Hoy', d.dailyOrders, d.dailyUnits + ' uds · ' + new Date().toLocaleDateString('es-CL'), '#2E4A6E')
+        + kpi('Récord Mensual', d.monthlyRecord + ' uds', 'Pico del mes · ' + d.recordDate, '#4A7AB5')
+        + kpi('Posiciones Libres', freeSlots, freeSlots + ' de ' + WH_CAPACITY + ' disponibles', '#5E7D52')
+        + '</div>'
 
-      // Aisle accordion
-      + '<div style="font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:.75rem;">Detalle por pasillo</div>'
-      + '<div id="occ-accordion"></div>'
-      + '</div>';
+        // Aisle accordion
+        + '<div style="font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:.75rem;">Detalle por pasillo</div>'
+        + '<div id="occ-accordion"></div>'
+        + '</div>';
 
     _renderOccChart();
     _renderOccAccordion();
@@ -4524,18 +5275,18 @@ function renderOccupancySection() {
 // ==========================================================================
 
 const FRESH_BUCKETS = [
-    { key: 'expired', label: 'Vencido',    color: '#7A2E1E' },
-    { key: 'm3',      label: '< 3 meses',  color: '#A8442C' },
-    { key: 'm6',      label: '< 6 meses',  color: '#C8932E' },
-    { key: 'm9',      label: '< 9 meses',  color: '#C9A876' },
-    { key: 'm12',     label: '< 1 año',    color: '#5E7D52' },
+    { key: 'expired', label: 'Vencido', color: '#7A2E1E' },
+    { key: 'm3', label: '< 3 meses', color: '#A8442C' },
+    { key: 'm6', label: '< 6 meses', color: '#C8932E' },
+    { key: 'm9', label: '< 9 meses', color: '#C9A876' },
+    { key: 'm12', label: '< 1 año', color: '#5E7D52' },
 ];
 
-let _freshFilter     = 'pasillo';
-let _freshTimeRange  = 'm3';
+let _freshFilter = 'pasillo';
+let _freshTimeRange = 'm3';
 let _freshOpenGroups = new Set();
 
-function setFreshFilter(f)    { _freshFilter = f;    _renderFreshAll(); }
+function setFreshFilter(f) { _freshFilter = f; _renderFreshAll(); }
 function setFreshTimeRange(t) { _freshTimeRange = t; _renderFreshAll(); }
 function toggleFreshGroup(key) {
     if (_freshOpenGroups.has(key)) _freshOpenGroups.delete(key);
@@ -4546,10 +5297,10 @@ function toggleFreshGroup(key) {
 function _getFreshBucket(expiryStr) {
     if (!expiryStr) return 'none';
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    const exp   = new Date(expiryStr + 'T00:00:00');
+    const exp = new Date(expiryStr + 'T00:00:00');
     if (exp < today) return 'expired';
     const days = (exp - today) / 86400000;
-    if (days < 90)  return 'm3';
+    if (days < 90) return 'm3';
     if (days < 180) return 'm6';
     if (days < 270) return 'm9';
     if (days < 365) return 'm12';
@@ -4560,54 +5311,54 @@ function _buildFreshGroups() {
     const prods = state.products;
     const groups = {};
     if (_freshFilter === 'pasillo') {
-        WH_GRID.aisles.forEach(function(a) { groups['Pasillo ' + a] = []; });
-        prods.forEach(function(p) {
+        WH_GRID.aisles.forEach(function (a) { groups['Pasillo ' + a] = []; });
+        prods.forEach(function (p) {
             const key = p.aisle ? 'Pasillo ' + p.aisle : 'Sin pasillo';
             if (!groups[key]) groups[key] = [];
             groups[key].push(p);
         });
     } else if (_freshFilter === 'categoria') {
-        prods.forEach(function(p) {
+        prods.forEach(function (p) {
             const key = p.category || 'Sin categoría';
             if (!groups[key]) groups[key] = [];
             groups[key].push(p);
         });
     } else {
         var cls = [];
-        try { cls = calculateABCClassification(); } catch(e) {}
+        try { cls = calculateABCClassification(); } catch (e) { }
         const classMap = {};
-        cls.forEach(function(p) { classMap[p.id] = p.abcClass; });
+        cls.forEach(function (p) { classMap[p.id] = p.abcClass; });
         groups['Clase A'] = []; groups['Clase B'] = []; groups['Clase C'] = [];
-        prods.forEach(function(p) {
+        prods.forEach(function (p) {
             const key = 'Clase ' + (classMap[p.id] || 'C');
             groups[key].push(p);
         });
     }
-    return Object.entries(groups).map(function(e) {
+    return Object.entries(groups).map(function (e) {
         const label = e[0], ps = e[1];
-        const counts = { expired:0, m3:0, m6:0, m9:0, m12:0, ok:0, none:0 };
-        ps.forEach(function(p) { counts[_getFreshBucket(p.expiry)]++; });
+        const counts = { expired: 0, m3: 0, m6: 0, m9: 0, m12: 0, ok: 0, none: 0 };
+        ps.forEach(function (p) { counts[_getFreshBucket(p.expiry)]++; });
         return { label: label, prods: ps, counts: counts, total: ps.length };
-    }).filter(function(r) { return r.total > 0; });
+    }).filter(function (r) { return r.total > 0; });
 }
 
 function _renderFreshAll() {
-    ['pasillo','categoria','abc'].forEach(function(f) {
+    ['pasillo', 'categoria', 'abc'].forEach(function (f) {
         const btn = document.getElementById('fresh-filter-' + f);
         if (!btn) return;
         const on = _freshFilter === f;
-        btn.style.background  = on ? 'var(--primary,#2E4A6E)' : 'rgba(36,31,26,.04)';
-        btn.style.color       = on ? '#fff' : 'var(--text-secondary)';
+        btn.style.background = on ? 'var(--primary,#2E4A6E)' : 'rgba(36,31,26,.04)';
+        btn.style.color = on ? '#fff' : 'var(--text-secondary)';
         btn.style.borderColor = on ? 'transparent' : 'rgba(36,31,26,.1)';
     });
-    FRESH_BUCKETS.forEach(function(b) {
+    FRESH_BUCKETS.forEach(function (b) {
         const btn = document.getElementById('fresh-time-' + b.key);
         if (!btn) return;
         const on = _freshTimeRange === b.key;
-        btn.style.background  = on ? b.color : 'rgba(36,31,26,.04)';
-        btn.style.color       = on ? '#fff' : 'var(--text-secondary)';
+        btn.style.background = on ? b.color : 'rgba(36,31,26,.04)';
+        btn.style.color = on ? '#fff' : 'var(--text-secondary)';
         btn.style.borderColor = on ? 'transparent' : 'rgba(36,31,26,.1)';
-        btn.style.boxShadow   = on ? '0 0 0 2px ' + b.color + '55' : 'none';
+        btn.style.boxShadow = on ? '0 0 0 2px ' + b.color + '55' : 'none';
     });
     _renderFreshChart();
     _renderFreshAccordion();
@@ -4621,20 +5372,20 @@ function _renderFreshChart() {
         chartEl.innerHTML = '<div style="color:var(--text-muted);font-size:.85rem;padding:.75rem 0;">Sin productos registrados.</div>';
         return;
     }
-    const bucket   = FRESH_BUCKETS.find(function(b) { return b.key === _freshTimeRange; }) || FRESH_BUCKETS[0];
-    const maxCount = Math.max(1, groups.reduce(function(m,g){ return Math.max(m, g.counts[_freshTimeRange]||0); }, 0));
-    const html = groups.map(function(row) {
+    const bucket = FRESH_BUCKETS.find(function (b) { return b.key === _freshTimeRange; }) || FRESH_BUCKETS[0];
+    const maxCount = Math.max(1, groups.reduce(function (m, g) { return Math.max(m, g.counts[_freshTimeRange] || 0); }, 0));
+    const html = groups.map(function (row) {
         const count = row.counts[_freshTimeRange] || 0;
-        const pct   = row.total > 0 ? Math.round((count / row.total) * 100) : 0;
-        const barW  = (count / maxCount) * 100;
+        const pct = row.total > 0 ? Math.round((count / row.total) * 100) : 0;
+        const barW = (count / maxCount) * 100;
         const inner = count > 0
             ? '<div style="width:' + barW.toFixed(1) + '%;background:' + bucket.color
-              + ';height:100%;border-radius:5px;display:flex;align-items:center;padding:0 .55rem;'
-              + 'font-size:.72rem;font-weight:700;color:rgba(36,31,26,.95);white-space:nowrap;'
-              + 'overflow:hidden;transition:width .35s;">'
-              + (barW > 10 ? count + ' · ' + pct + '%' : '') + '</div>'
+            + ';height:100%;border-radius:5px;display:flex;align-items:center;padding:0 .55rem;'
+            + 'font-size:.72rem;font-weight:700;color:rgba(36,31,26,.95);white-space:nowrap;'
+            + 'overflow:hidden;transition:width .35s;">'
+            + (barW > 10 ? count + ' · ' + pct + '%' : '') + '</div>'
             : '<div style="height:100%;display:flex;align-items:center;padding:0 .55rem;">'
-              + '<span style="font-size:.7rem;color:var(--text-muted);">ninguno</span></div>';
+            + '<span style="font-size:.7rem;color:var(--text-muted);">ninguno</span></div>';
         return '<div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem;">'
             + '<div style="min-width:110px;text-align:right;font-size:.79rem;font-weight:600;'
             + 'color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + row.label + '</div>'
@@ -4650,54 +5401,54 @@ function _renderFreshAccordion() {
     const el = document.getElementById('fresh-accordion');
     if (!el) return;
     const groups = _buildFreshGroups();
-    const html = groups.map(function(row) {
-        const isOpen   = _freshOpenGroups.has(row.label);
-        const urgCount = (row.counts['expired']||0) + (row.counts['m3']||0);
+    const html = groups.map(function (row) {
+        const isOpen = _freshOpenGroups.has(row.label);
+        const urgCount = (row.counts['expired'] || 0) + (row.counts['m3'] || 0);
         const urgBadge = urgCount > 0
             ? '<span style="font-size:.64rem;font-weight:700;background:#A8442C;color:#fff;'
-              + 'border-radius:10px;padding:1px 7px;margin-left:.4rem;">'
-              + urgCount + ' urgente' + (urgCount !== 1 ? 's' : '') + '</span>'
+            + 'border-radius:10px;padding:1px 7px;margin-left:.4rem;">'
+            + urgCount + ' urgente' + (urgCount !== 1 ? 's' : '') + '</span>'
             : '';
-        const sorted = row.prods.slice().sort(function(a, b) {
+        const sorted = row.prods.slice().sort(function (a, b) {
             if (!a.expiry && !b.expiry) return 0;
             if (!a.expiry) return 1;
             if (!b.expiry) return -1;
             return a.expiry < b.expiry ? -1 : a.expiry > b.expiry ? 1 : 0;
         });
-        const prodsHtml = sorted.map(function(p) {
-            const bk   = _getFreshBucket(p.expiry);
-            const bCfg = FRESH_BUCKETS.find(function(b) { return b.key === bk; });
+        const prodsHtml = sorted.map(function (p) {
+            const bk = _getFreshBucket(p.expiry);
+            const bCfg = FRESH_BUCKETS.find(function (b) { return b.key === bk; });
             const bClr = bCfg ? bCfg.color : (bk === 'ok' ? '#5E7D52' : '#6b7280');
             const bLbl = bCfg ? bCfg.label : (bk === 'ok' ? '> 1 año' : 'Sin venc.');
             let daysLabel = '';
             if (p.expiry) {
-                const today = new Date(); today.setHours(0,0,0,0);
-                const days  = Math.round((new Date(p.expiry + 'T00:00:00') - today) / 86400000);
-                daysLabel   = days < 0  ? 'Vencido hace ' + Math.abs(days) + 'd'
-                            : days === 0 ? '¡Vence hoy!'
-                            : 'Vence en ' + days + 'd';
+                const today = new Date(); today.setHours(0, 0, 0, 0);
+                const days = Math.round((new Date(p.expiry + 'T00:00:00') - today) / 86400000);
+                daysLabel = days < 0 ? 'Vencido hace ' + Math.abs(days) + 'd'
+                    : days === 0 ? '¡Vence hoy!'
+                        : 'Vence en ' + days + 'd';
             }
             return '<div style="background:rgba(36,31,26,.04);border-radius:8px;padding:.6rem .9rem;'
                 + 'margin:.25rem 0;border-left:3px solid ' + bClr + ';">'
                 + '<div style="display:grid;grid-template-columns:85px 1fr 85px 1fr;gap:.22rem .55rem;font-size:.76rem;">'
                 + '<span style="color:var(--text-muted);font-size:.7rem;">SKU</span>'
-                + '<span style="font-family:monospace;font-weight:700;">' + (p.sku||'—') + '</span>'
+                + '<span style="font-family:monospace;font-weight:700;">' + (p.sku || '—') + '</span>'
                 + '<span style="color:var(--text-muted);font-size:.7rem;">Frescura</span>'
                 + '<span style="font-weight:700;color:' + bClr + ';">' + bLbl + '</span>'
                 + '<span style="color:var(--text-muted);font-size:.7rem;">Artículo</span>'
                 + '<span style="font-weight:600;grid-column:2/5;color:var(--text-primary);">' + p.name + '</span>'
                 + '<span style="color:var(--text-muted);font-size:.7rem;">Vencimiento</span>'
-                + '<span style="color:' + bClr + ';font-weight:600;">' + (p.expiry||'—') + (daysLabel ? ' · ' + daysLabel : '') + '</span>'
+                + '<span style="color:' + bClr + ';font-weight:600;">' + (p.expiry || '—') + (daysLabel ? ' · ' + daysLabel : '') + '</span>'
                 + '<span style="color:var(--text-muted);font-size:.7rem;">Lote</span>'
-                + '<span>' + (p.lote||'—') + '</span>'
+                + '<span>' + (p.lote || '—') + '</span>'
                 + '<span style="color:var(--text-muted);font-size:.7rem;">Stock</span>'
                 + '<span style="font-weight:700;">' + p.stock + ' uds</span>'
                 + '<span style="color:var(--text-muted);font-size:.7rem;">Ubicación</span>'
-                + '<span>P.' + (p.aisle||'—') + ' · Est.' + (p.shelf||'—') + ' · Niv.' + (p.level||'—') + '</span>'
+                + '<span>P.' + (p.aisle || '—') + ' · Est.' + (p.shelf || '—') + ' · Niv.' + (p.level || '—') + '</span>'
                 + '</div></div>';
         }).join('');
         // Use data-key attribute to avoid quote nesting in onclick
-        const safeLabel = row.label.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+        const safeLabel = row.label.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
         return '<div style="margin-bottom:.45rem;border-radius:10px;border:1px solid rgba(36,31,26,.08);overflow:hidden;">'
             + '<div data-gkey="' + safeLabel + '" onclick="var k=this.dataset.gkey;toggleFreshGroup(k)" '
             + 'style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;'
@@ -4719,22 +5470,22 @@ function seedTestExpiryDates() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const buckets = [
-        { days: -45,  weight: 5  },
-        { days: -10,  weight: 5  },
-        { days: 12,   weight: 8  },
-        { days: 55,   weight: 10 },
-        { days: 85,   weight: 10 },
-        { days: 120,  weight: 13 },
-        { days: 165,  weight: 12 },
-        { days: 230,  weight: 12 },
-        { days: 310,  weight: 13 },
-        { days: 430,  weight: 7  },
-        { days: 600,  weight: 5  },
+        { days: -45, weight: 5 },
+        { days: -10, weight: 5 },
+        { days: 12, weight: 8 },
+        { days: 55, weight: 10 },
+        { days: 85, weight: 10 },
+        { days: 120, weight: 13 },
+        { days: 165, weight: 12 },
+        { days: 230, weight: 12 },
+        { days: 310, weight: 13 },
+        { days: 430, weight: 7 },
+        { days: 600, weight: 5 },
     ];
     const pool = [];
-    buckets.forEach(function(b) { for (var i = 0; i < b.weight; i++) pool.push(b.days); });
-    state.products.forEach(function(p, idx) {
-        const base   = pool[idx % pool.length];
+    buckets.forEach(function (b) { for (var i = 0; i < b.weight; i++) pool.push(b.days); });
+    state.products.forEach(function (p, idx) {
+        const base = pool[idx % pool.length];
         const jitter = Math.floor(Math.random() * 14) - 7;
         const d = new Date(today);
         d.setDate(d.getDate() + base + jitter);
@@ -4747,10 +5498,10 @@ function seedTestExpiryDates() {
 function renderFreshnessSection() {
     const el = document.getElementById('dashboard-freshness-section');
     if (!el) return;
-    const withExpiry = state.products.filter(function(p) { return !!p.expiry; }).length;
-    const expired    = state.products.filter(function(p) { return _getFreshBucket(p.expiry) === 'expired'; }).length;
-    const critical   = state.products.filter(function(p) { return _getFreshBucket(p.expiry) === 'm3'; }).length;
-    const tabBase  = 'padding:.42rem 1rem;border-radius:6px;border:1px solid;font-size:.77rem;font-weight:600;cursor:pointer;transition:all .2s;';
+    const withExpiry = state.products.filter(function (p) { return !!p.expiry; }).length;
+    const expired = state.products.filter(function (p) { return _getFreshBucket(p.expiry) === 'expired'; }).length;
+    const critical = state.products.filter(function (p) { return _getFreshBucket(p.expiry) === 'm3'; }).length;
+    const tabBase = 'padding:.42rem 1rem;border-radius:6px;border:1px solid;font-size:.77rem;font-weight:600;cursor:pointer;transition:all .2s;';
     const timeBase = 'padding:.38rem .9rem;border-radius:6px;border:1px solid;font-size:.76rem;font-weight:700;cursor:pointer;transition:all .2s;';
     el.innerHTML = '<div class="card">'
         + '<div class="card-header" style="border-bottom:1px solid var(--border-subtle);padding-bottom:1rem;margin-bottom:1.25rem;">'
@@ -4760,7 +5511,7 @@ function renderFreshnessSection() {
         + 'Indicador de Frescura de Inventario</h2>'
         + '<div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">'
         + '<span class="badge badge-info">' + withExpiry + ' con fecha</span>'
-        + (expired  > 0 ? '<span class="badge" style="background:rgba(127,29,29,.4);color:#fca5a5;border:1px solid #7f1d1d;">' + expired  + ' vencido'  + (expired  !== 1 ? 's' : '') + '</span>' : '')
+        + (expired > 0 ? '<span class="badge" style="background:rgba(127,29,29,.4);color:#fca5a5;border:1px solid #7f1d1d;">' + expired + ' vencido' + (expired !== 1 ? 's' : '') + '</span>' : '')
         + (critical > 0 ? '<span class="badge" style="background:rgba(168,68,44,.15);color:#A8442C;border:1px solid rgba(168,68,44,.5);">' + critical + ' crítico' + (critical !== 1 ? 's' : '') + '</span>' : '')
         + '<button onclick="seedTestExpiryDates()" style="margin-left:.5rem;padding:.3rem .8rem;border-radius:6px;border:1px dashed rgba(36,31,26,.25);background:rgba(36,31,26,.04);color:var(--text-muted);font-size:.72rem;cursor:pointer;" title="Asigna fechas de vencimiento de prueba a todos los productos">⚗ Cargar fechas de prueba</button>'
         + '</div></div>'
@@ -4884,10 +5635,10 @@ function generateSmoothPath(points) {
 
 function renderWeeklyChart() {
     const Y_BASE = 170;
-    const Y_TOP  = 20;
+    const Y_TOP = 20;
     const X_POSITIONS = [40, 110, 180, 250, 320, 390, 460];
     const DAY_LABELS_SHORT = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-    const DAY_LABELS_FULL  = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    const DAY_LABELS_FULL = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
     // Get Monday of the current week
     const today = new Date();
@@ -4915,7 +5666,7 @@ function renderWeeklyChart() {
             .reduce((sum, inv) => sum + inv.total, 0)
     );
 
-    const dayTotals     = sumByDate(thisWeekDates);
+    const dayTotals = sumByDate(thisWeekDates);
     const lastWeekTotals = sumByDate(lastWeekDates);
 
     const maxVal = Math.max(...dayTotals, 1);
@@ -5072,7 +5823,7 @@ function renderInventory() {
 
         // Dynamic icons based on industrial category
         let categorySvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`;
-        
+
         if (prod.category === 'Herramientas Eléctricas') {
             categorySvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`; // Lightning bolt
         } else if (prod.category === 'Consumibles') {
@@ -5088,16 +5839,16 @@ function renderInventory() {
         // Calculate remaining shelf life / inspection in days
         let shelfLifeText = 'Sin límite';
         let shelfLifeClass = 'badge-info';
-        
+
         if (prod.expDate) {
             const expDateObj = new Date(prod.expDate + 'T00:00:00');
             const currentDate = new Date();
-            expDateObj.setHours(0,0,0,0);
-            currentDate.setHours(0,0,0,0);
-            
+            expDateObj.setHours(0, 0, 0, 0);
+            currentDate.setHours(0, 0, 0, 0);
+
             const diffTime = expDateObj.getTime() - currentDate.getTime();
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
+
             if (diffDays < 0) {
                 shelfLifeText = `Reinspección Vencida (${Math.abs(diffDays)} d)`;
                 shelfLifeClass = 'badge-danger';
@@ -5215,7 +5966,7 @@ function openProductModal(productId = null) {
         document.getElementById("product-modal-price").value = prod.price;
         document.getElementById("product-modal-stock").value = prod.stock;
         document.getElementById("product-modal-threshold").value = prod.threshold;
-        
+
         // Additional batch & expiry details
         document.getElementById("product-modal-lot").value = prod.lot || "";
         document.getElementById("product-modal-mfg-date").value = prod.mfgDate || "";
@@ -5232,19 +5983,19 @@ function openProductModal(productId = null) {
     } else {
         // Mode: CREATE
         modalTitle.innerText = "Registrar Nuevo Suministro Industrial";
-        
+
         // Auto-generate cool default SKU
         const randomNum = Math.floor(1000 + Math.random() * 9000);
         document.getElementById("product-modal-sku").value = `SKU-VF-${randomNum}`;
-        
+
         // Auto-generate default Lot number
         const randomLot = Math.floor(100 + Math.random() * 900);
         document.getElementById("product-modal-lot").value = `LT-${randomLot}`;
-        
+
         // Default manufacturing/reception date to today's date
         const todayStr = new Date().toISOString().split('T')[0];
         document.getElementById("product-modal-mfg-date").value = todayStr;
-        
+
         // Default calibration inspection date to 1 year from now
         const nextYear = new Date();
         nextYear.setFullYear(nextYear.getFullYear() + 1);
@@ -5269,7 +6020,7 @@ function saveProductForm(event) {
     const price = parseFloat(document.getElementById("product-modal-price").value);
     const stock = parseInt(document.getElementById("product-modal-stock").value);
     const threshold = parseInt(document.getElementById("product-modal-threshold").value);
-    
+
     // Read batch and expiry inputs
     const lot = document.getElementById("product-modal-lot").value;
     const mfgDate = document.getElementById("product-modal-mfg-date").value;
@@ -5595,7 +6346,19 @@ function commitInvoiceTransaction() {
  * Reads filter values, computes classification, and renders all sub-views.
  */
 function renderABCView() {
+    // Fallback: si por cualquier razón el estado está vacío, sembrar demo
+    if (state.products.length === 0) {
+        state.products = [...DEMO_PRODUCTS];
+        saveProductsToStorage();
+    }
+    if (state.invoices.length === 0) {
+        state.invoices = [...DEMO_INVOICES];
+        saveInvoicesToStorage();
+    }
+
+    console.log('[WMS] productos:', state.products.length, '| facturas:', state.invoices.length);
     const classification = calculateABCClassification();
+    console.log('[WMS] clasificados:', classification.length, '| mal ubicados:', classification.filter(p => p.isMisplaced).length);
 
     // --- Update KPI stat cards ---
     const classA = classification.filter(p => p.abcClass === 'A');
@@ -5709,35 +6472,51 @@ function calculateABCClassification() {
     enriched.sort((a, b) => b.abcScore - a.abcScore);
 
     // --- Classify using cumulative % thresholds ---
-    const totalScore = enriched.reduce((sum, p) => sum + p.abcScore, 0) || 1;
-    let cumulative = 0;
+    const totalScore = enriched.reduce((sum, p) => sum + p.abcScore, 0);
 
-    enriched.forEach(p => {
-        cumulative += p.abcScore;
-        const cumulativePct = (cumulative / totalScore) * 100;
-        p.cumulativePct = cumulativePct;
+    if (totalScore === 0) {
+        // No invoice data in period — classify by physical aisle instead of Pareto
+        const aisleClass = { A: 'A', B: 'B', C: 'C', D: 'C' };
+        enriched.forEach(p => {
+            p.abcClass = aisleClass[p.aisle] || 'C';
+            p.cumulativePct = 100;
+        });
+    } else {
+        let cumulative = 0;
+        enriched.forEach(p => {
+            cumulative += p.abcScore;
+            const cumulativePct = (cumulative / totalScore) * 100;
+            p.cumulativePct = cumulativePct;
+            if (cumulativePct <= 80) {
+                p.abcClass = 'A';
+            } else if (cumulativePct <= 95) {
+                p.abcClass = 'B';
+            } else {
+                p.abcClass = 'C';
+            }
+        });
+    }
 
-        if (cumulativePct <= 80) {
-            p.abcClass = 'A';
-        } else if (cumulativePct <= 95) {
-            p.abcClass = 'B';
-        } else {
-            p.abcClass = 'C';
-        }
-    });
-
-    // --- Determine misplacement in hardware store context ---
-    // Class A (high rotation, e.g. Consumibles, SDS rotary hammers) should be in aisles A/B (distance ≤ 20m)
-    // Class C (heavy machinery, low rotation) should be in aisles C/D (distance > 20m)
+    // --- Determine misplacement ---
+    // Class A: debe estar en pasillo A o B (dist ≤ 20m)
+    // Class B: debe estar en pasillo B o C (dist ≤ 28m)
+    // Class C: no debe ocupar espacio premium de pasillo A (dist > 18m)
+    const aisleOrder = { A: 1, B: 2, C: 3, D: 4 };
     enriched.forEach(p => {
         const dist = p.pickingDistance || 25;
-        if (p.abcClass === 'A' && dist > 20) {
+        const aisleRank = aisleOrder[p.aisle] || 3;
+
+        if (p.abcClass === 'A' && (aisleRank > 2 || dist > 20)) {
             p.isMisplaced = true;
-            p.misplacedReason = `Artículo crítico Clase A ("${p.name.split(' ').slice(0,2).join(' ')}") ubicado a ${dist}m de despacho. Mover a zona acelerada (≤ 20m) para optimizar el picking diario.`;
+            p.misplacedReason = `Artículo crítico Clase A ("${p.name.split(' ').slice(0, 2).join(' ')}") ubicado en ${p.aisle ? 'Pasillo ' + p.aisle : 'zona lejana'} a ${dist}m de despacho. Mover a zona acelerada (Pasillo A/B, ≤ 20m) para optimizar el picking diario.`;
             p.suggestedAisle = 'A';
-        } else if (p.abcClass === 'C' && dist <= 15) {
+        } else if (p.abcClass === 'B' && (aisleRank === 1 || aisleRank > 3 || dist > 28)) {
             p.isMisplaced = true;
-            p.misplacedReason = `Carga pesada/baja rotación Clase C ("${p.name.split(' ').slice(0,2).join(' ')}") ocupa espacio premium a ${dist}m. Liberar estante rápido y reubicar a pasillo lejano (> 25m).`;
+            p.misplacedReason = `Artículo media rotación Clase B ("${p.name.split(' ').slice(0, 2).join(' ')}") mal posicionado en ${p.aisle ? 'Pasillo ' + p.aisle : 'zona incorrecta'} a ${dist}m. Reubicar a pasillo intermedio (Pasillo B/C, ≤ 28m).`;
+            p.suggestedAisle = 'B';
+        } else if (p.abcClass === 'C' && (aisleRank <= 1 || dist <= 18)) {
+            p.isMisplaced = true;
+            p.misplacedReason = `Artículo baja rotación Clase C ("${p.name.split(' ').slice(0, 2).join(' ')}") ocupa espacio premium en ${p.aisle ? 'Pasillo ' + p.aisle : 'zona delantera'} a ${dist}m. Liberar estante rápido y reubicar a Pasillo C/D (> 25m).`;
             p.suggestedAisle = 'D';
         } else {
             p.isMisplaced = false;
@@ -5806,26 +6585,18 @@ function renderWarehouseHeatmap(classification) {
                 const primary = productsOnShelf[0];
 
                 slot.classList.add(`slot-class-${primary.abcClass.toLowerCase()}`);
+                slot.style.cursor = 'pointer';
 
-                // Check misplacement
                 if (productsOnShelf.some(p => p.isMisplaced)) {
                     slot.classList.add('slot-misplaced');
                 }
 
-                // Slot visual content
-                const productNames = productsOnShelf.map(p => p.name.split(' ').slice(0, 2).join(' ')).join(', ');
                 slot.innerHTML = `
                     <span class="rack-slot-title">Clase ${primary.abcClass}</span>
                     <span class="rack-slot-meta">${productsOnShelf.length} SKU${productsOnShelf.length > 1 ? 's' : ''} &bull; Bahía ${s}</span>
-                    <div class="rack-tooltip">
-                        <h4>Estantería ${aisleId}${s}</h4>
-                        ${productsOnShelf.map(p => `
-                            <p><strong style="color: var(--text-primary);">${p.name}</strong></p>
-                            <p>Clase: <strong>${p.abcClass}</strong> &bull; Score ABC: <strong>${p.abcScore.toFixed(1)}</strong></p>
-                            <p>Distancia: ${p.pickingDistance}m ${p.isMisplaced ? '⚠️ Desalineado' : '✅ Correcto'}</p>
-                        `).join('<hr style="border-color: rgba(192,138,45,0.18); margin: 0.4rem 0;">')}
-                    </div>
                 `;
+
+                slot.addEventListener('click', () => openSlotModal(aisleId, s, productsOnShelf));
             }
 
             shelvesContainer.appendChild(slot);
@@ -5840,6 +6611,69 @@ function renderWarehouseHeatmap(classification) {
     document.getElementById('heatmap-warehouse-label').innerText = warehouseFilter === 'all' ? 'Todos los Depósitos' : warehouseFilter;
 }
 
+// --- WMS Slot Modal ---
+const _aisleLabels = {
+    A: 'Pasillo A · EPP y Consumibles',
+    B: 'Pasillo B · Bahía Herramientas',
+    C: 'Pasillo C · Bahía Fijaciones',
+    D: 'Pasillo D · Patio Carga Pesada'
+};
+const _abcColors = { A: 'var(--accent-emerald)', B: '#4A7AB5', C: 'var(--accent-rose)' };
+
+function openSlotModal(aisleId, shelf, products) {
+    let modal = document.getElementById('wms-slot-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'wms-slot-modal';
+        modal.style.cssText = 'display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;';
+        modal.innerHTML = `<div id="wms-slot-modal-box" style="background:#F7F3EA;border:1px solid var(--border-accent);border-radius:var(--radius-lg);padding:1.75rem;width:min(480px,92vw);max-height:80vh;overflow-y:auto;position:relative;box-shadow:0 24px 60px rgba(0,0,0,0.6);">
+            <button onclick="closeSlotModal()" style="position:absolute;top:1rem;right:1rem;background:transparent;border:none;cursor:pointer;color:var(--text-muted);font-size:1.3rem;line-height:1;">&#x2715;</button>
+            <div id="wms-slot-modal-content"></div>
+        </div>`;
+        modal.addEventListener('click', e => { if (e.target === modal) closeSlotModal(); });
+        document.body.appendChild(modal);
+    }
+
+    const hasMisplaced = products.some(p => p.isMisplaced);
+    const content = document.getElementById('wms-slot-modal-content');
+    content.innerHTML = `
+        <div style="margin-bottom:1.25rem;">
+            <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:0.2rem;">
+                Estantería ${aisleId}${shelf}
+            </div>
+            <div style="font-size:0.8rem;color:var(--text-muted);">${_aisleLabels[aisleId] || 'Pasillo ' + aisleId} &bull; Bahía ${shelf}</div>
+            ${hasMisplaced ? `<div style="margin-top:0.6rem;display:inline-flex;align-items:center;gap:0.4rem;background:rgba(255,42,95,0.08);color:var(--accent-rose);border:1px solid rgba(255,42,95,0.2);border-radius:20px;padding:0.2rem 0.75rem;font-size:0.75rem;font-weight:700;">⚠️ Contiene productos desalineados</div>` : `<div style="margin-top:0.6rem;display:inline-flex;align-items:center;gap:0.4rem;background:rgba(0,255,135,0.07);color:var(--accent-emerald);border:1px solid rgba(0,255,135,0.2);border-radius:20px;padding:0.2rem 0.75rem;font-size:0.75rem;font-weight:700;">✅ Ubicación óptima</div>`}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;">
+            ${products.map(p => `
+                <div style="background:rgba(36,31,26,0.04);border:1px solid var(--border-subtle);border-left:3px solid ${_abcColors[p.abcClass]};border-radius:var(--radius-sm);padding:0.85rem 1rem;">
+                    <div style="font-weight:700;font-size:0.9rem;color:var(--text-primary);margin-bottom:0.5rem;">${p.name}</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.35rem 1rem;font-size:0.78rem;color:var(--text-secondary);">
+                        <span>Clase ABC <strong style="color:${_abcColors[p.abcClass]};">Clase ${p.abcClass}</strong></span>
+                        <span>Score <strong style="color:var(--text-primary);">${p.abcScore.toFixed(1)}</strong></span>
+                        <span>SKU <strong style="color:var(--text-primary);">${p.sku || '—'}</strong></span>
+                        <span>Stock <strong style="color:var(--text-primary);">${p.stock ?? '—'} uds</strong></span>
+                        <span>Distancia <strong style="color:var(--text-primary);">${p.pickingDistance}m</strong></span>
+                        <span>Estado <strong style="${p.isMisplaced ? 'color:var(--accent-rose)' : 'color:var(--accent-emerald)'};">${p.isMisplaced ? '⚠️ Desalineado' : '✅ Correcto'}</strong></span>
+                    </div>
+                    ${p.isMisplaced ? `<div style="margin-top:0.6rem;display:flex;align-items:center;gap:0.5rem;padding-top:0.6rem;border-top:1px solid var(--border-subtle);">
+                        <span style="font-size:0.75rem;color:var(--text-muted);">Reubicar a</span>
+                        <span style="background:rgba(0,255,135,0.07);color:var(--accent-emerald);border:1px solid rgba(0,255,135,0.2);border-radius:20px;padding:0.15rem 0.65rem;font-size:0.75rem;font-weight:700;">Pasillo ${p.suggestedAisle}</span>
+                        <button class="btn btn-primary btn-sm" style="font-size:0.72rem;padding:.25rem .7rem;margin-left:auto;" onclick="applyOneRelocation('${p.id}','${p.suggestedAisle}');closeSlotModal();">Aplicar</button>
+                    </div>` : ''}
+                </div>
+            `).join('')}
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+}
+
+function closeSlotModal() {
+    const modal = document.getElementById('wms-slot-modal');
+    if (modal) modal.style.display = 'none';
+}
+
 /**
  * Renders the Pareto SVG chart with:
  * - Colored bars (green=A, blue=B, red=C) showing individual scores
@@ -5848,6 +6682,7 @@ function renderWarehouseHeatmap(classification) {
  */
 function renderParetoChart(classification) {
     const svg = document.getElementById('abc-pareto-svg');
+    if (!svg) return;
     svg.innerHTML = '';
 
     if (classification.length === 0) {
@@ -5873,8 +6708,8 @@ function renderParetoChart(classification) {
     // --- Draw grid lines ---
     for (let pct = 0; pct <= 100; pct += 25) {
         const y = padding.top + chartH - (pct / 100) * chartH;
-        svgParts +=`<line class="pareto-axis" x1="${padding.left}" y1="${y}" x2="${viewWidth - padding.right}" y2="${y}" />`;
-        svgParts +=`<text class="pareto-label" x="${padding.left - 8}" y="${y + 3}" text-anchor="end">${pct}%</text>`;
+        svgParts += `<line class="pareto-axis" x1="${padding.left}" y1="${y}" x2="${viewWidth - padding.right}" y2="${y}" />`;
+        svgParts += `<text class="pareto-label" x="${padding.left - 8}" y="${y + 3}" text-anchor="end">${pct}%</text>`;
     }
 
     // --- Draw 80% and 95% threshold horizontal dashed lines ---
@@ -5896,7 +6731,7 @@ function renderParetoChart(classification) {
 
         const classColor = p.abcClass === 'A' ? 'bar-class-a' : p.abcClass === 'B' ? 'bar-class-b' : 'bar-class-c';
 
-        svgParts +=`<rect class="pareto-bar ${classColor}" x="${x}" y="${barY}" width="${barWidth}" height="${barH}" rx="3">
+        svgParts += `<rect class="pareto-bar ${classColor}" x="${x}" y="${barY}" width="${barWidth}" height="${barH}" rx="3">
             <title>${p.name}\nScore ABC: ${p.abcScore.toFixed(1)} &bull; Clase ${p.abcClass}</title>
         </rect>`;
 
@@ -5907,7 +6742,7 @@ function renderParetoChart(classification) {
             const shortName = p.name.split(' ').slice(0, 1).join('').substring(0, 8);
             const lx = x + barWidth / 2;
             const ly = viewHeight - padding.bottom + 13;
-            svgParts +=`<text class="pareto-label" x="${lx}" y="${ly}" text-anchor="end" font-size="8" transform="rotate(-45 ${lx} ${ly})">${shortName}</text>`;
+            svgParts += `<text class="pareto-label" x="${lx}" y="${ly}" text-anchor="end" font-size="8" transform="rotate(-45 ${lx} ${ly})">${shortName}</text>`;
         }
 
         // Cumulative line point
@@ -5922,7 +6757,7 @@ function renderParetoChart(classification) {
 
     // --- Draw cumulative line ---
     if (linePoints.length > 1) {
-        svgParts +=`<polyline class="pareto-line" points="${linePoints.join(' ')}" />`;
+        svgParts += `<polyline class="pareto-line" points="${linePoints.join(' ')}" />`;
     }
     svgParts += dotElements;
 
@@ -5969,11 +6804,32 @@ function renderABCRecommendations(classification) {
 
     const arrowSvg = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`;
 
+    const aisleNames = {
+        A: 'Pasillo A · EPP y Consumibles',
+        B: 'Pasillo B · Bahía Herramientas',
+        C: 'Pasillo C · Bahía Fijaciones',
+        D: 'Pasillo D · Patio Carga Pesada'
+    };
+
     misplaced.forEach(p => {
         const card = document.createElement('div');
         card.className = 'abc-recommendation-card';
-        const tagClass = p.abcClass === 'A' ? 'tag-high' : 'tag-low';
-        const tagLabel = p.abcClass === 'A' ? 'Acelerado / Clase A' : 'Bajo Rotación / Clase C';
+        const tagClass = p.abcClass === 'A' ? 'tag-high' : p.abcClass === 'B' ? 'tag-medium' : 'tag-low';
+        const tagLabel = p.abcClass === 'A' ? 'Acelerado / Clase A' : p.abcClass === 'B' ? 'Media Rotación / Clase B' : 'Bajo Rotación / Clase C';
+        const fromLabel = aisleNames[p.aisle] || `Pasillo ${p.aisle}`;
+        const toLabel = aisleNames[p.suggestedAisle] || `Pasillo ${p.suggestedAisle}`;
+
+        // Determinar causa del desalineado
+        const aisleOrder = { A: 1, B: 2, C: 3, D: 4 };
+        const aisleRank = aisleOrder[p.aisle] || 3;
+        const dist = p.pickingDistance || 25;
+        const expectedMaxAisle = p.abcClass === 'A' ? 2 : p.abcClass === 'B' ? 3 : 99;
+        const aisleMismatch = p.abcClass === 'C' ? aisleRank <= 1 : aisleRank > expectedMaxAisle;
+        const distMismatch = (p.abcClass === 'A' && dist > 20) || (p.abcClass === 'B' && dist > 28) || (p.abcClass === 'C' && dist <= 18);
+
+        const causeBadges = [];
+        if (aisleMismatch) causeBadges.push(`<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(255,42,95,0.08);color:var(--accent-rose);border:1px solid rgba(255,42,95,0.2);border-radius:4px;padding:0.15rem 0.5rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Pasillo incorrecto</span>`);
+        if (distMismatch) causeBadges.push(`<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(192,138,45,0.08);color:var(--accent-gold);border:1px solid rgba(192,138,45,0.2);border-radius:4px;padding:0.15rem 0.5rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Distancia excesiva</span>`);
 
         card.innerHTML = `
             <div class="abc-rec-header">
@@ -5981,11 +6837,12 @@ function renderABCRecommendations(classification) {
                 <span style="font-family:'JetBrains Mono';font-size:0.78rem;color:var(--text-muted);font-weight:600;">Score: ${p.abcScore.toFixed(1)}</span>
             </div>
             <div class="abc-rec-product-name">${p.name}</div>
-            <div class="abc-rec-desc">${p.misplacedReason}</div>
+            ${causeBadges.length ? `<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin:0.4rem 0;">${causeBadges.join('')}</div>` : ''}
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.6rem;gap:.5rem;flex-wrap:wrap;">
-                <div style="display:flex;align-items:center;gap:.5rem;font-size:0.82rem;font-weight:700;color:var(--accent-gold);font-family:'Rajdhani';text-transform:uppercase;">
+                <div style="display:flex;align-items:center;gap:.5rem;">
+                    <span style="background:rgba(192,138,45,0.10);color:var(--accent-gold);border:1px solid rgba(192,138,45,0.25);border-radius:20px;padding:0.2rem 0.75rem;font-size:0.78rem;font-weight:700;font-family:'Rajdhani';text-transform:uppercase;letter-spacing:0.5px;">Pasillo ${p.aisle}</span>
                     ${arrowSvg}
-                    <span>Pasillo ${p.aisle} &rarr; Bahía ${p.suggestedAisle}</span>
+                    <span style="background:rgba(0,255,135,0.07);color:var(--accent-emerald);border:1px solid rgba(0,255,135,0.2);border-radius:20px;padding:0.2rem 0.75rem;font-size:0.78rem;font-weight:700;font-family:'Rajdhani';text-transform:uppercase;letter-spacing:0.5px;">Pasillo ${p.suggestedAisle}</span>
                 </div>
                 <button class="btn btn-primary btn-sm" style="font-size:0.75rem;padding:.3rem .8rem;"
                     onclick="applyOneRelocation('${p.id}', '${p.suggestedAisle}')">
@@ -6072,8 +6929,8 @@ function renderManualRelocation() {
         if (!_wmsSearch) return true;
         const q = _wmsSearch.toLowerCase();
         return (p.name || '').toLowerCase().includes(q) ||
-               (p.sku  || '').toLowerCase().includes(q) ||
-               (p.aisle|| '').toLowerCase().includes(q);
+            (p.sku || '').toLowerCase().includes(q) ||
+            (p.aisle || '').toLowerCase().includes(q);
     });
 
     const rows = filtered.map(p => {
@@ -6094,9 +6951,9 @@ function renderManualRelocation() {
                 <td style="text-align:center;font-size:0.8rem;">${p.pickingDistance ?? '—'} m</td>
                 <td style="text-align:right;">
                     ${isEditing
-                        ? `<button class="btn btn-danger btn-sm" onclick="_wmsEditId=null;renderManualRelocation()">✕ Cancelar</button>`
-                        : `<button class="btn btn-primary btn-sm" onclick="_wmsEditId='${p.id}';renderManualRelocation()">✎ Mover</button>`
-                    }
+                ? `<button class="btn btn-danger btn-sm" onclick="_wmsEditId=null;renderManualRelocation()">✕ Cancelar</button>`
+                : `<button class="btn btn-primary btn-sm" onclick="_wmsEditId='${p.id}';renderManualRelocation()">✎ Mover</button>`
+            }
                 </td>
             </tr>
             ${isEditing ? `
@@ -6153,14 +7010,14 @@ function renderManualRelocation() {
         : log.map(e => {
             const d = new Date(e.ts);
             return `<tr>
-                <td style="font-size:0.78rem;color:var(--text-muted);">${d.toLocaleDateString('es-CL')} ${d.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})}</td>
+                <td style="font-size:0.78rem;color:var(--text-muted);">${d.toLocaleDateString('es-CL')} ${d.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}</td>
                 <td style="font-size:0.82rem;">${e.productName}</td>
                 <td style="font-family:monospace;font-size:0.78rem;">${e.sku}</td>
                 <td style="text-align:center;font-weight:700;color:var(--accent-rose,#A8442C);">${e.fromAisle}-${e.fromShelf}</td>
                 <td style="text-align:center;font-weight:700;color:var(--accent-emerald,#5E7D52);">${e.toAisle}-${e.toShelf}</td>
                 <td style="font-size:0.78rem;color:var(--text-muted);">${e.by}</td>
             </tr>`;
-          }).join('');
+        }).join('');
 
     section.innerHTML = `
         <div class="card">
@@ -6207,7 +7064,7 @@ function renderManualRelocation() {
                     </svg>
                     Historial de Movimientos WMS
                 </h2>
-                <span class="badge badge-info">${(state.wmsLog||[]).length} movimientos</span>
+                <span class="badge badge-info">${(state.wmsLog || []).length} movimientos</span>
             </div>
             <div class="table-responsive">
                 <table class="custom-table" style="font-size:0.82rem;">
@@ -6238,19 +7095,19 @@ function saveManualRelocation(productId) {
     if (!product) return;
 
     const newWarehouse = document.getElementById('wms-e-wh')?.value || product.warehouse;
-    const newAisle     = document.getElementById('wms-e-aisle')?.value || product.aisle;
-    const newShelf     = parseInt(document.getElementById('wms-e-shelf')?.value) || product.shelf;
-    const newLevel     = parseInt(document.getElementById('wms-e-level')?.value) || product.level;
+    const newAisle = document.getElementById('wms-e-aisle')?.value || product.aisle;
+    const newShelf = parseInt(document.getElementById('wms-e-shelf')?.value) || product.shelf;
+    const newLevel = parseInt(document.getElementById('wms-e-level')?.value) || product.level;
 
     const prevAisle = product.aisle;
     const prevShelf = product.shelf;
 
-    product.warehouse      = newWarehouse;
-    product.aisle          = newAisle;
-    product.shelf          = newShelf;
-    product.level          = newLevel;
+    product.warehouse = newWarehouse;
+    product.aisle = newAisle;
+    product.shelf = newShelf;
+    product.level = newLevel;
     product.pickingDistance = AISLE_DIST[newAisle] || product.pickingDistance;
-    product.location       = `${newAisle}-${newShelf}`;
+    product.location = `${newAisle}-${newShelf}`;
 
     if (!state.wmsLog) state.wmsLog = [];
     state.wmsLog.unshift({
@@ -6410,18 +7267,18 @@ function exportToCSV() {
 
 // --- Catálogo de estados (lenguaje simple para operarios) ---
 const PICKING_STATUS = {
-    pendiente:  { label: 'Pendiente',   badge: 'badge-warning', dot: 'var(--accent-gold)',    next: 'Iniciar preparación' },
-    en_proceso: { label: 'Preparando',  badge: 'badge-info',    dot: 'var(--accent-cyan)',    next: 'Finalizar' },
-    parcial:    { label: 'Incompleto',  badge: 'badge-warning', dot: 'var(--accent-gold)',    next: 'Despachar parcial' },
-    completado: { label: 'Listo',       badge: 'badge-success', dot: 'var(--accent-emerald)', next: 'Despachar' },
-    despachado: { label: 'Despachado',  badge: 'badge-success', dot: 'var(--accent-emerald)', next: '' },
-    cancelado:  { label: 'Cancelado',   badge: 'badge-danger',  dot: 'var(--accent-rose)',    next: '' }
+    pendiente: { label: 'Pendiente', badge: 'badge-warning', dot: 'var(--accent-gold)', next: 'Iniciar preparación' },
+    en_proceso: { label: 'Preparando', badge: 'badge-info', dot: 'var(--accent-cyan)', next: 'Finalizar' },
+    parcial: { label: 'Incompleto', badge: 'badge-warning', dot: 'var(--accent-gold)', next: 'Despachar parcial' },
+    completado: { label: 'Listo', badge: 'badge-success', dot: 'var(--accent-emerald)', next: 'Despachar' },
+    despachado: { label: 'Despachado', badge: 'badge-success', dot: 'var(--accent-emerald)', next: '' },
+    cancelado: { label: 'Cancelado', badge: 'badge-danger', dot: 'var(--accent-rose)', next: '' }
 };
 
 const PICKING_PRIORITY = {
-    alta:  { label: 'Urgente', badge: 'badge-danger' },
-    media: { label: 'Normal',  badge: 'badge-info' },
-    baja:  { label: 'Sin prisa', badge: 'badge-success' }
+    alta: { label: 'Urgente', badge: 'badge-danger', color: 'var(--accent-rose)' },
+    media: { label: 'Normal', badge: 'badge-info', color: '#4A7AB5' },
+    baja: { label: 'Sin prisa', badge: 'badge-success', color: 'var(--accent-emerald)' }
 };
 
 // Orden físico de pasillos (cercano → lejano al muelle de despacho)
@@ -6431,13 +7288,13 @@ const AISLE_ORDER = { 'A': 1, 'B': 2, 'C': 3, 'D': 4 };
 let _newPickItems = [];
 
 const PICKING_SUB_META = {
-    panel:      { title: 'Resumen', desc: 'Indicadores de preparación de pedidos.' },
-    nueva:      { title: 'Nueva lista', desc: 'Pedidos listos para preparar.' },
-    proceso:    { title: 'En preparación', desc: 'Pedidos que se están recogiendo ahora.' },
+    panel: { title: 'Resumen', desc: 'Indicadores de preparación de pedidos.' },
+    nueva: { title: 'Nueva lista', desc: 'Pedidos listos para preparar.' },
+    proceso: { title: 'En preparación', desc: 'Pedidos que se están recogiendo ahora.' },
     completado: { title: 'Preparados', desc: 'Pedidos listos o ya despachados.' },
-    comprometido:{ title: 'Stock comprometido', desc: 'Unidades reservadas por pedidos en curso.' },
+    comprometido: { title: 'Stock comprometido', desc: 'Unidades reservadas por pedidos en curso.' },
     pendientes: { title: 'Productos pendientes', desc: 'Lo que aún falta por recoger.' },
-    historial:  { title: 'Historial', desc: 'Registro de movimientos y cambios.' }
+    historial: { title: 'Historial', desc: 'Registro de movimientos y cambios.' }
 };
 
 const PICKING_SESSION = (typeof getVulcanSession === 'function' && getVulcanSession()) || null;
@@ -6957,7 +7814,7 @@ function renderPickingPanel() {
                     <span class="badge badge-warning">${expiring.length}</span></div>
                 <div class="pick-expiry-list">
                     ${expiring.length === 0 ? emptyMini('Ningún producto próximo a vencer en los pedidos activos. 👍') :
-                        expiring.slice(0, 6).map(e => `
+            expiring.slice(0, 6).map(e => `
                             <div class="pick-expiry-row">
                                 <div>
                                     <div class="pick-expiry-name">${e.name}</div>
@@ -7115,8 +7972,8 @@ function renderPickingNew() {
                     </tr></thead>
                     <tbody>
                         ${pending.length === 0
-                            ? `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:2rem 0;">Todos los pedidos ya tienen lista de preparación. ✅</td></tr>`
-                            : pending.map(inv => `
+            ? `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:2rem 0;">Todos los pedidos ya tienen lista de preparación. ✅</td></tr>`
+            : pending.map(inv => `
                                 <tr>
                                     <td style="font-family:'JetBrains Mono';font-weight:600;">${inv.id}</td>
                                     <td>${inv.clientName}</td>
@@ -7131,13 +7988,6 @@ function renderPickingNew() {
             </div>
         </div>
 
-        <!-- ═══ LISTAS RECIENTES ═══ -->
-        <div class="card">
-            <div class="card-header"><h2 class="card-title">${pickIcon('check')} Listas creadas recientemente</h2></div>
-            <div class="pick-card-grid">
-                ${[...state.pickingLists].slice(-6).reverse().map(l => pickingListCard(l)).join('') || emptyMini('Aún no hay listas de preparación.')}
-            </div>
-        </div>
     `;
 }
 
@@ -7243,9 +8093,9 @@ function _removeNewPickItem(idx) {
 function createManualPickingList() {
     if (_newPickItems.length === 0) { triggerToast('error', 'Agrega al menos un producto.'); return; }
     const clientName = document.getElementById('np-client')?.value?.trim() || 'Sin nombre';
-    const clientId   = document.getElementById('np-client-id')?.value?.trim() || '';
-    const operator   = document.getElementById('np-operator')?.value?.trim() || 'Sin asignar';
-    const priority   = document.getElementById('np-priority')?.value || 'media';
+    const clientId = document.getElementById('np-client-id')?.value?.trim() || '';
+    const operator = document.getElementById('np-operator')?.value?.trim() || 'Sin asignar';
+    const priority = document.getElementById('np-priority')?.value || 'media';
     const ordered = sortByRoute([..._newPickItems]);
     const list = {
         id: nextPickingId(),
@@ -7268,6 +8118,7 @@ function createManualPickingList() {
     savePickingToStorage();
     _newPickItems = [];
     triggerToast('success', `Lista ${list.id} creada para ${clientName}.`);
+    state.activePickingSub = 'proceso';
     renderPicking();
 }
 
@@ -7322,6 +8173,7 @@ function generatePickingFromOrder(invoiceId) {
         return;
     }
     generatePickingFromInvoice(inv);
+    state.activePickingSub = 'proceso';
     renderPicking();
 }
 
@@ -7331,16 +8183,20 @@ function pickingListCard(list) {
     const st = PICKING_STATUS[list.status];
     const pr = PICKING_PRIORITY[list.priority] || PICKING_PRIORITY.media;
     return `
-        <div class="pick-list-card status-${list.status}" onclick="openPickingDetail('${list.id}')">
+        <div class="pick-list-card status-${list.status}" onclick="openPickingDetail('${list.id}')" style="border-left: 3px solid ${pr.color};">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                <span style="display:inline-flex;align-items:center;gap:4px;background:${pr.color}22;color:${pr.color};border:1px solid ${pr.color}44;border-radius:20px;padding:0.15rem 0.6rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">
+                    ${list.priority === 'alta' ? '🔴' : list.priority === 'baja' ? '🟢' : '🔵'} ${pr.label}
+                </span>
+                <span class="badge ${st.badge}" style="font-size:0.68rem;">${st.label}</span>
+            </div>
             <div class="pick-list-card-top">
                 <div>
                     <div class="pick-list-id">${list.id}</div>
                     <div class="pick-list-client">${list.clientName}</div>
                 </div>
-                <span class="badge ${st.badge}">${st.label}</span>
             </div>
             <div class="pick-list-meta">
-                <span class="badge ${pr.badge}" style="font-size:0.68rem;">${pr.label}</span>
                 <span class="pick-list-op">${pickIcon('box')} ${list.operator}</span>
             </div>
             <div class="pick-progress-track"><div class="pick-progress-fill status-fill-${list.status}" style="width:${p.pct}%;"></div></div>
@@ -7371,7 +8227,13 @@ function getFilteredLists(statuses) {
         if (pickingFilters.estado !== 'all' && l.status !== pickingFilters.estado) return false;
         if (pickingFilters.operario !== 'all' && l.operator !== pickingFilters.operario) return false;
         if (pickingFilters.prioridad !== 'all' && l.priority !== pickingFilters.prioridad) return false;
-        if (pickingFilters.cliente && !l.clientName.toLowerCase().includes(pickingFilters.cliente.toLowerCase())) return false;
+        if (pickingFilters.cliente) {
+            const q = pickingFilters.cliente.toLowerCase();
+            const matchClient = l.clientName.toLowerCase().includes(q);
+            const matchId = l.id.toLowerCase().includes(q);
+            const matchProduct = l.items.some(it => it.name.toLowerCase().includes(q));
+            if (!matchClient && !matchId && !matchProduct) return false;
+        }
         if (pickingFilters.zona !== 'all' && !l.items.some(it => it.aisle === pickingFilters.zona)) return false;
         return true;
     });
@@ -7382,7 +8244,7 @@ function pickingFilterBar(scopeStatuses) {
     return `
         <div class="card pick-filter-bar">
             <div class="pick-filter-group">
-                <input type="text" class="form-input" id="pf-cliente" placeholder="Buscar cliente..." value="${pickingFilters.cliente}" oninput="applyPickingFilters()">
+                <input type="text" class="form-input" id="pf-cliente" placeholder="Buscar cliente, pedido o producto..." value="${pickingFilters.cliente}" oninput="applyPickingFilters()">
             </div>
             <select class="form-select" id="pf-estado" onchange="applyPickingFilters()">
                 <option value="all">Todos los estados</option>
@@ -7433,9 +8295,9 @@ function renderPickingCompleted() {
                     <thead><tr><th>Pedido</th><th>Cliente</th><th>Operario</th><th style="text-align:center;">Productos</th><th style="text-align:right;">Tiempo real</th><th>Estado</th><th style="text-align:right;">Acción</th></tr></thead>
                     <tbody>
                         ${lists.length === 0 ? `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2.5rem 0;">No hay pedidos preparados con estos filtros.</td></tr>` :
-                        lists.map(l => {
-                            const p = listProgress(l); const st = PICKING_STATUS[l.status];
-                            return `<tr>
+            lists.map(l => {
+                const p = listProgress(l); const st = PICKING_STATUS[l.status];
+                return `<tr>
                                 <td style="font-family:'JetBrains Mono';font-weight:600;">${l.id}</td>
                                 <td>${l.clientName}</td>
                                 <td>${l.operator}</td>
@@ -7447,7 +8309,7 @@ function renderPickingCompleted() {
                                     ${l.status === 'completado' ? `<button class="btn btn-primary btn-sm" onclick="dispatchPicking('${l.id}')">Despachar</button>` : ''}
                                 </td>
                             </tr>`;
-                        }).join('')}
+            }).join('')}
                     </tbody>
                 </table>
             </div>
@@ -7457,43 +8319,62 @@ function renderPickingCompleted() {
 // ==========================================================================
 //   SUB-VISTA: STOCK COMPROMETIDO
 // ==========================================================================
+let _committedQuery = '';
+
 function renderCommittedStock() {
     const c = document.getElementById('picking-content');
-    const rows = state.products.map(p => {
+    let rows = state.products.map(p => {
         const committed = getCommittedStock(p.id);
         const available = Math.max(0, Number(p.stock) - committed);
-        return { p, phys: Number(p.stock), committed, available };
+        return { p, phys: Number(p.stock), committed, available, loc: buildLocationCode(p) };
     }).filter(r => r.committed > 0 || r.phys > 0);
 
     rows.sort((a, b) => b.committed - a.committed);
+
+    const q = _committedQuery.toLowerCase().trim();
+    if (q) {
+        rows = rows.filter(r =>
+            r.p.name.toLowerCase().includes(q) ||
+            (r.p.sku || '').toLowerCase().includes(q) ||
+            r.loc.toLowerCase().includes(q) ||
+            (r.p.aisle || '').toLowerCase().includes(q)
+        );
+    }
 
     c.innerHTML = `
         <div class="card">
             <div class="card-header"><h2 class="card-title">${pickIcon('box')} Unidades reservadas por pedidos en curso</h2></div>
             <p class="pick-help">El <strong>stock comprometido</strong> son unidades ya apartadas para pedidos que se están preparando. El <strong>disponible real</strong> es lo que aún puedes vender.</p>
+            <div style="margin-bottom:1rem;">
+                <input type="text" class="form-input" placeholder="Buscar por nombre, SKU o ubicación (ej: A-01, SKU-BOSC-1500)..."
+                    value="${_committedQuery}"
+                    oninput="_committedQuery=this.value;renderCommittedStock();"
+                    style="max-width:480px;">
+            </div>
             <div class="table-responsive">
                 <table class="custom-table">
                     <thead><tr><th>Producto</th><th>Ubicación</th><th style="text-align:right;">Stock físico</th><th style="text-align:right;">Comprometido</th><th style="text-align:right;">Disponible real</th><th style="min-width:140px;">Reserva</th></tr></thead>
                     <tbody>
-                        ${rows.map(r => {
-                            const pctCommitted = r.phys > 0 ? Math.min(100, (r.committed / r.phys) * 100) : (r.committed > 0 ? 100 : 0);
-                            const loc = buildLocationCode(r.p);
-                            return `<tr>
-                                <td>
-                                    <div class="product-meta-info">
-                                        <span class="product-name">${r.p.name}</span>
-                                        <span class="product-sku">${r.p.sku}</span>
-                                    </div>
-                                </td>
-                                <td>${loc ? `<span class="pick-loc-chip">${loc}</span>` : '<span class="badge badge-danger">Sin ubicación</span>'}</td>
-                                <td style="text-align:right;font-family:'JetBrains Mono';font-weight:600;">${r.phys}</td>
-                                <td style="text-align:right;font-family:'JetBrains Mono';font-weight:700;color:var(--accent-gold);">${r.committed}</td>
-                                <td style="text-align:right;font-family:'JetBrains Mono';font-weight:700;color:${r.available === 0 ? 'var(--accent-rose)' : 'var(--accent-emerald)'};">${r.available}</td>
-                                <td>
-                                    <div class="pick-progress-track" style="height:8px;"><div class="pick-progress-fill" style="width:${pctCommitted}%;background:var(--accent-gold-gradient);"></div></div>
-                                </td>
-                            </tr>`;
-                        }).join('')}
+                        ${rows.length === 0
+            ? `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem 0;">Sin resultados para "${_committedQuery}".</td></tr>`
+            : rows.map(r => {
+                const pctCommitted = r.phys > 0 ? Math.min(100, (r.committed / r.phys) * 100) : (r.committed > 0 ? 100 : 0);
+                return `<tr>
+                                    <td>
+                                        <div class="product-meta-info">
+                                            <span class="product-name">${r.p.name}</span>
+                                            <span class="product-sku">${r.p.sku}</span>
+                                        </div>
+                                    </td>
+                                    <td>${r.loc ? `<span class="pick-loc-chip">${r.loc}</span>` : '<span class="badge badge-danger">Sin ubicación</span>'}</td>
+                                    <td style="text-align:right;font-family:'JetBrains Mono';font-weight:600;">${r.phys}</td>
+                                    <td style="text-align:right;font-family:'JetBrains Mono';font-weight:700;color:var(--accent-gold);">${r.committed}</td>
+                                    <td style="text-align:right;font-family:'JetBrains Mono';font-weight:700;color:${r.available === 0 ? 'var(--accent-rose)' : 'var(--accent-emerald)'};">${r.available}</td>
+                                    <td>
+                                        <div class="pick-progress-track" style="height:8px;"><div class="pick-progress-fill" style="width:${pctCommitted}%;background:var(--accent-gold-gradient);"></div></div>
+                                    </td>
+                                </tr>`;
+            }).join('')}
                     </tbody>
                 </table>
             </div>
@@ -7538,7 +8419,7 @@ function renderPendingProducts() {
                     <thead><tr><th>Producto</th><th>Ubicación</th><th>Pedido</th><th style="text-align:center;">Faltan</th><th>Lote</th><th>Estado</th></tr></thead>
                     <tbody>
                         ${pending.length === 0 ? `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2.5rem 0;">¡No hay productos pendientes! Todo está recogido. 🎉</td></tr>` :
-                        pending.map(x => `
+            pending.map(x => `
                             <tr>
                                 <td><span class="product-name">${x.it.name}</span></td>
                                 <td>${x.it.location ? `<span class="pick-loc-chip">${x.it.location}</span> <span class="pick-zone-tag">${zoneLabel(x.it.aisle)}</span>` : '<span class="badge badge-danger">Sin ubicación</span>'}</td>
@@ -7573,10 +8454,10 @@ function renderPickingHistory() {
                 </div></div>
             <div class="pick-timeline">
                 ${events.length === 0 ? emptyMini('Sin movimientos registrados.') :
-                events.slice(0, 60).map(e => {
-                    const d = new Date(e.ts);
-                    const time = d.toLocaleString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-                    return `<div class="pick-timeline-item">
+            events.slice(0, 60).map(e => {
+                const d = new Date(e.ts);
+                const time = d.toLocaleString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                return `<div class="pick-timeline-item">
                         <div class="pick-timeline-dot"></div>
                         <div class="pick-timeline-body">
                             <div class="pick-timeline-head">
@@ -7586,7 +8467,7 @@ function renderPickingHistory() {
                             <div class="pick-timeline-detail">${e.detail} · <span style="color:var(--accent-cyan);">${e.listId}</span> · ${e.client} · ${e.by}</div>
                         </div>
                     </div>`;
-                }).join('')}
+            }).join('')}
             </div>
         </div>`;
 }
@@ -7703,11 +8584,31 @@ function pickItemRow(list, it, idx, isActive) {
     const d = daysToExpiry(it.expDate);
     const expBadge = d !== null && d <= 30 ? `<span class="badge ${d < 0 ? 'badge-danger' : 'badge-warning'}" style="font-size:0.62rem;">${d < 0 ? 'Vencido' : 'Vence ' + d + 'd'}</span>` : '';
     const fefoBadge = `<span class="pick-fefo-tag" title="Lote elegido por vencer primero">FEFO</span>`;
+
+    // #6 — Badge de stock crítico
+    const prod = state.products.find(p => p.id === it.productId);
+    const currentStock = prod ? Number(prod.stock) : 0;
+    let stockBadge = '';
+    if (currentStock === 0) {
+        stockBadge = `<span class="badge badge-danger" style="font-size:0.62rem;">Sin stock</span>`;
+    } else if (currentStock < it.requestedQty) {
+        stockBadge = `<span class="badge badge-warning" style="font-size:0.62rem;">Stock: ${currentStock}/${it.requestedQty}</span>`;
+    }
+
+    // #5 — Botón de confirmación ítem a ítem
+    const confirmBtn = isActive ? (done
+        ? `<button class="pick-check checked" onclick="togglePickItem('${list.id}','${it.productId}')" title="Desmarcar">
+               ${pickIcon('check')}
+           </button>`
+        : `<button class="pick-check" onclick="togglePickItem('${list.id}','${it.productId}')" title="Confirmar recogida completa" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.6rem;color:var(--text-muted);padding:0.3rem;">
+               <span class="pick-route-num">${idx + 1}</span>
+               <span style="font-size:0.55rem;letter-spacing:0.3px;">CONFIRMAR</span>
+           </button>`)
+        : `<button class="pick-check ${done ? 'checked' : ''}" disabled>${done ? pickIcon('check') : `<span class="pick-route-num">${idx + 1}</span>`}</button>`;
+
     return `
         <div class="pick-item-row ${done ? 'item-done' : partial ? 'item-partial' : ''}">
-            <button class="pick-check ${done ? 'checked' : ''}" ${isActive ? '' : 'disabled'} onclick="togglePickItem('${list.id}','${it.productId}')">
-                ${done ? pickIcon('check') : `<span class="pick-route-num">${idx + 1}</span>`}
-            </button>
+            ${confirmBtn}
             <div class="pick-item-info">
                 <div class="pick-item-name">${it.name}</div>
                 <div class="pick-item-meta">
@@ -7715,6 +8616,7 @@ function pickItemRow(list, it, idx, isActive) {
                     <span class="pick-zone-tag">${zoneLabel(it.aisle)}</span>
                     <span class="pick-lot-tag">${fefoBadge} Lote ${it.lot || '—'}</span>
                     ${expBadge}
+                    ${stockBadge}
                 </div>
             </div>
             <div class="pick-item-qty">
@@ -8025,9 +8927,9 @@ function exportAllPickingPDF() {
 <div class="kpi">
   <div class="kpi-box"><div class="val">${total}</div><div class="lbl">Total órdenes</div></div>
   <div class="kpi-box"><div class="val" style="color:#16a34a;">${done}</div><div class="lbl">Completadas</div></div>
-  <div class="kpi-box"><div class="val" style="color:#2563eb;">${state.pickingLists.filter(l=>l.status==='en_proceso').length}</div><div class="lbl">En proceso</div></div>
-  <div class="kpi-box"><div class="val" style="color:#d97706;">${state.pickingLists.filter(l=>l.status==='pendiente').length}</div><div class="lbl">Pendientes</div></div>
-  <div class="kpi-box"><div class="val">${total > 0 ? Math.round((done/total)*100) : 0}%</div><div class="lbl">Tasa completado</div></div>
+  <div class="kpi-box"><div class="val" style="color:#2563eb;">${state.pickingLists.filter(l => l.status === 'en_proceso').length}</div><div class="lbl">En proceso</div></div>
+  <div class="kpi-box"><div class="val" style="color:#d97706;">${state.pickingLists.filter(l => l.status === 'pendiente').length}</div><div class="lbl">Pendientes</div></div>
+  <div class="kpi-box"><div class="val">${total > 0 ? Math.round((done / total) * 100) : 0}%</div><div class="lbl">Tasa completado</div></div>
 </div>
 
 <div class="section-bar">Detalle de Órdenes (${total} registros)</div>
@@ -8112,7 +9014,7 @@ function exportPickingPDF(id) {
             <td><strong>${it.name}</strong></td>
             <td style="font-family:monospace;font-size:8.5pt;color:#555;">${it.sku || '—'}</td>
             <td style="text-align:center;font-weight:bold;color:#1a1a2e;">${it.warehouse || '—'}</td>
-            <td style="text-align:center;font-size:15pt;font-weight:900;color:#1a1a2e;">${it.aisle || loc.split('-')[0]?.replace(/[^A-Z]/gi,'') || '?'}</td>
+            <td style="text-align:center;font-size:15pt;font-weight:900;color:#1a1a2e;">${it.aisle || loc.split('-')[0]?.replace(/[^A-Z]/gi, '') || '?'}</td>
             <td style="text-align:center;font-weight:bold;">${it.shelf || '?'}</td>
             <td style="text-align:center;color:#666;">${it.level || '—'}</td>
             <td style="font-family:monospace;font-size:8.5pt;">${it.lot || '—'}</td>
