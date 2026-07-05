@@ -3172,3 +3172,77 @@ body::before {
     border-radius: var(--radius-md);
     margin-bottom: 1.5rem;
 }
+
+/* ==========================================================================
+   RESPONSIVE — MÓVIL / TABLET (drawer + stacking)
+   Habilita la demo en celular y tablet. Sidebar -> drawer off-canvas.
+   ========================================================================== */
+
+/* Botón hamburguesa — oculto en escritorio, visible en modo drawer */
+.mobile-nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-right: 0.9rem;
+}
+.mobile-nav-toggle svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+/* Overlay del drawer */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 18, 14, 0.5);
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+.sidebar-overlay.show { display: block; opacity: 1; }
+
+/* ---- Tablet y móvil: sidebar como drawer off-canvas ---- */
+@media (max-width: 1024px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
+        z-index: 101;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .main-wrapper { margin-left: 0; }
+    .mobile-nav-toggle { display: inline-flex; }
+    .top-header { padding: 0 1.25rem; }
+}
+
+/* ---- Colapsar grids de 2 columnas + header flexible ---- */
+@media (max-width: 900px) {
+    .dashboard-main-grid,
+    .invoice-split-layout,
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    .top-header {
+        height: auto;
+        min-height: var(--header-height);
+        padding: 0.85rem 1.25rem;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    .header-actions { gap: 0.75rem; flex-wrap: wrap; }
+    .page-title-section h1 { font-size: 1.3rem; }
+    .page-title-section p { font-size: 0.8rem; }
+}
+
+/* ---- Teléfono ---- */
+@media (max-width: 600px) {
+    .date-badge { font-size: 0.78rem; padding: 0.5rem 0.8rem; }
+    .stat-value, .kpi-value { font-size: 1.6rem; }
+    .top-header { position: static; }
+}

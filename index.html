@@ -152,10 +152,20 @@
         </div>
     </aside>
 
+    <!-- Overlay del drawer móvil -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileNav()"></div>
+
     <!-- Main Wrapper -->
     <div class="main-wrapper">
         <!-- Top Header -->
         <header class="top-header">
+            <button type="button" class="mobile-nav-toggle" id="mobile-nav-toggle" onclick="toggleMobileNav()" aria-label="Abrir menú">
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" aria-hidden="true">
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+            </button>
             <div class="page-title-section">
                 <h1 id="header-view-title">Dashboard Operativo</h1>
                 <p id="header-view-desc">Análisis general y rendimiento de inventario en tiempo real.</p>
@@ -1213,6 +1223,34 @@
     <script src="demo-data.js"></script>
     <!-- Script Application Logic -->
     <script src="app.js"></script>
+
+    <!-- Drawer de navegación móvil / tablet -->
+    <script>
+        (function () {
+            var sidebar = document.querySelector('.sidebar');
+            var overlay = document.getElementById('sidebar-overlay');
+            var toggle = document.getElementById('mobile-nav-toggle');
+            window.toggleMobileNav = function () {
+                if (!sidebar) return;
+                var open = sidebar.classList.toggle('open');
+                if (overlay) overlay.classList.toggle('show', open);
+                if (toggle) toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+            };
+            window.closeMobileNav = function () {
+                if (sidebar) sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('show');
+                if (toggle) toggle.setAttribute('aria-label', 'Abrir menú');
+            };
+            // Cerrar el drawer al elegir una sección
+            document.querySelectorAll('.sidebar .nav-link').forEach(function (link) {
+                link.addEventListener('click', window.closeMobileNav);
+            });
+            // Cerrar con Escape
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') window.closeMobileNav();
+            });
+        })();
+    </script>
 </body>
 
 </html>

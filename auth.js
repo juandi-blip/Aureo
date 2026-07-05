@@ -85,24 +85,12 @@ function vulcanLogout() {
 // ==========================================================================
 const VULCAN_IS_LOGIN_PAGE = !!document.getElementById("login-form");
 
-// La demo es una herramienta de escritorio y su dashboard no es responsive.
-// En celular no renderizamos el sistema: redirigimos a un gate que invita a
-// abrirla en el computador (protege la primera impresión del prospecto que
-// llega por WhatsApp/correo).
-const VULCAN_IS_MOBILE =
-    /Mobi|Android|iPhone|iPod/i.test(navigator.userAgent) ||
-    // Solo tratamos el ancho pequeño como "móvil" si además hay pantalla táctil,
-    // para no expulsar a un usuario de escritorio con la ventana a medio tamaño.
-    (window.innerWidth < 760 && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
+// La demo ahora es responsive (drawer off-canvas + layout adaptativo): funciona
+// en celular y tablet, no solo escritorio. Ya no redirigimos a desktop-only.html;
+// se conserva ese archivo por si se quiere un gate opcional en el futuro.
 
 (function guardImmediate() {
-    // 1. Gate móvil — antes que cualquier otra cosa.
-    if (VULCAN_IS_MOBILE) {
-        window.location.replace("desktop-only.html");
-        return;
-    }
-
-    // 2. Página de login (selector de perfil): si ya hay sesión, entrar al sistema.
+    // Página de login (selector de perfil): si ya hay sesión, entrar al sistema.
     if (VULCAN_IS_LOGIN_PAGE) {
         if (getVulcanSession()) {
             window.location.replace("index.html");
