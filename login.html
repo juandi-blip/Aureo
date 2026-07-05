@@ -31,100 +31,218 @@
             </div>
 
             <div class="login-heading">
-                <h1>Iniciar Sesión</h1>
-                <p>Ingresa tus credenciales para acceder al panel de operaciones.</p>
+                <h1>Elige una perspectiva</h1>
+                <p>Cada usuario ve un sistema distinto. Entra con un rol y descubre qué módulos desbloquea.</p>
             </div>
 
-            <form id="login-form" novalidate>
-                <!-- Usuario -->
-                <div class="login-field">
-                    <label for="login-username">Usuario</label>
-                    <div class="field-input-wrap">
-                        <svg class="field-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                            <circle cx="12" cy="7" r="4" />
-                        </svg>
-                        <input type="text" id="login-username" name="username" placeholder="Ej: admin"
-                            autocomplete="username" autofocus>
-                    </div>
-                </div>
-
-                <!-- Contraseña -->
-                <div class="login-field">
-                    <label for="login-password">Contraseña</label>
-                    <div class="field-input-wrap">
-                        <svg class="field-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                        </svg>
-                        <input type="password" id="login-password" name="password" placeholder="••••••••"
-                            autocomplete="current-password">
-                        <button type="button" class="toggle-password" id="toggle-password"
-                            aria-label="Mostrar contraseña">
-                            <svg class="icon-eye" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                <circle cx="12" cy="12" r="3" />
+            <!-- Selector de perfil (acceso principal a la demo) -->
+            <div class="demo-accounts">
+                <button type="button" class="demo-account" data-user="admin" data-role="admin">
+                    <span class="demo-account-left">
+                        <span class="demo-account-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="7" />
+                                <rect x="14" y="3" width="7" height="7" />
+                                <rect x="14" y="14" width="7" height="7" />
+                                <rect x="3" y="14" width="7" height="7" />
                             </svg>
-                            <svg class="icon-eye-off" viewBox="0 0 24 24" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                                <line x1="1" y1="1" x2="23" y2="23" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Mensaje de error -->
-                <div class="login-error" id="login-error">
-                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="8" x2="12" y2="12" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" />
-                    </svg>
-                    <span class="error-text">Credenciales inválidas.</span>
-                </div>
-
-                <!-- Botón -->
-                <button type="submit" class="login-submit" id="login-submit">
-                    <span class="btn-spinner"></span>
-                    <span class="btn-label">Acceder al Sistema</span>
-                    <svg class="btn-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                        <polyline points="12 5 19 12 12 19" />
-                    </svg>
+                        </span>
+                        <span class="demo-account-info">
+                            <span class="demo-role-name">Administrador</span>
+                            <span class="demo-account-desc">Ve y controla todo el sistema.</span>
+                            <span class="demo-account-modules">
+                                <span class="mod-chip">POS</span>
+                                <span class="mod-chip">Inventario</span>
+                                <span class="mod-chip">Mapa de calor</span>
+                                <span class="mod-chip">ABC</span>
+                                <span class="mod-chip">Picking</span>
+                                <span class="mod-chip">Configuración</span>
+                            </span>
+                            <span class="demo-cred"><strong>admin</strong> · admin123</span>
+                        </span>
+                    </span>
+                    <span class="demo-enter">
+                        <span class="demo-enter-label">Entrar</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </span>
                 </button>
-            </form>
 
-            <!-- Cuentas demo (clic para autocompletar) -->
-            <div class="login-demo">
-                <div class="login-demo-title">Cuentas de demostración</div>
-                <div class="demo-accounts">
-                    <div class="demo-account" data-user="admin" data-pass="admin123">
-                        <span class="demo-cred"><strong>admin</strong> / admin123</span>
-                        <span class="demo-role">Admin</span>
+                <button type="button" class="demo-account" data-user="warehouse" data-role="warehouse">
+                    <span class="demo-account-left">
+                        <span class="demo-account-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                                <line x1="12" y1="22.08" x2="12" y2="12" />
+                            </svg>
+                        </span>
+                        <span class="demo-account-info">
+                            <span class="demo-role-name">Jefe de Depósito</span>
+                            <span class="demo-account-desc">Bodega y logística de despacho.</span>
+                            <span class="demo-account-modules">
+                                <span class="mod-chip">Inventario</span>
+                                <span class="mod-chip">Mapa de calor</span>
+                                <span class="mod-chip">Picking</span>
+                            </span>
+                            <span class="demo-cred"><strong>warehouse</strong> · warehouse123</span>
+                        </span>
+                    </span>
+                    <span class="demo-enter">
+                        <span class="demo-enter-label">Entrar</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </span>
+                </button>
+
+                <button type="button" class="demo-account" data-user="cashier" data-role="cashier">
+                    <span class="demo-account-left">
+                        <span class="demo-account-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="9" cy="21" r="1" />
+                                <circle cx="20" cy="21" r="1" />
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                            </svg>
+                        </span>
+                        <span class="demo-account-info">
+                            <span class="demo-role-name">Cajero</span>
+                            <span class="demo-account-desc">Terminal de punto de venta.</span>
+                            <span class="demo-account-modules">
+                                <span class="mod-chip">POS</span>
+                                <span class="mod-chip">Facturación</span>
+                            </span>
+                            <span class="demo-cred"><strong>cashier</strong> · cashier123</span>
+                        </span>
+                    </span>
+                    <span class="demo-enter">
+                        <span class="demo-enter-label">Entrar</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </span>
+                </button>
+            </div>
+
+            <!-- Acceso manual (secundario, colapsado) -->
+            <div class="login-manual">
+                <button type="button" class="login-manual-toggle" id="login-manual-toggle" aria-expanded="false"
+                    aria-controls="login-form">
+                    Acceder con usuario y contraseña
+                </button>
+
+                <form id="login-form" class="login-manual-form" novalidate hidden>
+                    <!-- Usuario -->
+                    <div class="login-field">
+                        <label for="login-username">Usuario</label>
+                        <div class="field-input-wrap">
+                            <svg class="field-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                            <input type="text" id="login-username" name="username" placeholder="Ej: admin"
+                                autocomplete="username">
+                        </div>
                     </div>
-                    <div class="demo-account" data-user="warehouse" data-pass="warehouse123">
-                        <span class="demo-cred"><strong>warehouse</strong> / warehouse123</span>
-                        <span class="demo-role">Depósito</span>
+
+                    <!-- Contraseña -->
+                    <div class="login-field">
+                        <label for="login-password">Contraseña</label>
+                        <div class="field-input-wrap">
+                            <svg class="field-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                            <input type="password" id="login-password" name="password" placeholder="••••••••"
+                                autocomplete="current-password">
+                            <button type="button" class="toggle-password" id="toggle-password"
+                                aria-label="Mostrar contraseña">
+                                <svg class="icon-eye" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                                <svg class="icon-eye-off" viewBox="0 0 24 24" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                    <line x1="1" y1="1" x2="23" y2="23" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
-                    <div class="demo-account" data-user="cashier" data-pass="cashier123">
-                        <span class="demo-cred"><strong>cashier</strong> / cashier123</span>
-                        <span class="demo-role">Caja</span>
+
+                    <!-- Mensaje de error -->
+                    <div class="login-error" id="login-error">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        <span class="error-text">Credenciales inválidas.</span>
                     </div>
-                </div>
+
+                    <!-- Botón -->
+                    <button type="submit" class="login-submit" id="login-submit">
+                        <span class="btn-spinner"></span>
+                        <span class="btn-label">Acceder al Sistema</span>
+                        <svg class="btn-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 
     <script src="auth.js"></script>
     <script>
-        // Autocompletar al hacer clic en una cuenta demo
-        document.querySelectorAll('.demo-account').forEach(acc => {
+        // Entrada por perfil: establece la sesión directamente y entra, sin pasar
+        // la contraseña por el formulario. Así el gestor de contraseñas del
+        // navegador no dispara el aviso de "contraseña filtrada" con las
+        // credenciales de demostración. Una micro-transición evita el salto brusco.
+        const demoAccounts = document.querySelectorAll('.demo-account');
+        demoAccounts.forEach(acc => {
             acc.addEventListener('click', () => {
+                const user = (typeof VULCAN_USERS !== 'undefined')
+                    ? VULCAN_USERS.find(u => u.username === acc.dataset.user)
+                    : null;
+
+                if (user && typeof setVulcanSession === 'function') {
+                    // Feedback visual antes de redirigir
+                    demoAccounts.forEach(a => { a.disabled = true; });
+                    acc.classList.add('entering');
+                    const label = acc.querySelector('.demo-enter-label');
+                    if (label) label.textContent = 'Entrando…';
+                    setVulcanSession(user, null);
+                    setTimeout(() => window.location.replace('index.html'), 420);
+                    return;
+                }
+
+                // Fallback: autocompletar el formulario para entrada manual.
+                const pass = { admin: 'admin123', warehouse: 'warehouse123', cashier: 'cashier123' }[acc.dataset.user] || '';
                 document.getElementById('login-username').value = acc.dataset.user;
-                document.getElementById('login-password').value = acc.dataset.pass;
+                document.getElementById('login-password').value = pass;
                 document.getElementById('login-username').dispatchEvent(new Event('input'));
             });
+        });
+
+        // Acceso manual colapsable (detalle secundario para la demo)
+        const manualToggle = document.getElementById('login-manual-toggle');
+        const manualForm = document.getElementById('login-form');
+        manualToggle.addEventListener('click', () => {
+            const isHidden = manualForm.hasAttribute('hidden');
+            if (isHidden) {
+                manualForm.removeAttribute('hidden');
+                manualToggle.setAttribute('aria-expanded', 'true');
+                document.getElementById('login-username').focus();
+            } else {
+                manualForm.setAttribute('hidden', '');
+                manualToggle.setAttribute('aria-expanded', 'false');
+            }
         });
     </script>
 </body>

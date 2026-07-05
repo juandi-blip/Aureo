@@ -485,7 +485,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="invoice-client-id">R.U.T / Identificación Fiscal</label>
+                            <label class="form-label" for="invoice-client-id">NIT / Identificación Fiscal</label>
                             <div class="input-wrapper">
                                 <svg viewBox="0 0 24 24">
                                     <rect x="3" y="4" width="18" height="16" rx="2" ry="2" />
@@ -493,7 +493,7 @@
                                     <line x1="7" y1="12" x2="17" y2="12" />
                                     <line x1="7" y1="16" x2="13" y2="16" />
                                 </svg>
-                                <input type="text" class="form-input" id="invoice-client-id" value="RUT-12.845.922-K"
+                                <input type="text" class="form-input" id="invoice-client-id" value="CC 79.845.922"
                                     oninput="updateInvoicePreview()">
                             </div>
                         </div>
@@ -579,7 +579,7 @@
                                     id="invoice-corp-sub">Suministros de Acero e Ingeniería</span>
                             </div>
                             <div class="invoice-meta">
-                                <span class="invoice-number-label">Boleta de Suministro</span>
+                                <span class="invoice-number-label">Factura de Suministro</span>
                                 <div class="invoice-number" id="preview-invoice-number">FACT-2026-0001</div>
                                 <div class="invoice-date" id="preview-invoice-date">31/05/2026</div>
                             </div>
@@ -592,7 +592,7 @@
                         <div class="invoice-client-summary">
                             <div class="client-summary-title">Cliente / Despacho</div>
                             <div class="client-summary-name" id="preview-client-name">Juan Díaz</div>
-                            <div class="client-summary-details" id="preview-client-id">RUT-12.845.922-K</div>
+                            <div class="client-summary-details" id="preview-client-id">CC 79.845.922</div>
                         </div>
 
                         <!-- Items list inside receipt -->
@@ -617,6 +617,18 @@
                             <div class="totals-row grand-total">
                                 <span>TOTAL A COBRAR</span>
                                 <span class="totals-value" id="preview-grand-total">$0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- DIAN — Facturación Electrónica (simulada para la demo) -->
+                        <div class="invoice-dian-block" style="margin-top: 1rem; padding-top: 0.85rem; border-top: 1px dashed var(--border-subtle); display: flex; gap: 0.75rem; align-items: center;">
+                            <div id="preview-cufe-qr" aria-hidden="true"
+                                style="width: 54px; height: 54px; flex-shrink: 0; border-radius: 6px; background-image: conic-gradient(#111 0 25%, #fff 0 50%, #111 0 75%, #fff 0 100%); background-size: 9px 9px; border: 1px solid var(--border-subtle);"></div>
+                            <div style="min-width: 0;">
+                                <div style="font-size: 0.62rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted);">Factura Electrónica de Venta · DIAN</div>
+                                <div style="font-size: 0.62rem; color: var(--text-muted); margin-top: 2px;">CUFE</div>
+                                <div id="preview-cufe" style="font-size: 0.6rem; line-height: 1.35; word-break: break-all; color: var(--text-secondary); font-family: monospace;">—</div>
+                                <div style="font-size: 0.58rem; color: var(--text-muted); margin-top: 3px;">Resolución DIAN 18760000001 · Rango FACT-1 al FACT-5000</div>
                             </div>
                         </div>
                     </div>
@@ -777,11 +789,12 @@
                 </div>
             </div>
 
-            <!-- Pareto Chart -->
-            <div class="card" style="margin-bottom: 2rem;">
-                <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+            <!-- Pareto ABC Chart -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header">
                     <h2 class="card-title">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /><line x1="2" y1="20" x2="22" y2="20" />
                         </svg>
                         Gráfico de Pareto ABC
@@ -995,7 +1008,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label" for="settings-company-name">Razón Social Ferretería</label>
-                            <input type="text" class="form-input" id="settings-company-name" value="Aureo S.A.">
+                            <input type="text" class="form-input" id="settings-company-name" value="Aureo S.A.S.">
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="settings-company-slogan">Eslogan Comercial / Giro</label>
@@ -1007,16 +1020,15 @@
                         <div class="form-group">
                             <label class="form-label" for="settings-company-currency">Divisa de Operación</label>
                             <select class="form-select" id="settings-company-currency">
-                                <option value="USD">Dólar Comercial ($)</option>
-                                <option value="EUR">Euro Siderúrgico (€)</option>
-                                <option value="CLP">Peso Chileno ($)</option>
+                                <option value="COP" selected>Peso Colombiano ($)</option>
+                                <option value="USD">Dólar ($)</option>
+                                <option value="EUR">Euro (€)</option>
                                 <option value="MXN">Peso Mexicano ($)</option>
-                                <option value="COP">Peso Colombiano ($)</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="settings-company-tax-id">R.U.T / Registro Tributario</label>
-                            <input type="text" class="form-input" id="settings-company-tax-id" value="RUT-77.928.344-9">
+                            <label class="form-label" for="settings-company-tax-id">NIT / Registro Tributario</label>
+                            <input type="text" class="form-input" id="settings-company-tax-id" value="NIT 901.456.789-0">
                         </div>
                     </div>
                     <div
@@ -1053,7 +1065,7 @@
                 <div class="form-group">
                     <label class="form-label" for="product-modal-name">Nombre / Especificación Técnica</label>
                     <input type="text" class="form-input" id="product-modal-name" required
-                        placeholder="Ej: Rotomartillo SDS-Max Bosch 1500W">
+                        placeholder="Ej: Rotomartillo SDS-Max Ferrox 1500W">
                 </div>
 
                 <div class="form-row">
@@ -1145,7 +1157,7 @@
                     <div class="form-group">
                         <label class="form-label" for="product-modal-brand">Marca del Fabricante</label>
                         <input type="text" class="form-input" id="product-modal-brand" required
-                            placeholder="Ej: Bosch, DeWalt, Stanley">
+                            placeholder="Ej: Ferrox, Kratos, Andina Tools">
                     </div>
                 </div>
 
@@ -1192,9 +1204,13 @@
     <div class="toast-container" id="toast-container"></div>
 
     <!-- SheetJS — lectura de archivos Excel (.xlsx / .xls) -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"
+        integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT"
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- Guardia de sesión y control de acceso por rol (debe ir ANTES de app.js) -->
     <script src="auth.js"></script>
+    <!-- Data ficticia del demo comercial (debe ir ANTES de app.js) -->
+    <script src="demo-data.js"></script>
     <!-- Script Application Logic -->
     <script src="app.js"></script>
 </body>

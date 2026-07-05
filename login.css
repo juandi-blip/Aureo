@@ -37,11 +37,12 @@ body {
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     display: flex;
-    align-items: center;
+    align-items: safe center;
     justify-content: center;
     padding: 1.5rem;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* Textura industrial de fondo (capa única, estática) */
@@ -101,7 +102,7 @@ body::before {
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
-    padding: 2.75rem 2.5rem 2.25rem;
+    padding: 2.25rem 2.25rem 2rem;
     box-shadow:
         0 24px 60px rgba(60, 48, 30, 0.14),
         0 4px 14px rgba(60, 48, 30, 0.07);
@@ -438,8 +439,8 @@ body::before {
 
 /* ----- Credenciales demo ----- */
 .login-demo {
-    margin-top: 1.75rem;
-    padding-top: 1.5rem;
+    margin-top: 1.35rem;
+    padding-top: 1.2rem;
     border-top: 1px dashed var(--border-subtle);
 }
 
@@ -450,7 +451,7 @@ body::before {
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.7rem;
     text-align: center;
 }
 
@@ -464,41 +465,199 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgba(255, 255, 255, 0.015);
+    gap: 0.85rem;
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    background: var(--bg-surface);
     border: 1px solid var(--border-subtle);
-    border-radius: 8px;
-    padding: 0.55rem 0.85rem;
+    border-radius: 10px;
+    padding: 0.7rem 0.85rem;
     cursor: pointer;
     transition: var(--transition-smooth);
 }
 
-.demo-account:hover {
+.demo-account:hover:not(:disabled) {
     border-color: var(--accent-gold);
-    background: rgba(46, 74, 110, 0.05);
+    background: rgba(46, 74, 110, 0.04);
     transform: translateX(2px);
+}
+
+.demo-account:disabled {
+    cursor: default;
+}
+
+.demo-account:disabled:not(.entering) {
+    opacity: 0.45;
+}
+
+.demo-account .demo-account-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.demo-account .demo-role-name {
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.demo-account .demo-account-desc {
+    font-family: var(--font-ui);
+    font-size: 0.7rem;
+    line-height: 1.4;
+    color: var(--text-muted);
 }
 
 .demo-account .demo-cred {
     font-family: var(--font-mono);
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     color: var(--text-secondary);
+    margin-top: 0.1rem;
 }
 
 .demo-account .demo-cred strong {
     color: var(--accent-gold);
 }
 
-.demo-account .demo-role {
+.demo-account .demo-enter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
     font-family: var(--font-ui);
-    font-size: 0.68rem;
-    font-weight: 400;
+    font-size: 0.72rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    padding: 0.15rem 0.55rem;
-    border-radius: 4px;
-    background: rgba(46, 74, 110, 0.08);
     color: var(--accent-gold);
-    border: 1px solid rgba(46, 74, 110, 0.15);
+}
+
+.demo-account .demo-enter svg {
+    width: 15px;
+    height: 15px;
+    transition: transform 0.25s ease;
+}
+
+.demo-account:hover:not(:disabled) .demo-enter svg {
+    transform: translateX(3px);
+}
+
+.demo-account.entering {
+    border-color: var(--accent-gold);
+    background: rgba(46, 74, 110, 0.06);
+}
+
+.demo-account .demo-account-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.demo-account .demo-account-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 9px;
+    background: rgba(46, 74, 110, 0.07);
+    border: 1px solid rgba(46, 74, 110, 0.12);
+    color: var(--accent-gold);
+}
+
+.demo-account .demo-account-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Chips de módulos que desbloquea cada rol */
+.demo-account .demo-account-modules {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.35rem;
+}
+
+.demo-account .mod-chip {
+    font-family: var(--font-ui);
+    font-size: 0.64rem;
+    font-weight: 500;
+    line-height: 1;
+    padding: 0.2rem 0.45rem;
+    border-radius: 5px;
+    white-space: nowrap;
+    background: rgba(46, 74, 110, 0.06);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+}
+
+/* ----- Acento por rol ----- */
+.demo-account[data-role="admin"] .demo-account-icon {
+    color: #2E4A6E;
+    background: rgba(46, 74, 110, 0.09);
+    border-color: rgba(46, 74, 110, 0.16);
+}
+.demo-account[data-role="admin"]:hover:not(:disabled),
+.demo-account[data-role="admin"].entering {
+    border-color: #2E4A6E;
+}
+.demo-account[data-role="admin"] .demo-enter { color: #2E4A6E; }
+
+.demo-account[data-role="warehouse"] .demo-account-icon {
+    color: #5E7D52;
+    background: rgba(94, 125, 82, 0.10);
+    border-color: rgba(94, 125, 82, 0.20);
+}
+.demo-account[data-role="warehouse"]:hover:not(:disabled),
+.demo-account[data-role="warehouse"].entering {
+    border-color: #5E7D52;
+}
+.demo-account[data-role="warehouse"] .demo-enter { color: #5E7D52; }
+
+.demo-account[data-role="cashier"] .demo-account-icon {
+    color: #A8442C;
+    background: rgba(168, 68, 44, 0.09);
+    border-color: rgba(168, 68, 44, 0.18);
+}
+.demo-account[data-role="cashier"]:hover:not(:disabled),
+.demo-account[data-role="cashier"].entering {
+    border-color: #A8442C;
+}
+.demo-account[data-role="cashier"] .demo-enter { color: #A8442C; }
+
+/* ----- Acceso manual (secundario, colapsable) ----- */
+.login-manual {
+    margin-top: 1.35rem;
+    padding-top: 1.2rem;
+    border-top: 1px dashed var(--border-subtle);
+    text-align: center;
+}
+
+.login-manual-toggle {
+    background: none;
+    border: none;
+    font-family: var(--font-ui);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+}
+
+.login-manual-toggle:hover {
+    color: var(--accent-gold);
+}
+
+.login-manual-form {
+    margin-top: 1.25rem;
+    text-align: left;
+    animation: cardRise 0.35s ease both;
 }
 
 /* ----- Animación de error (shake) ----- */

@@ -85,17 +85,44 @@ function vulcanLogout() {
 // ==========================================================================
 const VULCAN_IS_LOGIN_PAGE = !!document.getElementById("login-form");
 
+// La demo es una herramienta de escritorio y su dashboard no es responsive.
+// En celular no renderizamos el sistema: redirigimos a un gate que invita a
+// abrirla en el computador (protege la primera impresión del prospecto que
+// llega por WhatsApp/correo).
+const VULCAN_IS_MOBILE =
+    /Mobi|Android|iPhone|iPod/i.test(navigator.userAgent) ||
+    // Solo tratamos el ancho pequeño como "móvil" si además hay pantalla táctil,
+    // para no expulsar a un usuario de escritorio con la ventana a medio tamaño.
+    (window.innerWidth < 760 && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
+
 (function guardImmediate() {
+    // 1. Gate móvil — antes que cualquier otra cosa.
+    if (VULCAN_IS_MOBILE) {
+        window.location.replace("desktop-only.html");
+        return;
+    }
+
+    // 2. Página de login (selector de perfil): si ya hay sesión, entrar al sistema.
     if (VULCAN_IS_LOGIN_PAGE) {
-        // En la página de login: si ya hay sesión válida, ir directo al sistema
         if (getVulcanSession()) {
             window.location.replace("index.html");
         }
         return;
     }
-    // En el sistema principal: si NO hay sesión válida, bloquear y mandar al login
+
+    // 3. Sistema principal en escritorio: entrada sin fricción (Opción B).
+    //    Si no hay sesión, entramos directo como admin (el prospecto ve todo el
+    //    producto de una). El selector de perfil sigue disponible: "Cerrar sesión"
+    //    lleva de vuelta a login.html para ver otros roles.
     if (!getVulcanSession()) {
-        window.location.replace("login.html");
+        const adminUser = (typeof VULCAN_USERS !== "undefined")
+            ? VULCAN_USERS.find(u => u.username === "admin")
+            : null;
+        if (adminUser) {
+            setVulcanSession(adminUser, null);
+        } else {
+            window.location.replace("login.html");
+        }
     }
 })();
 
@@ -241,7 +268,7 @@ function initAppSession() {
     if (roleEl) roleEl.innerText = ROLE_LABELS[session.role] || session.role;
 
     // 2. Ocultar módulos (pestañas) no permitidos para el rol
-    const allTabs = ["dashboard", "inventory", "invoicing", "logistics", "picking", "inventario", "settings"];
+    const allTabs = ["dashboard", "inventory", "invoicing", "logistics", "picking", "dataentry", "inventario", "settings"];
     allTabs.forEach(tab => {
         const link = document.getElementById(`nav-${tab}`);
         if (!link) return;
