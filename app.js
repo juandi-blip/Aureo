@@ -653,7 +653,7 @@ function switchInventarioSub(subId) {
 
     if (subId === 'crear-tarea') {
         content.innerHTML = `
-            <div style="margin-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start;">
+            <div class="resp-grid-2-900" style="margin-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start;">
 
                 <!-- Creación de orden -->
                 <div class="card">
@@ -2492,7 +2492,7 @@ function renderDetalleRapidoMC(t) {
                 <span class="badge ${estadoBadge(t.estado)}">${t.estado || '—'}</span>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem 0.9rem; font-size:0.82rem;">
+            <div class="kv-grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem 0.9rem; font-size:0.82rem;">
                 <div>
                     <div style="color:var(--text-muted); font-size:0.75rem; margin-bottom:2px;">Tipo</div>
                     <div style="font-weight:500;">${t.tipo || '—'}</div>
@@ -5284,7 +5284,7 @@ function renderOccupancySection() {
         + '<div id="occ-chart-area" style="background:var(--bg-secondary,#16162a);border-radius:12px;padding:1rem 1.5rem;margin-bottom:1.5rem;"></div>'
 
         // KPI row
-        + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem;">'
+        + '<div class="wms-kpi-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem;">'
         + kpi('Ocupación General', stockPct + '%', state.products.length + ' de ' + WH_CAPACITY + ' slots', genClr)
         + kpi('Despachos Hoy', d.dailyOrders, d.dailyUnits + ' uds · ' + new Date().toLocaleDateString('es-CO'), '#2E4A6E')
         + kpi('Récord Mensual', d.monthlyRecord + ' uds', 'Pico del mes · ' + d.recordDate, '#4A7AB5')
@@ -6701,7 +6701,7 @@ function openSlotModal(aisleId, shelf, products) {
             ${products.map(p => `
                 <div style="background:rgba(36,31,26,0.04);border:1px solid var(--border-subtle);border-left:3px solid ${_abcColors[p.abcClass]};border-radius:var(--radius-sm);padding:0.85rem 1rem;">
                     <div style="font-weight:700;font-size:0.9rem;color:var(--text-primary);margin-bottom:0.5rem;">${escapeHtml(p.name)}</div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.35rem 1rem;font-size:0.78rem;color:var(--text-secondary);">
+                    <div class="kv-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:0.35rem 1rem;font-size:0.78rem;color:var(--text-secondary);">
                         <span>Clase ABC <strong style="color:${_abcColors[p.abcClass]};">Clase ${p.abcClass}</strong></span>
                         <span>Score <strong style="color:var(--text-primary);">${p.abcScore.toFixed(1)}</strong></span>
                         <span>SKU <strong style="color:var(--text-primary);">${p.sku || '—'}</strong></span>
@@ -7016,7 +7016,7 @@ function renderManualRelocation() {
                         <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--accent-cyan,#2E4A6E);margin-bottom:.9rem;">
                             Nueva ubicación para: <em style="color:var(--text-primary);">${escapeHtml(p.name)}</em>
                         </div>
-                        <div style="display:grid;grid-template-columns:2fr 100px 80px 80px 110px;gap:.75rem;align-items:end;">
+                        <div class="resp-collapse-600" style="display:grid;grid-template-columns:2fr 100px 80px 80px 110px;gap:.75rem;align-items:end;">
                             <div class="form-group" style="margin:0;">
                                 <label class="form-label">Bodega</label>
                                 <select class="form-select" id="wms-e-wh">
@@ -7931,7 +7931,7 @@ function renderPickingNew() {
             </p>
 
             <!-- Datos del pedido -->
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:1rem;margin-bottom:1.2rem;align-items:end;">
+            <div class="resp-collapse-600" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:1rem;margin-bottom:1.2rem;align-items:end;">
                 <div class="form-group" style="margin:0;">
                     <label class="form-label">Cliente / Razón Social</label>
                     <input type="text" class="form-input" id="np-client" placeholder="Nombre del cliente">
@@ -7959,7 +7959,7 @@ function renderPickingNew() {
                 <div style="font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:.8rem;">
                     Agregar producto por SKU
                 </div>
-                <div style="display:grid;grid-template-columns:160px 1fr 80px auto;gap:.75rem;align-items:end;">
+                <div class="resp-collapse-600" style="display:grid;grid-template-columns:160px 1fr 80px auto;gap:.75rem;align-items:end;">
                     <div class="form-group" style="margin:0;">
                         <label class="form-label">SKU</label>
                         <input type="text" class="form-input" id="np-sku"

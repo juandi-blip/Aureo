@@ -3223,11 +3223,21 @@ body::before {
 
 /* ---- Colapsar grids de 2 columnas + header flexible ---- */
 @media (max-width: 900px) {
+    /* padding desktop de .page-container (2.75rem 3.5rem = 44/56px) le come
+       112px de ancho a una pantalla de celular; es la causa raíz de varios
+       cortes marginales (botones, filas de detalle) en toda la app. */
+    .page-container {
+        padding: 1.75rem 1.25rem;
+    }
     .dashboard-main-grid,
     .invoice-split-layout,
     .form-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
     }
+    /* Grids con columnas puestas inline por JS: requieren !important
+       para que el media query pueda ganarle al style inline. */
+    .resp-grid-2-900 { grid-template-columns: 1fr !important; }
+    .wms-kpi-row { grid-template-columns: repeat(2, 1fr) !important; }
     .top-header {
         height: auto;
         min-height: var(--header-height);
@@ -3238,11 +3248,67 @@ body::before {
     .header-actions { gap: 0.75rem; flex-wrap: wrap; }
     .page-title-section h1 { font-size: 1.3rem; }
     .page-title-section p { font-size: 0.8rem; }
+    .warehouse-racks-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
 /* ---- Teléfono ---- */
 @media (max-width: 600px) {
+    .page-container { padding: 1.25rem 0.85rem; }
     .date-badge { font-size: 0.78rem; padding: 0.5rem 0.8rem; }
     .stat-value, .kpi-value { font-size: 1.6rem; }
     .top-header { position: static; }
+    .warehouse-racks-grid { grid-template-columns: 1fr !important; }
+
+    /* Grids con columnas inline que colapsan a una sola en teléfono.
+       resp-collapse-600: filas de campos de formulario (picking, WMS).
+       kv-grid-2: grillas etiqueta/valor de 2 columnas.
+       wms-kpi-row: fila de KPIs de ocupación. */
+    .resp-collapse-600 { grid-template-columns: 1fr !important; }
+    .kv-grid-2 { grid-template-columns: 1fr !important; }
+    .wms-kpi-row { grid-template-columns: 1fr !important; }
+
+    /* Filas de acciones con align-self:flex-end fijo por inline style
+       (Exportar/Imprimir, etc.) se recortan en vez de apilarse. */
+    .table-controls > div[style*="align-self: flex-end"] {
+        align-self: stretch !important;
+        width: 100%;
+    }
+    .table-controls > div[style*="align-self: flex-end"] .btn {
+        flex: 1 1 auto;
+    }
+}
+
+/* ---- Grid blowout: por defecto un hijo de grid tiene min-width:auto,
+   así que aunque la columna sea 1fr, el track crece para caber el
+   contenido mínimo del hijo (una tabla ancha, texto sin wrap, etc.) y la
+   card termina más ancha que la pantalla. Forzamos min-width:0 en los
+   hijos de todo grid que colapsamos arriba. ---- */
+@media (max-width: 900px) {
+    .dashboard-main-grid > *,
+    .invoice-split-layout > *,
+    .form-row > *,
+    .resp-grid-2-900 > *,
+    .wms-kpi-row > *,
+    .warehouse-racks-grid > * {
+        min-width: 0;
+    }
+}
+@media (max-width: 600px) {
+    .resp-collapse-600 > *,
+    .kv-grid-2 > * {
+        min-width: 0;
+    }
+    /* Red de seguridad: cualquier tabla/contenido ancho que quede dentro
+       de una card en el celular escapa haciendo scroll horizontal propio
+       en vez de forzar el ancho de toda la página. */
+    .card {
+        overflow-x: auto;
+    }
+    /* .card-header es flex nowrap por defecto (título + botón de acción).
+       Sin wrap, el nuevo overflow-x:auto de .card lo deja desplazable en
+       vez de apilarse, cortando el título. Debe envolver, no scrollear. */
+    .card-header {
+        flex-wrap: wrap;
+        row-gap: 0.5rem;
+    }
 }
