@@ -73,6 +73,18 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('clientes')" id="nav-clientes">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                        <span>Clientes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" onclick="switchTab('inventario')" id="nav-inventario">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
@@ -102,6 +114,27 @@
                             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                         </svg>
                         <span>Preparación de Pedidos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('reports')" id="nav-reports">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18" />
+                            <path d="M18.7 8l-5.1 5.1-2.8-2.8L7 14" />
+                        </svg>
+                        <span>Reportes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('purchasing')" id="nav-purchasing">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1" />
+                            <circle cx="20" cy="21" r="1" />
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                        </svg>
+                        <span>Compras</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -393,6 +426,9 @@
                 </div>
             </div>
 
+            <!-- Proactive alerts panel (rendered dynamically, alerts.js) -->
+            <div id="dashboard-alerts-section" style="margin-top:2rem;"></div>
+
             <!-- Occupancy indices (rendered dynamically) -->
             <div id="dashboard-occupancy-section" style="margin-top:2rem;"></div>
 
@@ -491,7 +527,8 @@
                                     <circle cx="12" cy="7" r="4" />
                                 </svg>
                                 <input type="text" class="form-input" id="invoice-client-name" value="Juan Díaz"
-                                    oninput="updateInvoicePreview()">
+                                    list="clients-datalist" autocomplete="off" oninput="updateInvoicePreview()">
+                                <datalist id="clients-datalist"></datalist>
                             </div>
                         </div>
                         <div class="form-group">
@@ -663,6 +700,45 @@
                             Despachar y Cobrar
                         </button>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CLIENTES VIEW (CRM ligero) -->
+        <section class="page-container" id="clientes-view">
+            <div class="card">
+                <!-- Search Controls -->
+                <div class="table-controls">
+                    <div class="search-filter-group">
+                        <div class="input-wrapper" style="flex: 1;">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <input type="text" class="form-input" id="clientes-search"
+                                placeholder="Buscar por nombre o NIT / identificación..."
+                                oninput="filterClientes()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clients Table -->
+                <div class="table-responsive">
+                    <table class="custom-table" id="clientes-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>NIT / Identificación</th>
+                                <th style="text-align: center;">Compras</th>
+                                <th>Última Compra</th>
+                                <th style="text-align: right;">Valor Total Histórico</th>
+                                <th style="text-align: right;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientes-table-body">
+                            <!-- Populated dynamically from clients.js -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
@@ -957,6 +1033,44 @@
             <div id="picking-content"></div>
         </section>
 
+        <!-- REPORTES VIEW -->
+        <section class="page-container" id="reports-view">
+            <!-- Sub-pestañas del módulo -->
+            <div class="picking-subtabs">
+                <button class="picking-subtab active" id="repsub-ventas" onclick="switchReportSub('ventas')">
+                    Ventas
+                </button>
+                <button class="picking-subtab" id="repsub-rotacion" onclick="switchReportSub('rotacion')">
+                    Rotación
+                </button>
+                <button class="picking-subtab" id="repsub-rentabilidad" onclick="switchReportSub('rentabilidad')">
+                    Rentabilidad
+                </button>
+                <button class="picking-subtab" id="repsub-clientes" onclick="switchReportSub('clientes')">
+                    Por Cliente
+                </button>
+            </div>
+
+            <!-- Contenido dinámico de la sub-pestaña activa -->
+            <div id="reports-content"></div>
+        </section>
+
+        <!-- COMPRAS VIEW -->
+        <section class="page-container" id="purchasing-view">
+            <!-- Sub-pestañas del módulo -->
+            <div class="picking-subtabs">
+                <button class="picking-subtab active" id="pursub-solicitud" onclick="switchPurchasingSub('solicitud')">
+                    Solicitud de Pedido
+                </button>
+                <button class="picking-subtab" id="pursub-ordenes" onclick="switchPurchasingSub('ordenes')">
+                    Órdenes de Compra
+                </button>
+            </div>
+
+            <!-- Contenido dinámico de la sub-pestaña activa -->
+            <div id="purchasing-content"></div>
+        </section>
+
         <!-- INVENTARIO VIEW -->
         <section class="page-container" id="inventario-view">
             <div class="dataentry-tabs" id="inventario-tabs"></div>
@@ -1052,7 +1166,76 @@
                     </div>
                 </form>
             </div>
+
+            <!-- PERMISOS GRANULARES (solo admin) -->
+            <div class="card" id="permisos-card" style="max-width: 960px; margin: 2rem auto 0; display:none;">
+                <div class="card-header"
+                    style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                    <h2 class="card-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        Permisos Granulares por Rol
+                    </h2>
+                </div>
+
+                <div id="permisos-table-wrap" style="overflow-x: auto;"></div>
+
+                <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+                    <button type="button" class="btn btn-secondary" onclick="openAddRoleModal()">Agregar Rol</button>
+                    <button type="button" class="btn btn-primary" onclick="savePermisos()">Guardar Cambios</button>
+                </div>
+
+                <div style="margin-top: 2rem; border-top: 1px solid var(--border-subtle); padding-top: 1.5rem;">
+                    <h3 class="form-label" style="font-weight: 700; margin-bottom: 0.75rem;">Asignar Rol a Usuario</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+                        Reasigna a cuál de los roles definidos arriba queda vinculado cada usuario de la demo
+                        (usuario y contraseña no cambian).
+                    </p>
+                    <div id="permisos-user-assign-wrap"></div>
+                    <div style="margin-top: 0.75rem; display: flex; justify-content: flex-end;">
+                        <button type="button" class="btn btn-secondary" onclick="saveUserRoleAssignments()">Guardar
+                            Asignación</button>
+                    </div>
+                </div>
+            </div>
         </section>
+    </div>
+
+    <!-- AGREGAR ROL PERSONALIZADO MODAL -->
+    <div class="modal-overlay" id="add-role-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Agregar Rol Personalizado</h3>
+                <button class="modal-close-btn" onclick="closeAddRoleModal()">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+
+            <form id="add-role-form" onsubmit="createCustomRole(event)">
+                <div class="form-group">
+                    <label class="form-label" for="add-role-name">Nombre del Rol</label>
+                    <input type="text" class="form-input" id="add-role-name" required
+                        placeholder="Ej: Supervisor de Turno">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Módulos Permitidos</label>
+                    <div id="add-role-tabs-wrap"
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 1rem;"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddRoleModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Rol</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- PRODUCT DETAIL ADD / EDIT MODAL -->
@@ -1192,6 +1375,76 @@
         </div>
     </div>
 
+    <!-- CLIENT DETAIL MODAL (ficha de cliente, historial y notas) -->
+    <div class="modal-overlay" id="client-detail-modal">
+        <div class="modal-content modal-content-lg">
+            <div class="modal-header">
+                <h3 class="modal-title">Ficha de Cliente</h3>
+                <button class="modal-close-btn" onclick="closeClientDetail()">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Nombre / Razón Social</label>
+                    <div id="client-detail-name"
+                        style="font-weight: 700; font-size: 1.05rem; color: var(--text-primary);">—</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">NIT / Identificación</label>
+                    <div id="client-detail-nit"
+                        style="font-family: 'JetBrains Mono', monospace; color: var(--text-secondary);">—</div>
+                </div>
+            </div>
+
+            <div class="stats-grid" style="margin: 0.5rem 0 1.5rem;">
+                <div class="card stat-card stat-cyan">
+                    <div class="stat-header"><span class="stat-title"># Compras</span></div>
+                    <div class="stat-value" id="client-detail-count">0</div>
+                </div>
+                <div class="card stat-card stat-gold">
+                    <div class="stat-header"><span class="stat-title">Última Compra</span></div>
+                    <div class="stat-value" id="client-detail-last" style="font-size: 1.1rem;">—</div>
+                </div>
+                <div class="card stat-card stat-emerald">
+                    <div class="stat-header"><span class="stat-title">Valor Total Histórico</span></div>
+                    <div class="stat-value" id="client-detail-total" style="font-size: 1.1rem;">$0</div>
+                </div>
+            </div>
+
+            <h3 class="form-label" style="font-weight: 700; margin-bottom: 0.75rem;">Historial de Facturas</h3>
+            <div class="table-responsive" style="max-height: 260px; overflow-y: auto;">
+                <table class="custom-table" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th>Factura</th>
+                            <th>Fecha</th>
+                            <th style="text-align: center;">Ítems</th>
+                            <th style="text-align: right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="client-detail-history-body"></tbody>
+                </table>
+            </div>
+
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <label class="form-label" for="client-detail-notas">Notas Comerciales</label>
+                <textarea class="form-input" id="client-detail-notas" rows="4"
+                    placeholder="Notas internas sobre este cliente..."
+                    style="resize: vertical; font-family: inherit;"></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeClientDetail()">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="saveClientNotes()">Guardar Notas</button>
+            </div>
+        </div>
+    </div>
+
     <!-- PICKING DETAIL / PREPARACIÓN INTERACTIVA MODAL -->
     <div class="modal-overlay" id="picking-modal">
         <div class="modal-content modal-content-lg">
@@ -1221,8 +1474,24 @@
     <script src="auth.js"></script>
     <!-- Data ficticia del demo comercial (debe ir ANTES de app.js) -->
     <script src="demo-data.js"></script>
-    <!-- Script Application Logic -->
-    <script src="app.js"></script>
+    <!-- Script Application Logic — dividido en módulos por dominio (antes era un único app.js) -->
+    <script src="core.js"></script>
+    <script src="clients.js"></script>
+    <script src="alerts.js"></script>
+    <script src="inventory.js"></script>
+    <script src="data-entry.js"></script>
+    <script src="wms.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="inventory-ui.js"></script>
+    <script src="invoicing.js"></script>
+    <script src="picking.js"></script>
+    <script src="reports.js"></script>
+    <script src="purchasing.js"></script>
+    <script src="permissions.js"></script>
+    <!-- Asistente IA: widget de chat flotante (fase 2). Backend serverless en
+         api/assistant-chat.js — sin ANTHROPIC_API_KEY configurada, muestra un
+         mensaje de "no disponible" en vez de fallar. -->
+    <script src="assistant.js"></script>
 
     <!-- Drawer de navegación móvil / tablet -->
     <script>
