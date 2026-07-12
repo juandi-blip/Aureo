@@ -557,8 +557,8 @@ function renderPickingPanel() {
             expiring.slice(0, 6).map(e => `
                             <div class="pick-expiry-row">
                                 <div>
-                                    <div class="pick-expiry-name">${e.name}</div>
-                                    <div class="pick-expiry-lot">Lote ${e.lot || '—'}</div>
+                                    <div class="pick-expiry-name">${escapeHtml(e.name)}</div>
+                                    <div class="pick-expiry-lot">Lote ${escapeHtml(e.lot) || '—'}</div>
                                 </div>
                                 <span class="badge ${e.days < 0 ? 'badge-danger' : e.days <= 15 ? 'badge-warning' : 'badge-info'}">
                                     ${e.days < 0 ? 'Vencido' : e.days + ' días'}
@@ -739,7 +739,7 @@ function _renderNewPickTable() {
     }
     const rows = _newPickItems.map((it, i) => `
         <tr>
-            <td style="font-family:monospace;font-size:0.82rem;">${it.sku}</td>
+            <td style="font-family:monospace;font-size:0.82rem;">${escapeHtml(it.sku)}</td>
             <td>${escapeHtml(it.name)}</td>
             <td style="text-align:center;font-weight:700;color:var(--accent-cyan,#2E4A6E);">${it.aisle}</td>
             <td style="text-align:center;">${it.shelf}</td>
@@ -984,7 +984,7 @@ function pickingFilterBar(scopeStatuses) {
     return `
         <div class="card pick-filter-bar">
             <div class="pick-filter-group">
-                <input type="text" class="form-input" id="pf-cliente" placeholder="Buscar cliente, pedido o producto..." value="${pickingFilters.cliente}" oninput="applyPickingFilters()">
+                <input type="text" class="form-input" id="pf-cliente" placeholder="Buscar cliente, pedido o producto..." value="${escapeHtml(pickingFilters.cliente)}" oninput="applyPickingFilters()">
             </div>
             <select class="form-select" id="pf-estado" onchange="applyPickingFilters()">
                 <option value="all">Todos los estados</option>
@@ -1096,17 +1096,17 @@ function renderCommittedStock() {
                     <thead><tr><th>Producto</th><th>Ubicación</th><th style="text-align:right;">Stock físico</th><th style="text-align:right;">Comprometido</th><th style="text-align:right;">Disponible real</th><th style="min-width:140px;">Reserva</th></tr></thead>
                     <tbody>
                         ${rows.length === 0
-            ? `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem 0;">Sin resultados para "${_committedQuery}".</td></tr>`
+            ? `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem 0;">Sin resultados para "${escapeHtml(_committedQuery)}".</td></tr>`
             : rows.map(r => {
                 const pctCommitted = r.phys > 0 ? Math.min(100, (r.committed / r.phys) * 100) : (r.committed > 0 ? 100 : 0);
                 return `<tr>
                                     <td>
                                         <div class="product-meta-info">
-                                            <span class="product-name">${r.p.name}</span>
-                                            <span class="product-sku">${r.p.sku}</span>
+                                            <span class="product-name">${escapeHtml(r.p.name)}</span>
+                                            <span class="product-sku">${escapeHtml(r.p.sku)}</span>
                                         </div>
                                     </td>
-                                    <td>${r.loc ? `<span class="pick-loc-chip">${r.loc}</span>` : '<span class="badge badge-danger">Sin ubicación</span>'}</td>
+                                    <td>${r.loc ? `<span class="pick-loc-chip">${escapeHtml(r.loc)}</span>` : '<span class="badge badge-danger">Sin ubicación</span>'}</td>
                                     <td style="text-align:right;font-family:'JetBrains Mono';font-weight:600;">${r.phys}</td>
                                     <td style="text-align:right;font-family:'JetBrains Mono';font-weight:700;color:var(--accent-gold);">${r.committed}</td>
                                     <td style="text-align:right;font-family:'JetBrains Mono';font-weight:700;color:${r.available === 0 ? 'var(--accent-rose)' : 'var(--accent-emerald)'};">${r.available}</td>
@@ -1161,11 +1161,11 @@ function renderPendingProducts() {
                         ${pending.length === 0 ? `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2.5rem 0;">¡No hay productos pendientes! Todo está recogido. 🎉</td></tr>` :
             pending.map(x => `
                             <tr>
-                                <td><span class="product-name">${x.it.name}</span></td>
-                                <td>${x.it.location ? `<span class="pick-loc-chip">${x.it.location}</span> <span class="pick-zone-tag">${zoneLabel(x.it.aisle)}</span>` : '<span class="badge badge-danger">Sin ubicación</span>'}</td>
-                                <td style="font-family:'JetBrains Mono';font-size:0.8rem;cursor:pointer;color:var(--accent-cyan);" onclick="openPickingDetail('${x.list.id}')">${x.list.id}</td>
+                                <td><span class="product-name">${escapeHtml(x.it.name)}</span></td>
+                                <td>${x.it.location ? `<span class="pick-loc-chip">${escapeHtml(x.it.location)}</span> <span class="pick-zone-tag">${escapeHtml(zoneLabel(x.it.aisle))}</span>` : '<span class="badge badge-danger">Sin ubicación</span>'}</td>
+                                <td style="font-family:'JetBrains Mono';font-size:0.8rem;cursor:pointer;color:var(--accent-cyan);" onclick="openPickingDetail('${x.list.id}')">${escapeHtml(x.list.id)}</td>
                                 <td style="text-align:center;font-weight:700;">${x.remaining}</td>
-                                <td style="font-family:'JetBrains Mono';font-size:0.8rem;">${x.it.lot || '—'}</td>
+                                <td style="font-family:'JetBrains Mono';font-size:0.8rem;">${escapeHtml(x.it.lot) || '—'}</td>
                                 <td><span class="badge ${x.reasonClass}">${x.reason}</span></td>
                             </tr>`).join('')}
                     </tbody>
@@ -1201,10 +1201,10 @@ function renderPickingHistory() {
                         <div class="pick-timeline-dot"></div>
                         <div class="pick-timeline-body">
                             <div class="pick-timeline-head">
-                                <strong>${e.action}</strong>
+                                <strong>${escapeHtml(e.action)}</strong>
                                 <span class="pick-timeline-time">${time}</span>
                             </div>
-                            <div class="pick-timeline-detail">${e.detail} · <span style="color:var(--accent-cyan);">${e.listId}</span> · ${e.client} · ${e.by}</div>
+                            <div class="pick-timeline-detail">${escapeHtml(e.detail)} · <span style="color:var(--accent-cyan);">${escapeHtml(e.listId)}</span> · ${escapeHtml(e.client)} · ${escapeHtml(e.by)}</div>
                         </div>
                     </div>`;
             }).join('')}

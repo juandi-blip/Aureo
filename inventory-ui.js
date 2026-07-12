@@ -94,7 +94,7 @@ function renderInventory() {
 
         tr.innerHTML = `
             <td style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.82rem;white-space:nowrap;color:var(--text-primary);">
-                ${prod.sku || '—'}
+                ${escapeHtml(prod.sku) || '—'}
             </td>
             <td>
                 <div class="product-cell">
@@ -102,16 +102,16 @@ function renderInventory() {
                         ${categorySvg}
                     </div>
                     <div class="product-meta-info">
-                        <span class="product-name">${prod.name}</span>
-                        <span class="product-sku"><strong style="color:var(--accent-gold);font-size:0.7rem;">${prod.brand}</strong></span>
+                        <span class="product-name">${escapeHtml(prod.name)}</span>
+                        <span class="product-sku"><strong style="color:var(--accent-gold);font-size:0.7rem;">${escapeHtml(prod.brand)}</strong></span>
                     </div>
                 </div>
             </td>
             <td style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.85rem;">
-                ${lotFormatted}
+                ${escapeHtml(lotFormatted)}
             </td>
             <td>
-                <span style="font-weight: 600; font-family:'Rajdhani'; font-size: 0.95rem;">${prod.category}</span>
+                <span style="font-weight: 600; font-family:'Rajdhani'; font-size: 0.95rem;">${escapeHtml(prod.category)}</span>
             </td>
             <td style="text-align: right; font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-primary);">
                 ${formatCurrency(prod.price)}

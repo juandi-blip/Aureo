@@ -50,6 +50,15 @@ function escapeHtml(value) {
         .replace(/'/g, '&#39;');
 }
 
+// Neutraliza inyección de fórmulas al exportar CSV/Excel: prefija con apóstrofo
+// cualquier celda que empiece por = + - @ (o tab/CR), y escapa las comillas
+// duplicándolas (formato CSV estándar). Devuelve el valor entre comillas.
+function csvSafe(value) {
+    let s = value === null || value === undefined ? '' : String(value);
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return '"' + s.replace(/"/g, '""') + '"';
+}
+
 // Verifica que la librería XLSX (CDN externo) esté cargada antes de usarla.
 // Si el CDN falló, avisamos con un toast en vez de romper con ReferenceError.
 function _ensureXLSX() {
@@ -375,7 +384,27 @@ function saveCompanySettings(event) {
 }
 
 function resetSystemDatabase() {
-    if (confirm("¿Estás seguro de que deseas formatear todos los datos del sistema? Se perderán las modificaciones personalizadas y el inventario volverá a su estado base.")) {
+    // Gate de rol: solo admin puede formatear. En modo demo el rol vive en la
+    // sesión de localStorage (no es un control de seguridad real —eso exige
+    // backend—, pero evita el borrado accidental por un rol operativo).
+    const _session = typeof getVulcanSession === 'function' ? getVulcanSession() : null;
+    if (_session && _session.role && _session.role !== 'admin') {
+        if (typeof triggerToast === 'function') {
+            triggerToast('error', 'Solo un administrador puede formatear la base de datos.');
+        }
+        return;
+    }
+
+    // Confirmación tipeada: hay que escribir FORMATEAR para proceder. Un solo
+    // click de confirm() es demasiado frágil para una acción destructiva total.
+    const _typed = prompt('Esta acción borra TODOS los datos y no se puede deshacer.\nEscribe FORMATEAR (en mayúsculas) para confirmar:');
+    if (_typed !== 'FORMATEAR') {
+        if (_typed !== null && typeof triggerToast === 'function') {
+            triggerToast('info', 'Formateo cancelado: el texto no coincide.');
+        }
+        return;
+    }
+    {
         [
             "aura_products", "aura_invoices", "aura_settings", "aura_picking",
             "aura_seed_version", "aura_wms_log", "aura_clients",
@@ -541,7 +570,7 @@ function triggerToast(type, message) {
 
     toast.innerHTML = `
         ${svgIcon}
-        <span class="toast-message">${message}</span>
+        <span class="toast-message">${escapeHtml(message)}</span>
     `;
 
     container.appendChild(toast);
