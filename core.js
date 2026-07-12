@@ -539,6 +539,11 @@ function switchTab(tabId) {
             headerDesc.innerText = "Ventas, rotación, rentabilidad y desempeño por cliente — en una sola vista exportable.";
             renderReportes();
             break;
+        case 'purchasing':
+            headerTitle.innerText = "Compras a Proveedores";
+            headerDesc.innerText = "Solicitudes de pedido, generación de órdenes de compra y consulta por proveedor.";
+            renderCompras();
+            break;
         case 'settings':
             headerTitle.innerText = "Parámetros Técnicos";
             headerDesc.innerText = "Configuraciones tributarias, moneda de operación y restablecimiento.";

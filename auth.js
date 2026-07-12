@@ -17,8 +17,8 @@ const VULCAN_USERS = [
 
 // --- Mapa de permisos: qué pestañas puede ver cada rol ---
 const ROLE_TABS = {
-    admin: ["dashboard", "inventory", "invoicing", "clientes", "logistics", "picking", "dataentry", "inventario", "reports", "settings"],
-    warehouse: ["dashboard", "inventory", "logistics", "picking", "inventario"],
+    admin: ["dashboard", "inventory", "invoicing", "clientes", "logistics", "picking", "dataentry", "inventario", "reports", "purchasing", "settings"],
+    warehouse: ["dashboard", "inventory", "logistics", "picking", "inventario", "purchasing"],
     // Reportes: cashier ve Ventas y Por Cliente (datos de su propia operación de
     // caja); se le da acceso al módulo completo por simplicidad de v1 (no hay
     // aún un recorte de sub-pestañas por rol), igual que Warehouse ya ve todo
@@ -327,7 +327,7 @@ function initAppSession() {
     }
 
     // 2. Ocultar módulos (pestañas) no permitidos para el rol
-    const allTabs = ["dashboard", "inventory", "invoicing", "clientes", "logistics", "picking", "dataentry", "inventario", "reports", "settings"];
+    const allTabs = ["dashboard", "inventory", "invoicing", "clientes", "logistics", "picking", "dataentry", "inventario", "reports", "purchasing", "settings"];
     allTabs.forEach(tab => {
         const link = document.getElementById(`nav-${tab}`);
         if (!link) return;

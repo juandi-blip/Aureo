@@ -16,6 +16,7 @@ const PERMISOS_TABS = [
     { id: 'dataentry', label: 'Ingreso de Datos' },
     { id: 'inventario', label: 'Inventario (Conteos Físicos)' },
     { id: 'reports', label: 'Reportes' },
+    { id: 'purchasing', label: 'Compras' },
     { id: 'settings', label: 'Configuración' }
 ];
 

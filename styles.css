@@ -3312,3 +3312,49 @@ body::before {
         row-gap: 0.5rem;
     }
 }
+
+/* Módulo Compras a Proveedores */
+.compras-group-row td {
+    background-color: var(--bg-subtle);
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    padding: 0.65rem 1.5rem;
+}
+
+.compras-detail-row td {
+    padding: 1rem 1.5rem;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.compras-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.compras-detail-table th,
+.compras-detail-table td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.82rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+}
+
+.compras-qty-input {
+    width: 80px;
+}
+
+.compras-prov-select {
+    min-width: 160px;
+}
+
+.compras-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-subtle);
+    flex-wrap: wrap;
+}
