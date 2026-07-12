@@ -17,21 +17,9 @@ const VULCAN_USERS = [
 
 // --- Mapa de permisos: qué pestañas puede ver cada rol ---
 const ROLE_TABS = {
-    admin: ["dashboard", "inventory", "invoicing", "clientes", "logistics", "picking", "dataentry", "inventario", "reports", "purchasing", "settings"],
-    // Warehouse ve Compras: es quien detecta el stock bajo en el día a día y
-    // arma/ajusta la solicitud de pedido antes de que se genere la orden de
-    // compra — el mismo criterio que ya le da acceso a Logística/WMS e
-    // Inventario aunque la decisión final de compra sea administrativa.
-    warehouse: ["dashboard", "inventory", "logistics", "picking", "inventario", "purchasing"],
-    // Reportes: cashier ve Ventas y Por Cliente (datos de su propia operación de
-    // caja); se le da acceso al módulo completo por simplicidad de v1 (no hay
-    // aún un recorte de sub-pestañas por rol), igual que Warehouse ya ve todo
-    // Logística aunque parte de esos datos no le apliquen operativamente.
-    // Warehouse NO ve Reportes: Rotación ya la tiene disponible en Logística/WMS
-    // y Ventas/Rentabilidad/Por Cliente no son de su resorte operativo.
-    // Cashier NO ve Compras: es un flujo de reabastecimiento/depósito, ajeno
-    // a la operación de caja (igual que no ve Logística/WMS ni Picking).
-    cashier: ["dashboard", "invoicing", "clientes", "reports"]
+    admin: ["dashboard", "inventory", "invoicing", "logistics", "picking", "dataentry", "inventario", "compras", "settings"],
+    warehouse: ["dashboard", "inventory", "logistics", "picking", "inventario", "compras"],
+    cashier: ["dashboard", "invoicing"]
 };
 
 const ROLE_LABELS = {
@@ -43,58 +31,6 @@ const ROLE_LABELS = {
 // --- Configuración de sesión ---
 const SESSION_KEY = "vulcan_session";
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 horas
-
-// ==========================================================================
-//   PERMISOS GRANULARES — roles configurables (módulo "Permisos")
-//   Los 3 roles fijos de arriba (ROLE_TABS) siguen siendo la fuente de verdad
-//   de la primera carga: se "siembran" una única vez en localStorage como
-//   registros editables. Desde ese momento, getAllowedTabs() lee SIEMPRE de
-//   este storage (no de la constante ROLE_TABS), para que un admin pueda
-//   crear roles nuevos o reconfigurar los 3 existentes y que tenga efecto real.
-// ==========================================================================
-const ROLES_KEY = "aura_roles";
-const USER_ROLE_OVERRIDES_KEY = "aura_user_role_overrides";
-
-function getStoredRoles() {
-    try {
-        const raw = localStorage.getItem(ROLES_KEY);
-        if (raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-        }
-    } catch (e) {
-        // storage corrupto: re-sembrar abajo
-    }
-    // Primera carga (o storage vacío/corrupto): sembrar desde ROLE_TABS.
-    // builtIn:true marca los 3 roles que no se pueden eliminar.
-    const seeded = Object.keys(ROLE_TABS).map(roleId => ({
-        id: roleId,
-        name: ROLE_LABELS[roleId] || roleId,
-        tabs: [...ROLE_TABS[roleId]],
-        builtIn: true
-    }));
-    localStorage.setItem(ROLES_KEY, JSON.stringify(seeded));
-    return seeded;
-}
-
-function saveStoredRoles(roles) {
-    localStorage.setItem(ROLES_KEY, JSON.stringify(roles));
-}
-
-// --- Asignación opcional usuario→rol (solo para los 3 usuarios demo) ---
-function getUserRoleOverrides() {
-    try {
-        const raw = localStorage.getItem(USER_ROLE_OVERRIDES_KEY);
-        const parsed = raw ? JSON.parse(raw) : null;
-        return (parsed && typeof parsed === 'object') ? parsed : {};
-    } catch (e) {
-        return {};
-    }
-}
-
-function saveUserRoleOverrides(overrides) {
-    localStorage.setItem(USER_ROLE_OVERRIDES_KEY, JSON.stringify(overrides || {}));
-}
 
 // ==========================================================================
 //   HELPERS DE SESIÓN
@@ -135,11 +71,6 @@ function clearVulcanSession() {
 }
 
 function getAllowedTabs(role) {
-    const roles = getStoredRoles();
-    const def = roles.find(r => r.id === role);
-    if (def && Array.isArray(def.tabs)) return def.tabs;
-    // Fallback de seguridad si el rol no existe en el storage configurable
-    // (p.ej. storage manipulado a mano): usar el mapa fijo original o Dashboard.
     return ROLE_TABS[role] || ["dashboard"];
 }
 
@@ -154,32 +85,17 @@ function vulcanLogout() {
 // ==========================================================================
 const VULCAN_IS_LOGIN_PAGE = !!document.getElementById("login-form");
 
-// La demo ahora es responsive (drawer off-canvas + layout adaptativo): funciona
-// en celular y tablet, no solo escritorio. Ya no redirigimos a desktop-only.html;
-// se conserva ese archivo por si se quiere un gate opcional en el futuro.
-
 (function guardImmediate() {
-    // Página de login (selector de perfil): si ya hay sesión, entrar al sistema.
     if (VULCAN_IS_LOGIN_PAGE) {
+        // En la página de login: si ya hay sesión válida, ir directo al sistema
         if (getVulcanSession()) {
             window.location.replace("index.html");
         }
         return;
     }
-
-    // 3. Sistema principal en escritorio: entrada sin fricción (Opción B).
-    //    Si no hay sesión, entramos directo como admin (el prospecto ve todo el
-    //    producto de una). El selector de perfil sigue disponible: "Cerrar sesión"
-    //    lleva de vuelta a login.html para ver otros roles.
+    // En el sistema principal: si NO hay sesión válida, bloquear y mandar al login
     if (!getVulcanSession()) {
-        const adminUser = (typeof VULCAN_USERS !== "undefined")
-            ? VULCAN_USERS.find(u => u.username === "admin")
-            : null;
-        if (adminUser) {
-            setVulcanSession(adminUser, null);
-        } else {
-            window.location.replace("login.html");
-        }
+        window.location.replace("login.html");
     }
 })();
 
@@ -271,12 +187,7 @@ function initLoginForm() {
         if (!authOk) {
             const user = VULCAN_USERS.find(u => u.username === username && u.password === password);
             if (user) {
-                // La contraseña/usuario se validan exactamente igual que antes;
-                // lo único configurable es a qué ROL queda asignado ese usuario
-                // (ver Permisos → "Asignar rol a usuario"), por defecto su rol original.
-                const overrides = getUserRoleOverrides();
-                const effectiveRole = overrides[user.username] || user.role;
-                setVulcanSession({ ...user, role: effectiveRole }, null);
+                setVulcanSession(user, null);
                 authOk = true;
             }
         }
@@ -327,13 +238,10 @@ function initAppSession() {
     const nameEl = document.getElementById("session-username");
     const roleEl = document.getElementById("session-userrole");
     if (nameEl) nameEl.innerText = session.name;
-    if (roleEl) {
-        const roleDef = getStoredRoles().find(r => r.id === session.role);
-        roleEl.innerText = (roleDef && roleDef.name) || ROLE_LABELS[session.role] || session.role;
-    }
+    if (roleEl) roleEl.innerText = ROLE_LABELS[session.role] || session.role;
 
     // 2. Ocultar módulos (pestañas) no permitidos para el rol
-    const allTabs = ["dashboard", "inventory", "invoicing", "clientes", "logistics", "picking", "dataentry", "inventario", "reports", "purchasing", "settings"];
+    const allTabs = ["dashboard", "inventory", "invoicing", "logistics", "picking", "inventario", "settings"];
     allTabs.forEach(tab => {
         const link = document.getElementById(`nav-${tab}`);
         if (!link) return;

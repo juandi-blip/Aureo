@@ -9,18 +9,18 @@
     const PRODUCTS = [
         { id: "1", name: "Rotomartillo Percutor SDS-Max 1500W (Ferrox)", sku: "SKU-FRX-1500", category: "Herramientas Eléctricas", price: 489.00, stock: 8, threshold: 3, lot: "L-2938", mfgDate: "2026-01-15", expDate: "2028-06-15", warehouse: "Bodega Principal", aisle: "D", shelf: 3, level: 1, pickingDistance: 32, brand: "Ferrox", supplier: "Ferrox Andina", expiry: "2031-01-15" },
         { id: "2", name: "Disco Flap de Desbaste 4.5\" G60 (Caja x50) (TitanPro)", sku: "SKU-TTP-FLAP60", category: "Consumibles", price: 125.00, stock: 22, threshold: 5, lot: "L-1102", mfgDate: "2026-02-10", expDate: "2027-12-31", warehouse: "Bodega Principal", aisle: "A", shelf: 1, level: 2, pickingDistance: 8, brand: "TitanPro", supplier: "TitanPro Abrasivos", expiry: "2026-08-15" },
-        { id: "3", name: "Juego de Llaves Allen de Titanio Profesional (Andina Tools)", sku: "SKU-AND-ALLEN", category: "Herramientas Manuales", price: 49.00, stock: 35, threshold: 8, lot: "L-5524", mfgDate: "2025-11-01", expDate: "2027-11-01", warehouse: "Bodega Principal", aisle: "B", shelf: 2, level: 1, pickingDistance: 15, brand: "Andina Tools", supplier: "Andina Tools S.A.S.", expiry: "2035-11-01" },
+        { id: "3", name: "Juego de Llaves Allen de Titanio Profesional (Andina Tools)", sku: "SKU-AND-ALLEN", category: "Herramientas Manuales", price: 49.00, stock: 35, threshold: 8, lot: "L-5524", mfgDate: "2025-11-01", expDate: "2027-11-01", warehouse: "Bodega Principal", aisle: "B", shelf: 2, level: 1, pickingDistance: 15, brand: "Andina Tools", supplier: "Andina Tools SpA", expiry: "2035-11-01" },
         { id: "4", name: "Compresor de Aire Trifásico 3HP 100L (Vulcan Air)", sku: "SKU-VUL-100L", category: "Maquinaria Pesada", price: 899.00, stock: 2, threshold: 1, lot: "L-0045", mfgDate: "2025-08-20", expDate: "2030-08-20", warehouse: "Bodega Principal", aisle: "A", shelf: 4, level: 1, pickingDistance: 6, brand: "Vulcan Air", supplier: "Vulcan Air Equipos", expiry: "2035-08-20" },
         { id: "5", name: "Soldadora Inverter Turbo Profesional 250A (SoldarTek)", sku: "SKU-STK-250A", category: "Herramientas Eléctricas", price: 649.00, stock: 0, threshold: 2, lot: "L-8821", mfgDate: "2025-10-15", expDate: "2027-10-15", warehouse: "Bodega Principal", aisle: "D", shelf: 5, level: 3, pickingDistance: 38, brand: "SoldarTek", supplier: "SoldarTek Industrial", expiry: "2027-04-15" },
         { id: "6", name: "Cerradura Digital Multianclaje de Alta Seguridad (SegurAndes)", sku: "SKU-SGA-DIGI", category: "Fijaciones", price: 185.00, stock: 12, threshold: 3, lot: "L-9021", mfgDate: "2026-03-01", expDate: "2029-03-01", warehouse: "Bodega Principal", aisle: "C", shelf: 1, level: 2, pickingDistance: 24, brand: "SegurAndes", supplier: "SegurAndes EPP", expiry: "2031-03-01" },
         { id: "7", name: "Taladro Atornillador Inalámbrico 20V MAX (Rhino Power)", sku: "SKU-RHP-20V", category: "Herramientas Eléctricas", price: 219.00, stock: 14, threshold: 4, lot: "L-7001", mfgDate: "2026-01-20", expDate: "2029-01-20", warehouse: "Bodega Principal", aisle: "B", shelf: 1, level: 1, pickingDistance: 12, brand: "Rhino Power", supplier: "Ferrox Andina", expiry: "2030-01-20" },
         { id: "8", name: "Amoladora Angular 4.5\" 900W (Kratos)", sku: "SKU-KRT-900W", category: "Herramientas Eléctricas", price: 139.00, stock: 9, threshold: 3, lot: "L-7002", mfgDate: "2025-12-05", expDate: "2028-12-05", warehouse: "Bodega Principal", aisle: "B", shelf: 2, level: 1, pickingDistance: 14, brand: "Kratos", supplier: "Ferrox Andina", expiry: "2026-10-05" },
         { id: "9", name: "Sierra Circular 7-1/4\" 1800W (Kratos)", sku: "SKU-KRT-1800", category: "Herramientas Eléctricas", price: 169.00, stock: 6, threshold: 2, lot: "L-7003", mfgDate: "2025-11-18", expDate: "2028-11-18", warehouse: "Bodega Principal", aisle: "B", shelf: 3, level: 2, pickingDistance: 16, brand: "Kratos", supplier: "Ferrox Andina", expiry: "2027-03-18" },
-        { id: "10", name: "Set Destornilladores Aislados 1000V x12 (Andina Tools)", sku: "SKU-AND-D12", category: "Herramientas Manuales", price: 89.00, stock: 21, threshold: 5, lot: "L-7004", mfgDate: "2026-02-01", expDate: "2030-02-01", warehouse: "Bodega Principal", aisle: "B", shelf: 1, level: 2, pickingDistance: 13, brand: "Andina Tools", supplier: "Andina Tools S.A.S.", expiry: "2031-02-01" },
+        { id: "10", name: "Set Destornilladores Aislados 1000V x12 (Andina Tools)", sku: "SKU-AND-D12", category: "Herramientas Manuales", price: 89.00, stock: 21, threshold: 5, lot: "L-7004", mfgDate: "2026-02-01", expDate: "2030-02-01", warehouse: "Bodega Principal", aisle: "B", shelf: 1, level: 2, pickingDistance: 13, brand: "Andina Tools", supplier: "Andina Tools SpA", expiry: "2031-02-01" },
         { id: "11", name: "Llave de Impacto Neumática 1/2\" (Vulcan Air)", sku: "SKU-VUL-IMP12", category: "Herramientas Eléctricas", price: 299.00, stock: 4, threshold: 2, lot: "L-7005", mfgDate: "2025-10-22", expDate: "2029-10-22", warehouse: "Bodega Principal", aisle: "B", shelf: 4, level: 1, pickingDistance: 18, brand: "Vulcan Air", supplier: "Vulcan Air Equipos", expiry: "2026-12-22" },
-        { id: "12", name: "Juego de Dados Cromo Vanadio 1/2\" x40 (Andina Tools)", sku: "SKU-AND-D40", category: "Herramientas Manuales", price: 75.00, stock: 28, threshold: 6, lot: "L-7006", mfgDate: "2026-01-12", expDate: "2030-01-12", warehouse: "Bodega Principal", aisle: "B", shelf: 2, level: 2, pickingDistance: 15, brand: "Andina Tools", supplier: "Andina Tools S.A.S.", expiry: "2036-01-12" },
-        { id: "13", name: "Martillo de Uña Fibra de Vidrio 16oz (HerraMax)", sku: "SKU-HMX-16OZ", category: "Herramientas Manuales", price: 18.50, stock: 42, threshold: 10, lot: "L-7007", mfgDate: "2026-03-08", expDate: "2031-03-08", warehouse: "Bodega Principal", aisle: "B", shelf: 3, level: 1, pickingDistance: 15, brand: "HerraMax", supplier: "Andina Tools S.A.S.", expiry: "2036-03-08" },
-        { id: "14", name: "Flexómetro Profesional 8m Anti-impacto (HerraMax)", sku: "SKU-HMX-8M", category: "Herramientas Manuales", price: 14.90, stock: 55, threshold: 12, lot: "L-7008", mfgDate: "2026-02-25", expDate: "2031-02-25", warehouse: "Bodega Principal", aisle: "A", shelf: 2, level: 1, pickingDistance: 9, brand: "HerraMax", supplier: "Andina Tools S.A.S.", expiry: "2031-02-25" },
+        { id: "12", name: "Juego de Dados Cromo Vanadio 1/2\" x40 (Andina Tools)", sku: "SKU-AND-D40", category: "Herramientas Manuales", price: 75.00, stock: 28, threshold: 6, lot: "L-7006", mfgDate: "2026-01-12", expDate: "2030-01-12", warehouse: "Bodega Principal", aisle: "B", shelf: 2, level: 2, pickingDistance: 15, brand: "Andina Tools", supplier: "Andina Tools SpA", expiry: "2036-01-12" },
+        { id: "13", name: "Martillo de Uña Fibra de Vidrio 16oz (HerraMax)", sku: "SKU-HMX-16OZ", category: "Herramientas Manuales", price: 18.50, stock: 42, threshold: 10, lot: "L-7007", mfgDate: "2026-03-08", expDate: "2031-03-08", warehouse: "Bodega Principal", aisle: "B", shelf: 3, level: 1, pickingDistance: 15, brand: "HerraMax", supplier: "Andina Tools SpA", expiry: "2036-03-08" },
+        { id: "14", name: "Flexómetro Profesional 8m Anti-impacto (HerraMax)", sku: "SKU-HMX-8M", category: "Herramientas Manuales", price: 14.90, stock: 55, threshold: 12, lot: "L-7008", mfgDate: "2026-02-25", expDate: "2031-02-25", warehouse: "Bodega Principal", aisle: "A", shelf: 2, level: 1, pickingDistance: 9, brand: "HerraMax", supplier: "Andina Tools SpA", expiry: "2031-02-25" },
         { id: "15", name: "Guantes Anticorte Nivel 5 (Caja x12 pares) (SegurAndes)", sku: "SKU-SGA-GL5", category: "Consumibles", price: 64.00, stock: 18, threshold: 5, lot: "L-7009", mfgDate: "2026-01-05", expDate: "2026-07-10", warehouse: "Bodega Principal", aisle: "A", shelf: 1, level: 1, pickingDistance: 7, brand: "SegurAndes", supplier: "SegurAndes EPP", expiry: "2026-05-20" },
         { id: "16", name: "Casco de Seguridad con Ratchet (SegurAndes)", sku: "SKU-SGA-CAS", category: "Consumibles", price: 32.00, stock: 30, threshold: 8, lot: "L-7010", mfgDate: "2026-02-14", expDate: "2029-02-14", warehouse: "Bodega Principal", aisle: "A", shelf: 1, level: 2, pickingDistance: 8, brand: "SegurAndes", supplier: "SegurAndes EPP", expiry: "2031-02-14" },
         { id: "17", name: "Lentes de Seguridad Antiempañe (Caja x20) (SegurAndes)", sku: "SKU-SGA-LEN20", category: "Consumibles", price: 48.00, stock: 26, threshold: 6, lot: "L-7011", mfgDate: "2026-03-02", expDate: "2028-03-02", warehouse: "Bodega Principal", aisle: "A", shelf: 2, level: 2, pickingDistance: 9, brand: "SegurAndes", supplier: "SegurAndes EPP", expiry: "2026-08-20" },
@@ -39,16 +39,16 @@
 
     // --- CLIENTES FICTICIOS ---
     const CLIENTS = [
-        { name: "Constructora Horizonte S.A.S.", rut: "NIT 830.412.887-3" },
-        { name: "Minera del Cauca S.A.S.", rut: "NIT 900.554.120-8" },
-        { name: "Metalmecánica del Caribe", rut: "NIT 901.203.446-1" },
-        { name: "Ingeniería y Montajes Cordillera S.A.S.", rut: "NIT 830.980.332-5" },
-        { name: "Servicios Industriales del Magdalena", rut: "NIT 900.115.209-1" },
-        { name: "Agroindustrial Valle del Cauca", rut: "NIT 890.640.518-7" },
-        { name: "Taller Mecánico El Fundador", rut: "CC 79.774.905" },
-        { name: "Comercial Ferretera del Sur", rut: "NIT 901.856.041-9" },
-        { name: "Energía Solar Andina S.A.S.", rut: "NIT 900.220.874-0" },
-        { name: "Distribuidora Bahía Dorada", rut: "NIT 830.417.336-4" }
+        { name: "Constructora Horizonte Ltda.", rut: "RUT-76.412.887-3" },
+        { name: "Minera Atacama Norte", rut: "RUT-96.554.120-8" },
+        { name: "Maestranza del Pacífico", rut: "RUT-77.203.446-K" },
+        { name: "Ingeniería y Montajes Cordillera", rut: "RUT-76.980.332-5" },
+        { name: "Servicios Industriales Loa", rut: "RUT-78.115.209-1" },
+        { name: "Agroindustrial Valle Verde", rut: "RUT-79.640.518-7" },
+        { name: "Taller Mecánico El Fundador", rut: "RUT-12.774.905-2" },
+        { name: "Comercial Ferretera Sur", rut: "RUT-77.856.041-9" },
+        { name: "Energía Solar Altiplano", rut: "RUT-76.220.874-0" },
+        { name: "Pesquera Bahía Dorada", rut: "RUT-88.417.336-4" }
     ];
 
     // [díasAtrás, clienteIdx, items [productId, qty], descuentoPct, status]
@@ -146,15 +146,16 @@
     }
 
     // --- INGRESO DE DATOS ---
+    // postal: código postal colombiano (4-72) del municipio del proveedor
     const SUPPLIERS = [
-        { id: "PROV-0001", name: "Ferrox Andina", acreedor: "4000001" },
-        { id: "PROV-0002", name: "TitanPro Abrasivos", acreedor: "4000002" },
-        { id: "PROV-0003", name: "Andina Tools S.A.S.", acreedor: "4000003" },
-        { id: "PROV-0004", name: "Vulcan Air Equipos", acreedor: "4000004" },
-        { id: "PROV-0005", name: "SoldarTek Industrial", acreedor: "4000005" },
-        { id: "PROV-0006", name: "SegurAndes EPP", acreedor: "4000006" },
-        { id: "PROV-0007", name: "FixPro Fijaciones", acreedor: "4000007" },
-        { id: "PROV-0008", name: "NordSteel Import", acreedor: "4000008" }
+        { id: "PROV-0001", name: "Ferrox Andina", acreedor: "4000001", postal: "110111" },
+        { id: "PROV-0002", name: "TitanPro Abrasivos", acreedor: "4000002", postal: "050001" },
+        { id: "PROV-0003", name: "Andina Tools SpA", acreedor: "4000003", postal: "760001" },
+        { id: "PROV-0004", name: "Vulcan Air Equipos", acreedor: "4000004", postal: "080001" },
+        { id: "PROV-0005", name: "SoldarTek Industrial", acreedor: "4000005", postal: "680001" },
+        { id: "PROV-0006", name: "SegurAndes EPP", acreedor: "4000006", postal: "130001" },
+        { id: "PROV-0007", name: "FixPro Fijaciones", acreedor: "4000007", postal: "540001" },
+        { id: "PROV-0008", name: "NordSteel Import", acreedor: "4000008", postal: "470001" }
     ];
 
     const MATERIALS = [
@@ -314,12 +315,76 @@
         });
     }
 
+    // --- COMPRAS A PROVEEDORES ---
+    // Proveedores adicionales por producto (un producto puede comprarse a varios).
+    const PRODUCT_SUPPLIERS_EXTRA = {
+        "2": ["NordSteel Import"],
+        "5": ["Ferrox Andina"],
+        "18": ["FixPro Fijaciones"],
+        "21": ["NordSteel Import"],
+        "24": ["FixPro Fijaciones"]
+    };
+
+    function buildCompras(today) {
+        const productSuppliers = {};
+        PRODUCTS.forEach(function (p) {
+            productSuppliers[p.id] = [p.supplier].concat(PRODUCT_SUPPLIERS_EXTRA[p.id] || []);
+        });
+
+        function prod(pid) { return PRODUCTS.find(function (x) { return x.id === pid; }); }
+        // Costo estimado de compra: ~62% del precio de venta
+        function cost(pid) { const p = prod(pid); return p ? Math.round(p.price * 62) / 100 : 0; }
+        function ocItem(pid, qty) {
+            const p = prod(pid);
+            return { productId: pid, name: p.name, sku: p.sku, qty: qty, unitCost: cost(pid) };
+        }
+        function ocTotal(items) {
+            return Math.round(items.reduce(function (s, it) { return s + it.qty * it.unitCost; }, 0) * 100) / 100;
+        }
+
+        // Solicitudes manuales pendientes (las automáticas las calcula la app según stock vs punto de reorden)
+        const solicitudes = [
+            { id: "SOL-0001", productId: "13", supplier: "Andina Tools SpA", qty: 24, origin: "Manual", status: "pendiente", date: iso(daysAgo(today, 2)) },
+            { id: "SOL-0002", productId: "27", supplier: "NordSteel Import", qty: 4, origin: "Manual", status: "pendiente", date: iso(daysAgo(today, 1)) },
+            { id: "SOL-0003", productId: "16", supplier: "SegurAndes EPP", qty: 12, origin: "Manual", status: "pendiente", date: iso(today) }
+        ];
+
+        // OCs históricas coherentes con las etiquetas de recepción (OC-4501..4506 ya recibidas)
+        // [díasAtrásRecepción, proveedor, productId, qty, número]
+        const OC_PLAN = [
+            [9, "Ferrox Andina", "2", 40, "OC-4501"],
+            [8, "TitanPro Abrasivos", "3", 25, "OC-4502"],
+            [6, "SegurAndes EPP", "21", 20, "OC-4503"],
+            [5, "FixPro Fijaciones", "22", 15, "OC-4504"],
+            [3, "Andina Tools SpA", "4", 12, "OC-4505"],
+            [1, "NordSteel Import", "24", 5, "OC-4506"]
+        ];
+        const ocs = OC_PLAN.map(function (r) {
+            const items = [ocItem(r[2], r[3])];
+            return {
+                id: r[4], date: iso(daysAgo(today, r[0] + 3)), supplier: r[1],
+                items: items, total: ocTotal(items),
+                status: "Recibida", receivedDate: iso(daysAgo(today, r[0]))
+            };
+        });
+        // Una OC pendiente de recibir
+        const pendItems = [ocItem("25", 2), ocItem("11", 3)];
+        ocs.push({
+            id: "OC-4507", date: iso(daysAgo(today, 1)), supplier: "Vulcan Air Equipos",
+            items: pendItems, total: ocTotal(pendItems),
+            status: "Pendiente", receivedDate: null
+        });
+
+        return { productSuppliers: productSuppliers, solicitudes: solicitudes, ocs: ocs, nextOcSeq: 4508 };
+    }
+
     window.DEMO_DATA = {
         products: PRODUCTS,
         buildInvoices: buildInvoices,
         buildPicking: buildPicking,
         buildDE: buildDE,
         buildInvData: buildInvData,
-        buildWmsLog: buildWmsLog
+        buildWmsLog: buildWmsLog,
+        buildCompras: buildCompras
     };
 })();
