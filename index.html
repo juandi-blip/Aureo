@@ -128,17 +128,6 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" onclick="switchTab('purchasing')" id="nav-purchasing">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="9" cy="21" r="1" />
-                            <circle cx="20" cy="21" r="1" />
-                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                        </svg>
-                        <span>Compras</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" onclick="switchTab('settings')" id="nav-settings">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
@@ -1056,22 +1045,6 @@
             <div id="reports-content"></div>
         </section>
 
-        <!-- COMPRAS VIEW -->
-        <section class="page-container" id="purchasing-view">
-            <!-- Sub-pestañas del módulo -->
-            <div class="picking-subtabs">
-                <button class="picking-subtab active" id="pursub-solicitud" onclick="switchPurchasingSub('solicitud')">
-                    Solicitud de Pedido
-                </button>
-                <button class="picking-subtab" id="pursub-ordenes" onclick="switchPurchasingSub('ordenes')">
-                    Órdenes de Compra
-                </button>
-            </div>
-
-            <!-- Contenido dinámico de la sub-pestaña activa -->
-            <div id="purchasing-content"></div>
-        </section>
-
         <!-- INVENTARIO VIEW -->
         <section class="page-container" id="inventario-view">
             <div class="dataentry-tabs" id="inventario-tabs"></div>
@@ -1487,7 +1460,6 @@
     <script src="invoicing.js"></script>
     <script src="picking.js"></script>
     <script src="reports.js"></script>
-    <script src="purchasing.js"></script>
     <script src="permissions.js"></script>
     <!-- Melyor: socio operativo de IA, widget de chat flotante (fase 2).
          Backend serverless en api/melyor-chat.js — sin ANTHROPIC_API_KEY

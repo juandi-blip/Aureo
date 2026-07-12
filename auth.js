@@ -17,20 +17,14 @@ const VULCAN_USERS = [
 
 // --- Mapa de permisos: qué pestañas puede ver cada rol ---
 const ROLE_TABS = {
-    admin: ["dashboard", "inventory", "invoicing", "clientes", "logistics", "picking", "dataentry", "inventario", "reports", "purchasing", "settings"],
-    // Warehouse ve Compras: es quien detecta el stock bajo en el día a día y
-    // arma/ajusta la solicitud de pedido antes de que se genere la orden de
-    // compra — el mismo criterio que ya le da acceso a Logística/WMS e
-    // Inventario aunque la decisión final de compra sea administrativa.
-    warehouse: ["dashboard", "inventory", "logistics", "picking", "inventario", "purchasing"],
+    admin: ["dashboard", "inventory", "invoicing", "clientes", "logistics", "picking", "dataentry", "inventario", "reports", "settings"],
+    warehouse: ["dashboard", "inventory", "logistics", "picking", "inventario"],
     // Reportes: cashier ve Ventas y Por Cliente (datos de su propia operación de
     // caja); se le da acceso al módulo completo por simplicidad de v1 (no hay
     // aún un recorte de sub-pestañas por rol), igual que Warehouse ya ve todo
     // Logística aunque parte de esos datos no le apliquen operativamente.
     // Warehouse NO ve Reportes: Rotación ya la tiene disponible en Logística/WMS
     // y Ventas/Rentabilidad/Por Cliente no son de su resorte operativo.
-    // Cashier NO ve Compras: es un flujo de reabastecimiento/depósito, ajeno
-    // a la operación de caja (igual que no ve Logística/WMS ni Picking).
     cashier: ["dashboard", "invoicing", "clientes", "reports"]
 };
 
@@ -333,7 +327,7 @@ function initAppSession() {
     }
 
     // 2. Ocultar módulos (pestañas) no permitidos para el rol
-    const allTabs = ["dashboard", "inventory", "invoicing", "clientes", "logistics", "picking", "dataentry", "inventario", "reports", "purchasing", "settings"];
+    const allTabs = ["dashboard", "inventory", "invoicing", "clientes", "logistics", "picking", "dataentry", "inventario", "reports", "settings"];
     allTabs.forEach(tab => {
         const link = document.getElementById(`nav-${tab}`);
         if (!link) return;
