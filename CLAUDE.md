@@ -24,11 +24,13 @@ Pure frontend SPA — no framework, no bundler, no npm.
 - `login.html` + `login.css` — authentication page
 - `index.html` + `styles.css` — main application shell (all views embedded as `<section>` elements)
 
-**Scripts (load order matters):**
-- `auth.js` — must load before `app.js`. Runs an IIFE on load that immediately redirects unauthenticated users. Manages `vulcan_session` in `localStorage` (8-hour TTL), role-based tab visibility, and wraps `window.switchTab` to enforce permissions.
-- `app.js` — all application logic: state, rendering, CRUD for products/invoices/picking/data-entry, ABC analysis, WMS heatmap, chart rendering.
+**Scripts (load order matters — see the bottom of `index.html` for the authoritative order):**
+- `auth.js` — loads first. Runs an IIFE that immediately redirects unauthenticated users. Manages `vulcan_session` in `localStorage` (8-hour TTL), role-based tab visibility, and wraps `window.switchTab` to enforce permissions.
+- `demo-data.js` — fixture data for the commercial demo.
+- `core.js` — shared foundation: the global `state` object, `switchTab`, `API_BASE`/`AUTH_API`, and the `apiGet`/`apiPut` helpers. Must load before every domain module below.
+- Domain modules, one per area: `clients.js`, `alerts.js`, `inventory.js`, `data-entry.js`, `wms.js`, `dashboard.js`, `inventory-ui.js`, `invoicing.js`, `picking.js`, `reports.js`, `purchasing.js`, `permissions.js`, `melyor.js` (the AI assistant).
 
-**Global state** is a single `state` object in `app.js` (products, invoices, pickingLists, materials, etc.). It is persisted to `localStorage` and optionally synced to the backend via `apiGet`/`apiPut` helpers.
+**Global state** is a single `state` object in `core.js` (products, invoices, pickingLists, materials, etc.). It is persisted to `localStorage` and optionally synced to the backend via `apiGet`/`apiPut` helpers.
 
 **Tab/view routing** is handled by `switchTab(tabId)` which toggles `.active` on `<section id="{tab}-view">` elements. The active tab is gated by the user's role via `ROLE_TABS` in `auth.js`.
 
@@ -48,11 +50,17 @@ Pure frontend SPA — no framework, no bundler, no npm.
 - **Logistics/WMS** — ABC rotation analysis, Pareto chart, warehouse heatmap, relocation recommendations
 - **Picking** — order preparation workflow with sub-tabs (nueva → proceso → completado)
 - **Data Entry** — configurable sub-tabs for materials, suppliers, locations, movements, transit, labels
+- **Clients (CRM)** — purchase history, notes, inactive-client detection
+- **Alerts** — proactive low-stock, inactive-client and pending-invoice warnings
+- **Reports** — sales, rotation, profitability and per-client reports, exportable
+- **Purchasing** — purchase orders grouped by supplier, auto-numbered
+- **Permissions** — configurable per-role access
+- **Melyor** — the AI assistant surfaced across the app (`melyor.js`)
 - **Settings** — company info, currency, tax ID; "Format Database" resets all localStorage data
 
 ## Backend Integration
 
-`auth.js` and `app.js` both detect `window.location.protocol === 'file:'` to set `API_BASE`/`AUTH_API` to `http://localhost:3001`. All API calls (JWT Bearer token) silently fall back to local data on failure.
+`auth.js` and `core.js` both detect `window.location.protocol === 'file:'` to set `API_BASE`/`AUTH_API` to `http://localhost:3001`. All API calls (JWT Bearer token) silently fall back to local data on failure.
 
 ## External Dependencies
 
