@@ -18,6 +18,10 @@ const VULCAN_USERS = [
 // --- Mapa de permisos: qué pestañas puede ver cada rol ---
 const ROLE_TABS = {
     admin: ["dashboard", "inventory", "invoicing", "clientes", "logistics", "picking", "dataentry", "inventario", "reports", "purchasing", "settings"],
+    // Warehouse ve Compras: es quien detecta el stock bajo en el día a día y
+    // arma/ajusta la solicitud de pedido antes de que se genere la orden de
+    // compra — el mismo criterio que ya le da acceso a Logística/WMS e
+    // Inventario aunque la decisión final de compra sea administrativa.
     warehouse: ["dashboard", "inventory", "logistics", "picking", "inventario", "purchasing"],
     // Reportes: cashier ve Ventas y Por Cliente (datos de su propia operación de
     // caja); se le da acceso al módulo completo por simplicidad de v1 (no hay
@@ -25,6 +29,8 @@ const ROLE_TABS = {
     // Logística aunque parte de esos datos no le apliquen operativamente.
     // Warehouse NO ve Reportes: Rotación ya la tiene disponible en Logística/WMS
     // y Ventas/Rentabilidad/Por Cliente no son de su resorte operativo.
+    // Cashier NO ve Compras: es un flujo de reabastecimiento/depósito, ajeno
+    // a la operación de caja (igual que no ve Logística/WMS ni Picking).
     cashier: ["dashboard", "invoicing", "clientes", "reports"]
 };
 
@@ -131,10 +137,17 @@ function clearVulcanSession() {
 function getAllowedTabs(role) {
     const roles = getStoredRoles();
     const def = roles.find(r => r.id === role);
-    if (def && Array.isArray(def.tabs)) return def.tabs;
     // Fallback de seguridad si el rol no existe en el storage configurable
     // (p.ej. storage manipulado a mano): usar el mapa fijo original o Dashboard.
-    return ROLE_TABS[role] || ["dashboard"];
+    let tabs = (def && Array.isArray(def.tabs)) ? def.tabs : (ROLE_TABS[role] || ["dashboard"]);
+    // Modo demo: "settings" incluye el editor de roles/permisos (ver
+    // permisos-card dentro de settings-view en index.html) — se oculta para
+    // que un visitante gateado no pueda reconfigurar roles y romper la demo
+    // dentro de su propia sesión de 30 min.
+    if (window.AURA_DEMO_MODE) {
+        tabs = tabs.filter(t => t !== "settings");
+    }
+    return tabs;
 }
 
 // Logout global (usado por el botón en el sidebar)
