@@ -264,10 +264,10 @@ function buildDE_MatRows(list) {
     }
     return list.map(m => `
         <tr>
-          <td style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--accent-gold);font-weight:700;">${m.id}</td>
-          <td style="font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:600;">${m.code}</td>
-          <td><span class="product-name">${m.desc}</span></td>
-          <td style="text-align:center;font-weight:600;">${m.unit}</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--accent-gold);font-weight:700;">${escapeHtml(m.id)}</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:600;">${escapeHtml(m.code)}</td>
+          <td><span class="product-name">${escapeHtml(m.desc)}</span></td>
+          <td style="text-align:center;font-weight:600;">${escapeHtml(m.unit)}</td>
           <td style="font-family:'JetBrains Mono',monospace;font-size:.8rem;">
             <span class="badge badge-info">${m.uom}</span>
           </td>
@@ -515,13 +515,13 @@ function renderDE_Proveedores() {
               <label class="form-label">Proveedor</label>
               <input type="text" class="form-input" id="de-prov-name" required
                 placeholder="Ej: Ferrox Andina Ltda."
-                value="${isEdit ? editing.name : ''}">
+                value="${isEdit ? escapeHtml(editing.name) : ''}">
             </div>
             <div class="form-group">
               <label class="form-label">Acreedor <span style="font-size:.78rem;color:var(--text-muted);">(código del proveedor)</span></label>
               <input type="text" class="form-input" id="de-prov-acreedor" required
                 placeholder="Ej: ACR-0012"
-                value="${isEdit ? editing.acreedor : ''}">
+                value="${isEdit ? escapeHtml(editing.acreedor) : ''}">
             </div>
           </div>
           <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:.5rem;">
@@ -612,9 +612,9 @@ function buildDE_ProvRows(list) {
     }
     return list.map(s => `
     <tr>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--accent-gold);font-weight:700;">${s.id}</td>
-      <td><span class="product-name">${s.name}</span></td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:600;">${s.acreedor || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--accent-gold);font-weight:700;">${escapeHtml(s.id)}</td>
+      <td><span class="product-name">${escapeHtml(s.name)}</span></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:600;">${escapeHtml(s.acreedor) || '—'}</td>
       <td style="text-align:center;">
         <div style="display:inline-flex;gap:.5rem;">
           <button class="btn btn-secondary btn-icon-only" onclick="editDE_Proveedor('${s.id}')" title="Editar">
@@ -763,8 +763,8 @@ function _renderDE_ProvImportPreview(filename) {
           <tbody>
             ${preview.map(r => `
             <tr>
-              <td>${r.name || '—'}</td>
-              <td style="font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:600;">${r.acreedor || '—'}</td>
+              <td>${escapeHtml(r.name) || '—'}</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:600;">${escapeHtml(r.acreedor) || '—'}</td>
             </tr>`).join('')}
             ${more > 0 ? `<tr><td colspan="2" style="text-align:center;color:var(--text-muted);font-size:.8rem;">... y ${more} fila(s) más</td></tr>` : ''}
           </tbody>
@@ -1234,7 +1234,7 @@ function renderDE_Movimientos() {
     const v = (f, fb = '') => isEdit ? (editing[f] ?? fb) : fb;
 
     const matOptions = state.materials.map(m =>
-        `<option value="${m.id}" ${isEdit && editing.materialId === m.id ? 'selected' : ''}>${m.id} — ${m.desc}</option>`
+        `<option value="${escapeHtml(m.id)}" ${isEdit && editing.materialId === m.id ? 'selected' : ''}>${escapeHtml(m.id)} — ${escapeHtml(m.desc)}</option>`
     ).join('');
 
     const ubicOptions = [...new Set(state.locations.map(l => l.base))].sort((a, b) => a - b).map(b =>
@@ -1882,13 +1882,13 @@ function exportDE_TrCSV() {
     const rows = [...records].reverse().map(m => {
         const mat = state.materials.find(x => x.id === m.materialId);
         return [
-            `"${(m.datetime || '').replace('T', ' ')}"`,
+            (m.datetime || '').replace('T', ' '),
             'En Tránsito',
             m.user || '',
             m.materialId || '',
-            `"${m.desc || ''}"`,
+            m.desc || '',
             mat?.unit || '',
-            `"${m.category || ''}"`,
+            m.category || '',
             m.um || '',
             m.transitUMB || '',
             m.lotAlm || '',
@@ -1898,7 +1898,7 @@ function exportDE_TrCSV() {
             m.qty || '',
             m.transitLocation || '',
             m.transitValidation || 'Pendiente'
-        ];
+        ].map(csvSafe);
     });
 
     const csv = '﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
@@ -2155,26 +2155,26 @@ function buildDE_RotRows(list) {
     }
     return [...list].reverse().map(l => `
     <tr>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:700;color:var(--accent-gold);">${l.serialImp || '—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.serialCita || '—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.fechaRec || '—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;">${l.semana || '—'}</td>
-      <td style="font-size:.82rem;">${l.proveedor || '—'}</td>
-      <td style="font-size:.82rem;">${l.auxiliar || '—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.documento || '—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.remesa || '—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.ordenCompra || '—'}</td>
-      <td style="text-align:center;font-weight:700;">${l.cantidad || '—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.sku || '—'}</td>
-      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem;">${l.textoBreve || '—'}</td>
-      <td><span class="badge badge-info">${l.um || '—'}</span></td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.umb || '—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.fFabricacion || '—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.fVencimiento || '—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.loteProv || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:700;color:var(--accent-gold);">${escapeHtml(l.serialImp) || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${escapeHtml(l.serialCita) || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${escapeHtml(l.fechaRec) || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;">${escapeHtml(l.semana) || '—'}</td>
+      <td style="font-size:.82rem;">${escapeHtml(l.proveedor) || '—'}</td>
+      <td style="font-size:.82rem;">${escapeHtml(l.auxiliar) || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${escapeHtml(l.documento) || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${escapeHtml(l.remesa) || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${escapeHtml(l.ordenCompra) || '—'}</td>
+      <td style="text-align:center;font-weight:700;">${escapeHtml(l.cantidad) || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${escapeHtml(l.sku) || '—'}</td>
+      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem;">${escapeHtml(l.textoBreve) || '—'}</td>
+      <td><span class="badge badge-info">${escapeHtml(l.um) || '—'}</span></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${escapeHtml(l.umb) || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${escapeHtml(l.fFabricacion) || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${escapeHtml(l.fVencimiento) || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${escapeHtml(l.loteProv) || '—'}</td>
       <td>
         <div style="display:inline-flex;align-items:center;gap:.5rem;">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${l.loteAlm || '—'}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;">${escapeHtml(l.loteAlm) || '—'}</span>
           <button class="btn btn-secondary btn-icon-only" onclick="printDE_RotLabel('${l.id}')" title="Imprimir rótulo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="6 9 6 2 18 2 18 9"/>

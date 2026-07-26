@@ -1463,13 +1463,13 @@ function filtrarConteosF() {
                     </svg>
                 </button>
             </td>
-            <td>${c.ubicacion || '—'}</td>
-            <td>${c.zona || '—'}</td>
-            <td><span class="badge badge-info">${c.codigoMaterial || '—'}</span></td>
-            <td>${c.descripcion || '—'}</td>
-            <td>${c.loteAlmacen || '—'}</td>
-            <td>${c.loteProveedor || '—'}</td>
-            <td>${c.fv || '—'}</td>
+            <td>${escapeHtml(c.ubicacion) || '—'}</td>
+            <td>${escapeHtml(c.zona) || '—'}</td>
+            <td><span class="badge badge-info">${escapeHtml(c.codigoMaterial) || '—'}</span></td>
+            <td>${escapeHtml(c.descripcion) || '—'}</td>
+            <td>${escapeHtml(c.loteAlmacen) || '—'}</td>
+            <td>${escapeHtml(c.loteProveedor) || '—'}</td>
+            <td>${escapeHtml(c.fv) || '—'}</td>
             <td>
                 <input type="number" min="0"
                     style="width:80px; padding:0.25rem 0.4rem; border:1px solid var(--border-subtle); border-radius:4px; font-size:0.82rem; background:var(--bg-primary); color:var(--text-primary);"
@@ -1579,16 +1579,16 @@ function filtrarConciliacion() {
                         </svg>
                     </button>
                 </td>
-                <td>${c.ubicacion || '—'}</td>
-                <td><span class="badge badge-info">${c.codigoMaterial || '—'}</span></td>
-                <td>${c.descripcion || '—'}</td>
-                <td>${c.loteAlmacen || '—'}</td>
-                <td>${c.loteProveedor || '—'}</td>
+                <td>${escapeHtml(c.ubicacion) || '—'}</td>
+                <td><span class="badge badge-info">${escapeHtml(c.codigoMaterial) || '—'}</span></td>
+                <td>${escapeHtml(c.descripcion) || '—'}</td>
+                <td>${escapeHtml(c.loteAlmacen) || '—'}</td>
+                <td>${escapeHtml(c.loteProveedor) || '—'}</td>
                 <td style="text-align:right; font-weight:500;">${sis}</td>
                 <td style="text-align:right; font-weight:500;">${fis}</td>
                 <td style="text-align:right; font-weight:700; ${diffColor}">${diff > 0 ? '+' : ''}${diff}</td>
                 <td style="text-align:center;">${coincide}</td>
-                <td style="font-size:0.8rem; color:var(--text-secondary);">${c.obs || '—'}</td>
+                <td style="font-size:0.8rem; color:var(--text-secondary);">${escapeHtml(c.obs) || '—'}</td>
             </tr>
         `;
     }).join('');

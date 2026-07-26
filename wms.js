@@ -325,7 +325,7 @@ function _renderOccAccordion() {
                 return `<div style="background:rgba(36,31,26,.04);border-radius:8px;padding:.75rem 1rem;margin:.3rem 0;border-left:3px solid ${abcClr};">
                     <div style="display:grid;grid-template-columns:90px 1fr 90px 1fr;gap:.3rem .6rem;font-size:.78rem;align-items:start;">
                         <span style="color:var(--text-muted);font-size:.72rem;">SKU</span>
-                        <span style="font-family:monospace;font-weight:700;color:var(--text-primary);">${p.sku || '—'}</span>
+                        <span style="font-family:monospace;font-weight:700;color:var(--text-primary);">${escapeHtml(p.sku) || '—'}</span>
                         <span style="color:var(--text-muted);font-size:.72rem;">Clase ABC</span>
                         <span style="font-weight:700;color:${abcClr};">Clase ${abcCls}</span>
 
@@ -333,9 +333,9 @@ function _renderOccAccordion() {
                         <span style="font-weight:600;color:var(--text-primary);grid-column:2/5;">${escapeHtml(p.name)}</span>
 
                         <span style="color:var(--text-muted);font-size:.72rem;">Marca</span>
-                        <span>${p.brand || '—'}</span>
+                        <span>${escapeHtml(p.brand) || '—'}</span>
                         <span style="color:var(--text-muted);font-size:.72rem;">Categoría</span>
-                        <span>${p.category || '—'}</span>
+                        <span>${escapeHtml(p.category) || '—'}</span>
 
                         <span style="color:var(--text-muted);font-size:.72rem;">Stock</span>
                         <span style="font-weight:700;color:${stockLow ? '#A8442C' : 'var(--text-primary)'};">${p.stock} uds ${stockLow ? '⚠' : ''}</span>
@@ -1049,7 +1049,7 @@ function openSlotModal(aisleId, shelf, products) {
                     <div class="kv-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:0.35rem 1rem;font-size:0.78rem;color:var(--text-secondary);">
                         <span>Clase ABC <strong style="color:${_abcColors[p.abcClass]};">Clase ${p.abcClass}</strong></span>
                         <span>Score <strong style="color:var(--text-primary);">${p.abcScore.toFixed(1)}</strong></span>
-                        <span>SKU <strong style="color:var(--text-primary);">${p.sku || '—'}</strong></span>
+                        <span>SKU <strong style="color:var(--text-primary);">${escapeHtml(p.sku) || '—'}</strong></span>
                         <span>Stock <strong style="color:var(--text-primary);">${p.stock ?? '—'} uds</strong></span>
                         <span>Distancia <strong style="color:var(--text-primary);">${p.pickingDistance}m</strong></span>
                         <span>Estado <strong style="${p.isMisplaced ? 'color:var(--accent-rose)' : 'color:var(--accent-emerald)'};">${p.isMisplaced ? '⚠️ Desalineado' : '✅ Correcto'}</strong></span>
@@ -1409,11 +1409,11 @@ function renderManualRelocation() {
             const d = new Date(e.ts);
             return `<tr>
                 <td style="font-size:0.78rem;color:var(--text-muted);">${d.toLocaleDateString('es-CO')} ${d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</td>
-                <td style="font-size:0.82rem;">${e.productName}</td>
-                <td style="font-family:monospace;font-size:0.78rem;">${e.sku}</td>
-                <td style="text-align:center;font-weight:700;color:var(--accent-rose,#A8442C);">${e.fromAisle}-${e.fromShelf}</td>
-                <td style="text-align:center;font-weight:700;color:var(--accent-emerald,#5E7D52);">${e.toAisle}-${e.toShelf}</td>
-                <td style="font-size:0.78rem;color:var(--text-muted);">${e.by}</td>
+                <td style="font-size:0.82rem;">${escapeHtml(e.productName)}</td>
+                <td style="font-family:monospace;font-size:0.78rem;">${escapeHtml(e.sku)}</td>
+                <td style="text-align:center;font-weight:700;color:var(--accent-rose,#A8442C);">${escapeHtml(e.fromAisle)}-${escapeHtml(e.fromShelf)}</td>
+                <td style="text-align:center;font-weight:700;color:var(--accent-emerald,#5E7D52);">${escapeHtml(e.toAisle)}-${escapeHtml(e.toShelf)}</td>
+                <td style="font-size:0.78rem;color:var(--text-muted);">${escapeHtml(e.by)}</td>
             </tr>`;
         }).join('');
 
@@ -1569,7 +1569,7 @@ function renderABCTable(classification) {
                 <div class="product-cell">
                     <div class="product-meta-info">
                         <span class="product-name">${escapeHtml(p.name)}</span>
-                        <span class="product-sku">${p.sku} &bull; <strong style="color:var(--text-muted);">${p.brand}</strong></span>
+                        <span class="product-sku">${escapeHtml(p.sku)} &bull; <strong style="color:var(--text-muted);">${escapeHtml(p.brand)}</strong></span>
                     </div>
                 </div>
             </td>
@@ -1601,8 +1601,8 @@ function renderABCTable(classification) {
 }
 
 function buildXLSTable(title, headers, rows) {
-    const ths = headers.map(h => `<th>${h}</th>`).join('');
-    const trs = rows.map(r => '<tr>' + r.map(c => `<td>${c ?? ''}</td>`).join('') + '</tr>').join('');
+    const ths = headers.map(h => `<th>${escapeHtml(h)}</th>`).join('');
+    const trs = rows.map(r => '<tr>' + r.map(c => `<td>${escapeHtml(c ?? '')}</td>`).join('') + '</tr>').join('');
     return `<html xmlns:x="urn:schemas-microsoft-com:office:excel">
 <head><meta charset="UTF-8">
 <style>
@@ -1615,7 +1615,7 @@ function buildXLSTable(title, headers, rows) {
 </style>
 </head>
 <body>
-<h2>${title}</h2>
+<h2>${escapeHtml(title)}</h2>
 <table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>
 </body></html>`;
 }
