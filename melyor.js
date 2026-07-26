@@ -21,6 +21,13 @@ const MELYOR_NOT_CONFIGURED_MESSAGE =
     "Melyor aún no está activado — contacta al administrador.";
 const MELYOR_HISTORY_LIMIT = 8;
 
+// Persistencia local del historial visible — solo el navegador del usuario
+// (no hay backend con estado de conversación). Cap generoso para no dejar
+// crecer localStorage sin límite; MELYOR_HISTORY_LIMIT (más chico) sigue
+// siendo lo único que se manda al backend en cada request.
+const MELYOR_STORAGE_KEY = "aureo_melyor_history";
+const MELYOR_STORAGE_LIMIT = 40;
+
 let melyorMessages = []; // { role: 'user' | 'assistant', text: string }
 let melyorOpen = false;
 let melyorBusy = false;
@@ -34,8 +41,29 @@ let melyorBusy = false;
 // --------------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", initMelyorWidget);
 
+function loadMelyorHistory() {
+    try {
+        const raw = localStorage.getItem(MELYOR_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        melyorMessages = Array.isArray(parsed)
+            ? parsed.filter((m) => m && typeof m.text === "string" && (m.role === "user" || m.role === "assistant"))
+            : [];
+    } catch {
+        melyorMessages = []; // JSON corrupto o localStorage inaccesible: arrancamos en blanco
+    }
+}
+
+function saveMelyorHistory() {
+    try {
+        localStorage.setItem(MELYOR_STORAGE_KEY, JSON.stringify(melyorMessages.slice(-MELYOR_STORAGE_LIMIT)));
+    } catch {
+        /* localStorage lleno o inaccesible (modo privado): no persistimos, no rompemos el chat */
+    }
+}
+
 function initMelyorWidget() {
     if (document.getElementById("melyor-launcher")) return; // ya inicializado
+    loadMelyorHistory();
     injectMelyorStyles();
 
     const launcher = document.createElement("button");
@@ -99,7 +127,15 @@ function renderMelyorMessages() {
         return;
     }
 
-    const bubbles = melyorMessages
+    // El mensaje del asistente se agrega vacío y se va completando a medida
+    // que llegan chunks del stream — mientras esté vacío mostramos "Pensando..."
+    // en su lugar; apenas llega el primer chunk, el propio texto reemplaza al
+    // indicador (sin dejar los dos superpuestos).
+    const last = melyorMessages[melyorMessages.length - 1];
+    const showTyping = melyorBusy && last && last.role === "assistant" && !last.text.trim();
+    const visible = showTyping ? melyorMessages.slice(0, -1) : melyorMessages;
+
+    const bubbles = visible
         .map((m) => {
             const safeText = escapeHtml(m.text).replace(/\n/g, "<br>");
             const cls = m.role === "assistant" ? "melyor-msg-bot" : "melyor-msg-user";
@@ -107,7 +143,7 @@ function renderMelyorMessages() {
         })
         .join("");
 
-    const typingIndicator = melyorBusy
+    const typingIndicator = showTyping
         ? '<div class="melyor-msg melyor-msg-bot melyor-typing">Pensando...</div>'
         : "";
 
@@ -128,36 +164,55 @@ function handleMelyorSubmit(evt) {
 async function sendMelyorMessage(text) {
     melyorMessages.push({ role: "user", text });
     melyorBusy = true;
+    saveMelyorHistory();
     renderMelyorMessages();
 
-    let replyText;
+    // Placeholder que se va llenando en vivo con cada chunk del stream —
+    // mismo objeto por referencia, así que las funciones de abajo lo mutan
+    // directamente y cada mutación se refleja llamando a renderMelyorMessages().
+    const assistantMsg = { role: "assistant", text: "" };
+    melyorMessages.push(assistantMsg);
+
     try {
-        replyText = AI_MOCK_MODE ? await mockMelyorReply(text) : await callMelyorBackend(text);
+        if (AI_MOCK_MODE) {
+            await mockMelyorReplyStreaming(text, assistantMsg);
+        } else {
+            await callMelyorBackend(text, assistantMsg);
+        }
     } catch (err) {
         // Cualquier excepción no prevista (nunca debería llegar acá, ambos
         // caminos ya capturan sus propios errores) — igual la contenemos
         // para no dejar una excepción sin manejar en la consola.
-        replyText = MELYOR_NOT_CONFIGURED_MESSAGE;
+        assistantMsg.text = MELYOR_NOT_CONFIGURED_MESSAGE;
     }
 
-    melyorMessages.push({ role: "assistant", text: replyText });
+    if (!assistantMsg.text.trim()) {
+        assistantMsg.text = MELYOR_NOT_CONFIGURED_MESSAGE;
+    }
+
     melyorBusy = false;
+    saveMelyorHistory();
     renderMelyorMessages();
 }
 
 // --------------------------------------------------------------------------
-//   BACKEND REAL — /api/melyor-chat (Vercel serverless function). Bajo
+//   BACKEND REAL — /api/melyor-chat (Vercel Edge Function, streaming). Bajo
 //   `python -m http.server` local (sin Vercel dev) esta ruta no existe: el
-//   fetch falla o devuelve un 404 HTML, no JSON. Se trata igual que
-//   "not_configured" — ambos casos son "Melyor no está disponible ahora
-//   mismo", y el usuario ve el mismo mensaje amigable en los dos.
+//   fetch falla o devuelve un 404 HTML, no JSON/stream de texto. Se trata
+//   igual que "not_configured" — ambos casos son "Melyor no está disponible
+//   ahora mismo", y el usuario ve el mismo mensaje amigable en los dos.
+//
+//   Contrato: éxito = 200 con body "text/plain" que se va leyendo en chunks
+//   y apendeando a assistantMsg.text. Cualquier error (rate limit, sin API
+//   key, origen inválido, etc.) = 4xx/5xx con JSON — no streameado, se lee
+//   entero de una — y siempre se colapsa al mismo mensaje genérico.
 // --------------------------------------------------------------------------
-async function callMelyorBackend(question) {
+async function callMelyorBackend(question, assistantMsg) {
     const context = buildMelyorContext();
-    const history = melyorMessages.slice(-MELYOR_HISTORY_LIMIT).map((m) => ({
-        role: m.role,
-        text: m.text,
-    }));
+    const history = melyorMessages
+        .filter((m) => m !== assistantMsg)
+        .slice(-MELYOR_HISTORY_LIMIT)
+        .map((m) => ({ role: m.role, text: m.text }));
 
     let res;
     try {
@@ -169,22 +224,26 @@ async function callMelyorBackend(question) {
     } catch (networkErr) {
         // Sin servidor Vercel/serverless corriendo (ej. servido con
         // `python -m http.server`), o sin conexión: esperado hoy.
-        return MELYOR_NOT_CONFIGURED_MESSAGE;
+        assistantMsg.text = MELYOR_NOT_CONFIGURED_MESSAGE;
+        return;
     }
 
-    let data = null;
-    try {
-        data = await res.json();
-    } catch {
-        // 404 de un server estático plano devuelve HTML, no JSON — cae acá.
-        data = null;
+    const contentType = res.headers.get("content-type") || "";
+    if (!res.ok || !res.body || contentType.includes("application/json")) {
+        // Error conocido (JSON) o 404 HTML de un server estático plano —
+        // en ambos casos no hay stream de texto que leer.
+        assistantMsg.text = MELYOR_NOT_CONFIGURED_MESSAGE;
+        return;
     }
 
-    if (!res.ok || !data || data.error) {
-        return MELYOR_NOT_CONFIGURED_MESSAGE;
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        assistantMsg.text += decoder.decode(value, { stream: true });
+        renderMelyorMessages();
     }
-
-    return typeof data.reply === "string" && data.reply.trim() ? data.reply : MELYOR_NOT_CONFIGURED_MESSAGE;
 }
 
 // --------------------------------------------------------------------------
@@ -265,8 +324,7 @@ function buildMelyorContext() {
 //   cambiando AI_MOCK_MODE a `true` arriba de este archivo — nunca en el
 //   código que se despliega.
 // --------------------------------------------------------------------------
-async function mockMelyorReply(question) {
-    await new Promise((resolve) => setTimeout(resolve, 450)); // simula latencia de red
+function mockMelyorReplyText(question) {
     const q = question.toLowerCase();
 
     if (q.includes("stock") || q.includes("inventario") || q.includes("reorden")) {
@@ -285,6 +343,20 @@ async function mockMelyorReply(question) {
     }
 
     return `[MOCK] Recibí tu pregunta: "${question}". Ésta es una respuesta de prueba (modo mock) para verificar que el chat funciona visualmente, sin llamar a ninguna API real.`;
+}
+
+// Revela la respuesta mock palabra por palabra, con el mismo patrón de
+// mutar assistantMsg.text + renderMelyorMessages() que usa el streaming
+// real — así el flujo visual (incluida la transición "Pensando..." → texto)
+// se puede probar en local sin pegarle a ningún backend.
+async function mockMelyorReplyStreaming(question, assistantMsg) {
+    await new Promise((resolve) => setTimeout(resolve, 350)); // simula latencia inicial
+    const words = mockMelyorReplyText(question).split(" ");
+    for (let i = 0; i < words.length; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 35));
+        assistantMsg.text += (i === 0 ? "" : " ") + words[i];
+        renderMelyorMessages();
+    }
 }
 
 // --------------------------------------------------------------------------
