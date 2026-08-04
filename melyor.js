@@ -1,9 +1,9 @@
 // AUREO — MELYOR: panel de chat flotante que resume el estado ya
 // calculado del sistema (alertas, stock bajo, estadísticas de clientes,
 // KPIs del dashboard) y lo manda como contexto a un backend serverless
-// (api/melyor-chat.js) que reenvía la consulta a Claude (Anthropic).
+// (api/melyor-chat.js) que reenvía la consulta a OpenAI.
 //
-// Estado actual: no hay ANTHROPIC_API_KEY configurada en Vercel todavía
+// Estado actual: no hay OPENAI_API_KEY configurada en Vercel todavía
 // (a propósito — no hay clientes pagos aún, no queremos gastar en la API
 // real). El backend responde { error: "not_configured" } y este widget lo
 // muestra como un mensaje amigable en vez de un error crudo o quedarse
@@ -335,7 +335,7 @@ function mockMelyorReplyText(question) {
     }
 
     if (q.includes("cliente")) {
-        return "[MOCK] Ésta es una respuesta simulada sobre clientes. Activá una API key real de Anthropic para respuestas basadas en tus datos.";
+        return "[MOCK] Ésta es una respuesta simulada sobre clientes. Activá una API key real de OpenAI para respuestas basadas en tus datos.";
     }
 
     if (q.includes("factura") || q.includes("venta") || q.includes("kpi")) {
